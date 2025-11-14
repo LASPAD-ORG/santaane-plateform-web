@@ -6,18 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Santaane Platform Web** - A Next.js 16 application using the App Router architecture with Material-UI, Zustand for state management, and Axios for API communication.
 
+## Prerequisites
+
+- **Node.js**: v24.11.0 (required)
+- **Package Manager**: pnpm (install globally with `npm install -g pnpm`)
+
 ## Common Development Commands
 
 ```bash
 # Development
-npm run dev          # Start development server at http://localhost:3000
+pnpm dev             # Start development server at http://localhost:3000
+pnpm install         # Install dependencies
 
 # Production
-npm run build        # Create optimized production build
-npm start            # Run production server
+pnpm build           # Create optimized production build
+pnpm start           # Run production server
 
 # Code Quality
-npm run lint         # Run ESLint (currently basic setup)
+pnpm lint            # Run ESLint (currently basic setup)
 ```
 
 ## Architecture
@@ -151,9 +157,20 @@ src/
 ## TypeScript Configuration
 
 - **Target**: ES2017
-- **Module Resolution**: Bundler
+- **Module**: ESNext with bundler resolution
 - **Strict Mode**: Enabled
-- **JSX**: React 17+ transform (no need to import React)
+- **JSX**: react-jsx (no need to import React)
+- **Path Aliases**: Configured in tsconfig.json
+
+## Environment Variables
+
+Create a `.env.local` file at the project root for environment configuration:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```
+
+Variables prefixed with `NEXT_PUBLIC_` are accessible on the client side.
 
 ## Key Technical Decisions
 
@@ -162,3 +179,4 @@ src/
 3. **Zustand**: Lightweight state management (prefer over Context API for complex state)
 4. **Axios over Fetch**: Centralized HTTP client with interceptors for auth/error handling
 5. **cookies-next**: Simplified cookie API compatible with both server and client components
+6. **pnpm**: Chosen as package manager for faster installs and better disk space efficiency
