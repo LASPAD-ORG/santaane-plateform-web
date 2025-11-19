@@ -1,5 +1,8 @@
 # ✅ Architecture Frontend Santaane - Implémentation Complète
 
+
+## ATTENTION LES SERTVICES SONT MAINTENANT DANS LE DOSSIER API/NOM_DU_SERVICE EXEMPLE (AUTH, LABORATORIES, ... ce sont des dossiers)
+
 ## 🎯 Résumé
 
 L'architecture complète d'authentification avec gestion des rôles a été **implémentée avec succès** !
@@ -24,7 +27,7 @@ pnpm install
 ```
 
 ### 2. Vérifier les variables d'environnement
-Le fichier `.env.local` est déjà configuré :
+Le fichier `.env.exemple` est déjà configuré :
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_APP_NAME=Santaane Platform
