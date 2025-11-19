@@ -1,6 +1,10 @@
 import { create } from 'zustand';
+import axios from 'axios';
 import type { AuthState, RegisterPayload, User } from '@/types/auth';
-import * as authService from '@/services/authService';
+
+// Use Next.js API routes (not backend directly)
+// These routes handle HTTP-Only cookies and proxy to backend
+const API_BASE = '/api/auth';
 
 /**
  * Authentication store using Zustand
@@ -22,7 +26,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email: string, password: string) => {
     try {
       set({ isLoading: true });
-      const user = await authService.login(email, password);
+
+      // Call login API route
+      await axios.post(`${API_BASE}/login`, { email, password });
+
+      // Fetch user data after login
+      const response = await axios.get<User>(`${API_BASE}/me`);
+      const user = response.data;
+
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -36,7 +47,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (data: RegisterPayload) => {
     try {
       set({ isLoading: true });
-      const user = await authService.register(data);
+
+      // Call register API route
+      await axios.post(`${API_BASE}/register`, data);
+
+      // Fetch user data after registration (auto-login)
+      const response = await axios.get<User>(`${API_BASE}/me`);
+      const user = response.data;
+
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -49,7 +67,7 @@ export const useAuthStore = create<AuthState>((set) => ({
    */
   logout: async () => {
     try {
-      await authService.logout();
+      await axios.post(`${API_BASE}/logout`);
       set({ user: null, isAuthenticated: false });
     } catch (error) {
       // Even if logout fails, clear local state
@@ -80,9 +98,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       set({ isLoading: true });
 
-      // Try to fetch current user
-      // The API route will check the HTTP-Only cookie
-      const user = await authService.getCurrentUser();
+      // Fetch current user - API route checks HTTP-Only cookie
+      const response = await axios.get<User>(`${API_BASE}/me`);
+      const user = response.data;
+
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       // If fetching user fails (no cookie or invalid token), clear auth state
