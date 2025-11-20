@@ -26,45 +26,6 @@ const ROLES = [
   { name: 'AUTHOR - Auteur', value: 'AUTHOR' },
 ];
 
-// Common Material-UI icons
-const COMMON_ICONS = [
-  'Article',
-  'Dashboard',
-  'People',
-  'Settings',
-  'Assessment',
-  'Assignment',
-  'Book',
-  'Category',
-  'Description',
-  'Event',
-  'Folder',
-  'Grade',
-  'Group',
-  'Home',
-  'Info',
-  'Label',
-  'LibraryBooks',
-  'List',
-  'Lock',
-  'Mail',
-  'Notes',
-  'Notifications',
-  'Pages',
-  'PersonAdd',
-  'Public',
-  'Schedule',
-  'School',
-  'Science',
-  'Star',
-  'Storage',
-  'ThumbUp',
-  'Timeline',
-  'TrendingUp',
-  'ViewList',
-  'Work',
-];
-
 // Utility functions
 function toCamelCase(str) {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
@@ -82,19 +43,32 @@ function toKebabCase(str) {
     .toLowerCase();
 }
 
-function validatePageName(input) {
+function validateKebabCase(input, fieldName = 'Le champ') {
   if (!input || input.trim().length === 0) {
-    return 'Le nom de la page est requis';
+    return `${fieldName} est requis`;
   }
   if (!/^[a-z0-9-]+$/.test(input)) {
-    return 'Le nom doit contenir uniquement des lettres minuscules, chiffres et tirets';
+    return 'Doit contenir uniquement des lettres minuscules, chiffres et tirets';
   }
+  return true;
+}
 
-  const pagePath = path.join(process.cwd(), 'src', 'app', '(dashboard)', input);
+function validatePathParent(input) {
+  if (!input || input.trim().length === 0) {
+    return 'Le chemin est requis';
+  }
+  // Allow slashes for nested paths like "shared/author"
+  if (!/^[a-z0-9-/]+$/.test(input)) {
+    return 'Doit contenir uniquement des lettres minuscules, chiffres, tirets et slashes';
+  }
+  return true;
+}
+
+function validatePagePath(pathParent, folderName) {
+  const pagePath = path.join(process.cwd(), 'src', 'app', '(dashboard)', 'dashboard', pathParent, folderName);
   if (fs.existsSync(pagePath)) {
-    return `La page "${input}" existe déjà`;
+    return `La page "${pathParent}/${folderName}" existe déjà`;
   }
-
   return true;
 }
 
@@ -122,7 +96,7 @@ function writeFile(filePath, content) {
 }
 
 // Update roles.ts to add the new menu item
-function updateRolesConfig(pageName, displayName, iconName, route, allowedRoles) {
+function updateRolesConfig(pageName, displayName, iconName, route, roles) {
   const rolesConfigPath = path.join(process.cwd(), 'src', 'config', 'roles.ts');
 
   if (!fs.existsSync(rolesConfigPath)) {
@@ -137,7 +111,7 @@ function updateRolesConfig(pageName, displayName, iconName, route, allowedRoles)
     label: '${displayName}',
     path: '${route}',
     icon: ${iconName},
-    allowedRoles: [${allowedRoles.map(r => `UserRole.${r}`).join(', ')}],
+    roles: [${roles.map(r => `UserRole.${r}`).join(', ')}],
   },`;
 
   // Find the MENU_ITEMS array and add the new item
@@ -150,19 +124,7 @@ function updateRolesConfig(pageName, displayName, iconName, route, allowedRoles)
     const updatedItems = items.trimEnd() + '\n' + newMenuItem + '\n';
     content = content.replace(fullMatch, before + updatedItems + after);
 
-    // Make sure the icon is imported
-    const iconImportRegex = /import \{([^}]+)\} from '@mui\/icons-material';/;
-    const iconImportMatch = content.match(iconImportRegex);
-
-    if (iconImportMatch) {
-      const currentIcons = iconImportMatch[1].split(',').map(i => i.trim());
-      if (!currentIcons.includes(iconName)) {
-        currentIcons.push(iconName);
-        currentIcons.sort();
-        const newImport = `import {\n  ${currentIcons.join(',\n  ')},\n} from '@mui/icons-material';`;
-        content = content.replace(iconImportRegex, newImport);
-      }
-    }
+    // Note: We don't modify imports since we always use SettingsIcon which is already imported
 
     fs.writeFileSync(rolesConfigPath, content, 'utf8');
     console.log('✅ Menu mis à jour dans roles.ts');
@@ -180,47 +142,53 @@ async function main() {
     const answers = await inquirer.prompt([
       {
         type: 'input',
-        name: 'pageName',
-        message: 'Nom de la page (kebab-case, ex: my-feature):',
-        validate: validatePageName,
+        name: 'pathParent',
+        message: 'Chemin après /dashboard/ (ex: super-admin, shared/author, editor):',
+        validate: validatePathParent,
+        filter: (input) => input.trim().toLowerCase().replace(/\\/g, '/'),
+      },
+      {
+        type: 'input',
+        name: 'folderName',
+        message: 'Nom du dossier/page (kebab-case, ex: laboratories, researchers):',
+        validate: (input) => validateKebabCase(input, 'Le nom du dossier'),
         filter: (input) => toKebabCase(input.trim()),
       },
       {
         type: 'input',
         name: 'displayName',
-        message: 'Nom d\'affichage (ex: Ma Fonctionnalité):',
+        message: 'Nom d\'affichage (ex: Laboratoires):',
         validate: (input) => input.trim().length > 0 || 'Le nom d\'affichage est requis',
       },
       {
-        type: 'list',
-        name: 'iconName',
-        message: 'Icône Material-UI:',
-        choices: COMMON_ICONS,
-        pageSize: 15,
-      },
-      {
-        type: 'input',
-        name: 'route',
-        message: 'Route (ex: /dashboard/my-feature):',
-        default: (answers) => `/dashboard/${answers.pageName}`,
-        validate: validateRoute,
-      },
-      {
         type: 'checkbox',
-        name: 'allowedRoles',
+        name: 'roles',
         message: 'Rôles autorisés (sélection multiple):',
         choices: ROLES,
         validate: (input) => input.length > 0 || 'Sélectionnez au moins un rôle',
       },
     ]);
 
-    const { pageName, displayName, iconName, route, allowedRoles } = answers;
-    const featureNamePascal = toPascalCase(pageName);
+    const { pathParent, folderName, displayName, roles } = answers;
+    const iconName = 'Settings'; // For templates (page.tsx, card.tsx)
+    const iconNameForRoles = 'SettingsIcon'; // For roles.ts (Settings as SettingsIcon)
+    const featureNamePascal = toPascalCase(folderName);
+
+    // Generate route automatically
+    const route = `/dashboard/${pathParent}/${folderName}`;
+
+    // Validate that path doesn't exist
+    const pathValidation = validatePagePath(pathParent, folderName);
+    if (pathValidation !== true) {
+      console.error(`❌ ${pathValidation}`);
+      process.exit(1);
+    }
 
     console.log('\n📝 Création des fichiers...\n');
 
-    // Base path for the new page
-    const basePath = path.join(process.cwd(), 'src', 'app', '(dashboard)', pageName);
+    // Base path for the new page: src/app/(dashboard)/dashboard/[pathParent]/[folderName]
+    const basePath = path.join(process.cwd(), 'src', 'app', '(dashboard)', 'dashboard', pathParent, folderName);
+    const displayPath = `dashboard/${pathParent}/${folderName}`;
 
     // Create directories
     ensureDir(basePath);
@@ -230,55 +198,56 @@ async function main() {
     ensureDir(path.join(basePath, 'helpers'));
 
     // Create files
-    console.log(`  ✓ ${pageName}/page.tsx`);
+    console.log(`  ✓ ${displayPath}/page.tsx`);
     writeFile(
       path.join(basePath, 'page.tsx'),
-      getPageTemplate(pageName, featureNamePascal, iconName)
+      getPageTemplate(folderName, featureNamePascal, iconName)
     );
 
-    console.log(`  ✓ ${pageName}/checkers/validators.ts`);
+    console.log(`  ✓ ${displayPath}/checkers/validators.ts`);
     writeFile(
       path.join(basePath, 'checkers', 'validators.ts'),
-      getValidatorsTemplate(pageName, featureNamePascal)
+      getValidatorsTemplate(folderName, featureNamePascal)
     );
 
-    console.log(`  ✓ ${pageName}/fetchers/useFetch${featureNamePascal}.ts`);
+    console.log(`  ✓ ${displayPath}/fetchers/useFetch${featureNamePascal}.ts`);
     writeFile(
       path.join(basePath, 'fetchers', `useFetch${featureNamePascal}.ts`),
-      getFetcherGetTemplate(pageName, featureNamePascal)
+      getFetcherGetTemplate(folderName, featureNamePascal)
     );
 
-    console.log(`  ✓ ${pageName}/fetchers/useCreate${featureNamePascal}.ts`);
+    console.log(`  ✓ ${displayPath}/fetchers/useCreate${featureNamePascal}.ts`);
     writeFile(
       path.join(basePath, 'fetchers', `useCreate${featureNamePascal}.ts`),
-      getFetcherCreateTemplate(pageName, featureNamePascal)
+      getFetcherCreateTemplate(folderName, featureNamePascal)
     );
 
-    console.log(`  ✓ ${pageName}/components/${featureNamePascal}Card.tsx`);
+    console.log(`  ✓ ${displayPath}/components/${featureNamePascal}Card.tsx`);
     writeFile(
       path.join(basePath, 'components', `${featureNamePascal}Card.tsx`),
-      getCardTemplate(pageName, featureNamePascal, iconName)
+      getCardTemplate(folderName, featureNamePascal, iconName)
     );
 
-    console.log(`  ✓ ${pageName}/helpers/formatters.ts`);
+    console.log(`  ✓ ${displayPath}/helpers/formatters.ts`);
     writeFile(
       path.join(basePath, 'helpers', 'formatters.ts'),
-      getFormattersTemplate(pageName, featureNamePascal)
+      getFormattersTemplate(folderName, featureNamePascal)
     );
 
     // Update roles configuration
     console.log('\n🔧 Mise à jour de la configuration...\n');
-    updateRolesConfig(pageName, displayName, iconName, route, allowedRoles);
+    updateRolesConfig(folderName, displayName, iconNameForRoles, route, roles);
 
     console.log('\n✨ Page créée avec succès!\n');
     console.log('📂 Emplacement:', basePath);
     console.log('🔗 Route:', route);
-    console.log('👥 Rôles autorisés:', allowedRoles.join(', '));
+    console.log('👥 Rôles autorisés:', roles.join(', '));
     console.log('\n💡 Prochaines étapes:');
-    console.log('  1. Adapter les endpoints API dans les fetchers');
-    console.log('  2. Personnaliser les champs dans validators.ts');
-    console.log('  3. Ajuster le composant Card selon vos besoins');
-    console.log('  4. Tester la page:', route);
+    console.log('  1. Changer l\'icône SettingsIcon dans src/config/roles.ts');
+    console.log('  2. Adapter les endpoints API dans les fetchers');
+    console.log('  3. Personnaliser les champs dans validators.ts');
+    console.log('  4. Ajuster le composant Card selon vos besoins');
+    console.log('  5. Tester la page:', route);
     console.log('');
 
   } catch (error) {

@@ -2,6 +2,7 @@ import { UserRole } from '@/types/auth';
 import type { SvgIconTypeMap } from '@mui/material';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import {
+  Adb as AdbIcon,
   Analytics as AnalyticsIcon,
   Article as ArticleIcon,
   Assignment as AssignmentIcon,
@@ -10,11 +11,11 @@ import {
   Create as CreateIcon,
   Dashboard as DashboardIcon,
   Groups as GroupsIcon,
+  Mail,
   People as PeopleIcon,
   School as SchoolIcon,
   Settings as SettingsIcon,
   SupervisorAccount as SupervisorIcon,
-  Adb as AdbIcon
 } from '@mui/icons-material';
 
 export type IconComponent = OverridableComponent<SvgIconTypeMap<object, 'svg'>> & {
@@ -190,6 +191,36 @@ export const MENU_ITEMS: MenuItem[] = [
     path: '/dashboard/editor/test-composant',
     icon: Book,
     roles: [UserRole.SUPER_ADMIN, UserRole.EDITOR],
+  },
+  {
+    label: 'Gestion Mentor',
+    path: '/dashboard/super-admin/gestion-mentor',
+    icon: Mail,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Gestion evaluateur',
+    path: '/dashboard/super-admin/gestion-evaluateur',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Gestion manuscrit',
+    path: '/dashboard/shared/gestion-manuscrit',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN, UserRole.AUTHOR],
+  },
+  {
+    label: 'Gestion des doucourer',
+    path: '/dashboard/shared/author/gestion-des-doucourer',
+    icon: SettingsIcon,
+    roles: [UserRole.AUTHOR],
+  },
+  {
+    label: 'GeSTION EDITEUR',
+    path: '/dashboard/super-admin/gestion-des-editeur',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
   },
 ];
 
