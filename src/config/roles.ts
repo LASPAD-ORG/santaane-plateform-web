@@ -99,9 +99,9 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.SUPER_ADMIN],
   },
   {
-    label: 'Laboratoires',
-    path: '/dashboard/super-admin/laboratories',
-    icon: BusinessIcon,
+    label: 'Gestion utilisateurs',
+    path: '/dashboard/super-admin/gestion-utilisateurs',
+    icon: SettingsIcon,
     roles: [UserRole.SUPER_ADMIN],
   },
   {
@@ -138,13 +138,13 @@ export const MENU_ITEMS: MenuItem[] = [
     label: 'Mes Articles',
     path: '/dashboard/articles',
     icon: ArticleIcon,
-    roles: [UserRole.AUTHOR, UserRole.MENTOR, UserRole.EVALUATOR],
+    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
   },
   {
     label: 'Créer un Article',
     path: '/dashboard/articles/create',
     icon: CreateIcon,
-    roles: [UserRole.AUTHOR, UserRole.MENTOR, UserRole.EVALUATOR],
+    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
   },
   {
     label: 'Mon Profil',
@@ -158,15 +158,8 @@ export const MENU_ITEMS: MenuItem[] = [
     label: 'Mes Mentorats',
     path: '/dashboard/mentoring',
     icon: SchoolIcon,
-    roles: [UserRole.MENTOR, UserRole.EVALUATOR],
+    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
   },
-  {
-    label: 'Auteurs à Accompagner',
-    path: '/dashboard/mentoring/authors',
-    icon: SupervisorIcon,
-    roles: [UserRole.MENTOR, UserRole.EVALUATOR],
-  },
-
   // EVALUATOR menus (AUTHOR + MENTOR + EVALUATOR features)
   {
     label: 'Évaluations',
@@ -181,44 +174,38 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.EVALUATOR],
   },
   {
-    label: 'Test',
-    path: '/dashboard/super-admin/test-page',
-    icon: Book,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Test composant',
-    path: '/dashboard/editor/test-composant',
-    icon: Book,
-    roles: [UserRole.SUPER_ADMIN, UserRole.EDITOR],
-  },
-  {
-    label: 'Gestion Mentor',
-    path: '/dashboard/super-admin/gestion-mentor',
-    icon: Mail,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Gestion evaluateur',
-    path: '/dashboard/super-admin/gestion-evaluateur',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Gestion manuscrit',
-    path: '/dashboard/shared/gestion-manuscrit',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN, UserRole.AUTHOR],
-  },
-  {
     label: 'Gestion des doucourer',
     path: '/dashboard/shared/author/gestion-des-doucourer',
     icon: SettingsIcon,
     roles: [UserRole.AUTHOR],
   },
   {
-    label: 'GeSTION EDITEUR',
-    path: '/dashboard/super-admin/gestion-des-editeur',
+    label: 'Gestion soummission',
+    path: '/dashboard/shared/author/gestion-soummission',
+    icon: SettingsIcon,
+    roles: [UserRole.EDITOR, UserRole.EVALUATOR, UserRole.AUTHOR],
+  },
+  {
+    label: 'Gestion manuscrit',
+    path: '/dashboard/shared/author/gestion-manuscrit',
+    icon: SettingsIcon,
+    roles: [UserRole.MENTOR, UserRole.AUTHOR],
+  },
+  {
+    label: 'Mes auteurs',
+    path: '/dashboard/mentor/auteur-a-acompagner',
+    icon: SettingsIcon,
+    roles: [UserRole.MENTOR],
+  },
+  {
+    label: 'Parametrage revue',
+    path: '/dashboard/super-admin/parametrage-revue',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Gestion volume',
+    path: '/dashboard/super-admin/gestion-volumes',
     icon: SettingsIcon,
     roles: [UserRole.SUPER_ADMIN],
   },

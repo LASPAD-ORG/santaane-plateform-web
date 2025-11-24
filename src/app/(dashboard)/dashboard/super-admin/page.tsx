@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Card, CardContent, Paper, Grid } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid } from '@mui/material';
 import {
   Business as BusinessIcon,
   People as PeopleIcon,
@@ -10,9 +10,15 @@ import {
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
+import { useDashboardStats } from './hooks/useDashboardStats';
+import SubmissionsChart from './components/SubmissionsChart';
+import UsersDistributionChart from './components/UsersDistributionChart';
+import AcceptanceRateChart from './components/AcceptanceRateChart';
+import ActivityFeed from './components/ActivityFeed';
 
 export default function SuperAdminDashboard() {
   const { user } = useAuthStore();
+  const stats = useDashboardStats();
 
   return (
     <RoleGuard allowedRoles={[UserRole.SUPER_ADMIN]}>
@@ -32,7 +38,7 @@ export default function SuperAdminDashboard() {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <BusinessIcon sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
                   <Box>
-                    <Typography variant="h4">24</Typography>
+                    <Typography variant="h4">{stats.totalLaboratoires}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       Laboratoires
                     </Typography>
@@ -48,7 +54,7 @@ export default function SuperAdminDashboard() {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <PeopleIcon sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
                   <Box>
-                    <Typography variant="h4">1,248</Typography>
+                    <Typography variant="h4">{stats.totalUsers}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       Utilisateurs totaux
                     </Typography>
@@ -64,7 +70,7 @@ export default function SuperAdminDashboard() {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <ArticleIcon sx={{ fontSize: 40, color: 'info.main', mr: 2 }} />
                   <Box>
-                    <Typography variant="h4">5,432</Typography>
+                    <Typography variant="h4">{stats.publishedManuscripts.toLocaleString()}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       Manuscrits publiés
                     </Typography>
@@ -80,7 +86,7 @@ export default function SuperAdminDashboard() {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <TrendingIcon sx={{ fontSize: 40, color: 'warning.main', mr: 2 }} />
                   <Box>
-                    <Typography variant="h4">+32%</Typography>
+                    <Typography variant="h4">+{stats.monthlyGrowth}%</Typography>
                     <Typography variant="body2" color="text.secondary">
                       Croissance mensuelle
                     </Typography>
@@ -90,28 +96,24 @@ export default function SuperAdminDashboard() {
             </Card>
           </Grid>
 
-          {/* Platform Overview */}
-          <Grid size={{ xs: 12, md: 8 }}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
-                Aperçu de la plateforme Santaane
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Les statistiques de la plateforme, graphiques et métriques détaillées apparaîtront ici.
-              </Typography>
-            </Paper>
+          {/* Submissions Chart */}
+          <Grid size={{ xs: 12, lg: 8 }}>
+            <SubmissionsChart />
+          </Grid>
+
+          {/* Acceptance Rate Chart */}
+          <Grid size={{ xs: 12, lg: 4 }}>
+            <AcceptanceRateChart />
+          </Grid>
+
+          {/* Users Distribution Chart */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <UsersDistributionChart />
           </Grid>
 
           {/* Recent Activity */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
-                Activité récente
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Les dernières actions des laboratoires et utilisateurs apparaîtront ici.
-              </Typography>
-            </Paper>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <ActivityFeed />
           </Grid>
         </Grid>
       </Box>

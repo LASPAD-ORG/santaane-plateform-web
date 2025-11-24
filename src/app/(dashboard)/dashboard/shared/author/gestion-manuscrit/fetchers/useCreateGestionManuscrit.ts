@@ -26,10 +26,16 @@ export function useCreateGestionManuscrit() {
       const mockItem: GestionManuscritItem = {
         id: Math.random().toString(36).substring(7),
         ...payload,
-        status: payload.status || 'draft',
+        status: payload.status || 'brouillon',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         authorId: 'current-user',
+        commentairesMentor: {
+          forme: [],
+          style: [],
+          methodologie: [],
+          general: []
+        }
       };
       console.log('Mock: Created gestion-manuscrit', mockItem);
       return mockItem;
@@ -75,10 +81,16 @@ export function useUpdateGestionManuscrit() {
       const mockItem: GestionManuscritItem = {
         id,
         ...payload,
-        status: payload.status || 'draft',
+        status: payload.status || 'brouillon',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         authorId: 'current-user',
+        commentairesMentor: {
+          forme: [],
+          style: [],
+          methodologie: [],
+          general: []
+        }
       };
       console.log('Mock: Updated gestion-manuscrit', mockItem);
       return mockItem;
