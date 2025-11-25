@@ -7,7 +7,8 @@ export interface ValidationError {
 export interface GestionManuscritPayload {
   title: string;
   description?: string;
-  status?: string;
+  status?: 'brouillon' | 'en_attente' | 'publie' | 'archive';
+  contenu?: string;
   // Add more fields as needed
 }
 

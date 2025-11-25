@@ -17,11 +17,15 @@ export function formatGestionManuscritDate(dateString: string): string {
  */
 export function getStatusLabel(status: string): string {
   const labels: Record<string, string> = {
+    brouillon: 'Brouillon',
+    en_attente: 'En attente',
+    publie: 'Publié',
+    archive: 'Archivé',
+    // Legacy support
     draft: 'Brouillon',
     pending: 'En attente',
     published: 'Publié',
     archived: 'Archivé',
-    // Add more status labels as needed
   };
   return labels[status] || status;
 }
@@ -31,11 +35,15 @@ export function getStatusLabel(status: string): string {
  */
 export function getStatusColor(status: string): 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' {
   const colors: Record<string, 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'> = {
-    draft: 'default',
-    pending: 'warning',
+    brouillon: 'info',
+    en_attente: 'primary',
+    publie: 'success',
+    archive: 'default',
+    // Legacy support
+    draft: 'info',
+    pending: 'primary',
     published: 'success',
-    archived: 'error',
-    // Add more status colors as needed
+    archived: 'default',
   };
   return colors[status] || 'default';
 }

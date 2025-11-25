@@ -1,11 +1,12 @@
 'use client';
 
-import { Card, CardContent, CardActions, Typography, Box, Button, Chip } from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Box, Button, Chip, Skeleton } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Settings,
+  Description as DescriptionIcon,
+  Comment as CommentIcon,
 } from '@mui/icons-material';
 import type { GestionManuscritItem } from '../fetchers/useFetchGestionManuscrit';
 import {
@@ -20,6 +21,7 @@ interface GestionManuscritCardProps {
   onView?: (item: GestionManuscritItem) => void;
   onEdit?: (item: GestionManuscritItem) => void;
   onDelete?: (item: GestionManuscritItem) => void;
+  loading?: boolean;
 }
 
 export default function GestionManuscritCard({
@@ -27,7 +29,32 @@ export default function GestionManuscritCard({
   onView,
   onEdit,
   onDelete,
+  loading = false,
 }: GestionManuscritCardProps) {
+  if (loading) {
+    return (
+      <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+            <Skeleton variant="circular" width={32} height={32} />
+            <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 1 }} />
+          </Box>
+          <Skeleton variant="text" sx={{ fontSize: '1.25rem', mb: 1 }} />
+          <Skeleton variant="text" sx={{ mb: 2 }} />
+          <Skeleton variant="text" sx={{ mb: 2 }} />
+          <Skeleton variant="text" width="60%" />
+        </CardContent>
+        <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+          <Skeleton variant="rectangular" width={80} height={36} sx={{ borderRadius: 1 }} />
+        </CardActions>
+      </Card>
+    );
+  }
+
+  const totalComments = 
+    item.commentairesMentor.forme.length +
+    item.commentairesMentor.style.length +
+    item.commentairesMentor.methodologie.length;
   return (
     <Card
       sx={{
@@ -44,7 +71,7 @@ export default function GestionManuscritCard({
       <CardContent sx={{ flexGrow: 1 }}>
         {/* Header with icon and status */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Settings sx={{ fontSize: 32, color: 'primary.main' }} />
+          <DescriptionIcon sx={{ fontSize: 32, color: 'secondary.main' }} />
           <Chip
             label={getStatusLabel(item.status)}
             color={getStatusColor(item.status)}
@@ -53,15 +80,25 @@ export default function GestionManuscritCard({
         </Box>
 
         {/* Title */}
-        <Typography variant="h6" component="h3" gutterBottom>
+        <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
           {item.title}
         </Typography>
 
         {/* Description */}
         {item.description && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {truncateContent(item.description, 150)}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.5 }}>
+            {truncateContent(item.description, 120)}
           </Typography>
+        )}
+
+        {/* Comments indicator */}
+        {totalComments > 0 && (
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <CommentIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 0.5 }} />
+            <Typography variant="caption" color="text.secondary">
+              {totalComments} commentaire{totalComments > 1 ? 's' : ''}
+            </Typography>
+          </Box>
         )}
 
         {/* Metadata */}
@@ -81,9 +118,16 @@ export default function GestionManuscritCard({
       <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
         {onView && (
           <Button
+            variant="contained"
             size="small"
             startIcon={<VisibilityIcon />}
             onClick={() => onView(item)}
+            color="primary"
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
           >
             Voir
           </Button>
@@ -93,6 +137,11 @@ export default function GestionManuscritCard({
             size="small"
             startIcon={<EditIcon />}
             onClick={() => onEdit(item)}
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
           >
             Modifier
           </Button>
@@ -103,6 +152,11 @@ export default function GestionManuscritCard({
             color="error"
             startIcon={<DeleteIcon />}
             onClick={() => onDelete(item)}
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
           >
             Supprimer
           </Button>
