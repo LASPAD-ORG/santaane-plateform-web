@@ -11,10 +11,7 @@ export async function GET(request: NextRequest) {
     console.log('/api/auth/me called, token exists:', !!token);
 
     if (!token) {
-      return NextResponse.json(
-        { error: 'Non authentifié' },
-        { status: 401 }
-      );
+      return NextResponse.json(null, { status: 200 });
     }
 
     // Call backend API with token

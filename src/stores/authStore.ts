@@ -99,10 +99,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: true });
 
       // Fetch current user - API route checks HTTP-Only cookie
-      const response = await axios.get<User>(`${API_BASE}/me`);
+      const response = await axios.get<User | null>(`${API_BASE}/me`);
       const user = response.data;
 
-      set({ user, isAuthenticated: true, isLoading: false });
+      if (user) {
+        set({ user, isAuthenticated: true, isLoading: false });
+      } else {
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      }
     } catch (error) {
       // If fetching user fails (no cookie or invalid token), clear auth state
       // This is expected behavior when not logged in, so we don't log the error

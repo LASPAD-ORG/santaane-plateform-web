@@ -30,6 +30,7 @@ import {
 } from '@mui/icons-material';
 import { useFetchGestionManuscritById, GestionManuscritItem, CommentaireMentor } from '../fetchers/useFetchGestionManuscrit';
 import { formatGestionManuscritDate, getStatusColor, getStatusLabel } from '../helpers/formatters';
+import { PdfViewerAnnotated } from '../components/pdf/PdfViewerAnnotated';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -58,7 +59,7 @@ export default function ManuscritDetailPage() {
   const router = useRouter();
   const id = params.id as string;
   const { data: manuscrit, loading, fetch } = useFetchGestionManuscritById();
-  
+
   const [activeTab, setActiveTab] = useState(0);
   const [newComment, setNewComment] = useState('');
   const [localCommentaires, setLocalCommentaires] = useState<{
@@ -66,9 +67,9 @@ export default function ManuscritDetailPage() {
     style: CommentaireMentor[];
     methodologie: CommentaireMentor[];
     general: CommentaireMentor[];
-  }>({ 
-    forme: [], 
-    style: [], 
+  }>({
+    forme: [],
+    style: [],
     methodologie: [],
     general: []
   });
@@ -160,39 +161,39 @@ export default function ManuscritDetailPage() {
       .split('\n')
       .map((line, index) => {
         const trimmedLine = line.trim();
-        
+
         if (trimmedLine.startsWith('# ')) {
           return (
-            <Typography 
-              key={index} 
-              variant="h4" 
-              component="h1" 
+            <Typography
+              key={index}
+              variant="h4"
+              component="h1"
               sx={{ fontWeight: 700, mb: 2, mt: index > 0 ? 3 : 0 }}
             >
               {trimmedLine.substring(2)}
             </Typography>
           );
         }
-        
+
         if (trimmedLine.startsWith('## ')) {
           return (
-            <Typography 
-              key={index} 
-              variant="h5" 
-              component="h2" 
+            <Typography
+              key={index}
+              variant="h5"
+              component="h2"
               sx={{ fontWeight: 600, mb: 2, mt: 2 }}
             >
               {trimmedLine.substring(3)}
             </Typography>
           );
         }
-        
+
         if (trimmedLine.startsWith('### ')) {
           return (
-            <Typography 
-              key={index} 
-              variant="h6" 
-              component="h3" 
+            <Typography
+              key={index}
+              variant="h6"
+              component="h3"
               sx={{ fontWeight: 600, mb: 1, mt: 2 }}
             >
               {trimmedLine.substring(4)}
@@ -202,9 +203,9 @@ export default function ManuscritDetailPage() {
 
         if (trimmedLine.startsWith('**') && trimmedLine.endsWith('**')) {
           return (
-            <Typography 
-              key={index} 
-              variant="subtitle1" 
+            <Typography
+              key={index}
+              variant="subtitle1"
               sx={{ fontWeight: 700, mb: 1, mt: 1 }}
             >
               {trimmedLine.substring(2, trimmedLine.length - 2)}
@@ -214,50 +215,50 @@ export default function ManuscritDetailPage() {
 
         if (trimmedLine.startsWith('*') && trimmedLine.endsWith('*')) {
           return (
-            <Typography 
-              key={index} 
-              variant="body2" 
+            <Typography
+              key={index}
+              variant="body2"
               sx={{ fontStyle: 'italic', color: 'text.secondary', mb: 1 }}
             >
               {trimmedLine.substring(1, trimmedLine.length - 1)}
             </Typography>
           );
         }
-        
+
         if (trimmedLine.match(/^\d+\.\s/)) {
           return (
-            <Typography 
-              key={index} 
-              variant="body1" 
-              component="li" 
+            <Typography
+              key={index}
+              variant="body1"
+              component="li"
               sx={{ ml: 2, mb: 0.5, listStyleType: 'decimal', display: 'list-item' }}
             >
               {trimmedLine.substring(trimmedLine.indexOf(' ') + 1)}
             </Typography>
           );
         }
-        
+
         if (trimmedLine.startsWith('- ')) {
           return (
-            <Typography 
-              key={index} 
-              variant="body1" 
-              component="li" 
+            <Typography
+              key={index}
+              variant="body1"
+              component="li"
               sx={{ ml: 2, mb: 0.5, listStyleType: 'disc', display: 'list-item' }}
             >
               {trimmedLine.substring(2)}
             </Typography>
           );
         }
-        
+
         if (trimmedLine === '') {
           return <Box key={index} sx={{ mb: 1 }} />;
         }
-        
+
         return (
-          <Typography 
-            key={index} 
-            variant="body1" 
+          <Typography
+            key={index}
+            variant="body1"
             sx={{ mb: 1, lineHeight: 1.7 }}
           >
             {trimmedLine}
@@ -269,11 +270,11 @@ export default function ManuscritDetailPage() {
   const renderCommentsList = (comments: CommentaireMentor[]) => {
     if (comments.length === 0) {
       return (
-        <Paper 
-          variant="outlined" 
-          sx={{ 
-            p: 4, 
-            textAlign: 'center', 
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 4,
+            textAlign: 'center',
             bgcolor: 'grey.50',
             border: '1px dashed',
             borderColor: 'grey.300'
@@ -352,9 +353,9 @@ export default function ManuscritDetailPage() {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Le manuscrit demandé n'existe pas ou n'est plus disponible.
         </Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<ArrowBackIcon />} 
+        <Button
+          variant="contained"
+          startIcon={<ArrowBackIcon />}
           onClick={handleBack}
           color="primary"
         >
@@ -364,7 +365,7 @@ export default function ManuscritDetailPage() {
     );
   }
 
-  const totalComments = 
+  const totalComments =
     localCommentaires.forme.length +
     localCommentaires.style.length +
     localCommentaires.methodologie.length +
@@ -374,9 +375,9 @@ export default function ManuscritDetailPage() {
     <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2 }}>
-        <IconButton 
+        <IconButton
           onClick={handleBack}
-          sx={{ 
+          sx={{
             bgcolor: 'background.paper',
             boxShadow: 1,
             '&:hover': { bgcolor: 'grey.100' }
@@ -384,7 +385,7 @@ export default function ManuscritDetailPage() {
         >
           <ArrowBackIcon />
         </IconButton>
-        
+
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
             {manuscrit.title}
@@ -425,28 +426,37 @@ export default function ManuscritDetailPage() {
       )}
 
       {/* Content */}
-      {manuscrit.contenu && (
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 4, 
-            mb: 4, 
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 2,
-            maxHeight: '60vh',
-            overflow: 'auto'
-          }}
-        >
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+      {/* Content */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 0,
+          mb: 4,
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+          height: '80vh',
+          overflow: 'hidden'
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Contenu du manuscrit
           </Typography>
-          <Box sx={{ '& > *:last-child': { mb: 0 } }}>
-            {formatContent(manuscrit.contenu)}
-          </Box>
-        </Paper>
-      )}
+        </Box>
+        <Box sx={{ height: 'calc(100% - 60px)' }}>
+          {/* Using a sample PDF for demonstration since we don't have a backend for files yet */}
+          <PdfViewerAnnotated
+            fileUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
+            initialAnnotations={[]}
+            onSaveAnnotations={(anns: any[]) => {
+              console.log('Annotations saved:', anns);
+              // Here we would save to backend
+            }}
+          />
+        </Box>
+      </Paper>
 
       {/* Comments Section */}
       <Box>
@@ -455,8 +465,8 @@ export default function ManuscritDetailPage() {
         </Typography>
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs 
-            value={activeTab} 
+          <Tabs
+            value={activeTab}
             onChange={handleTabChange}
             variant="fullWidth"
             sx={{
@@ -508,7 +518,7 @@ export default function ManuscritDetailPage() {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               variant="outlined"
-              sx={{ 
+              sx={{
                 flexGrow: 1,
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2
@@ -521,7 +531,7 @@ export default function ManuscritDetailPage() {
               onClick={handleAddComment}
               disabled={!newComment.trim()}
               color="secondary"
-              sx={{ 
+              sx={{
                 borderRadius: 2,
                 textTransform: 'none',
                 fontWeight: 600,

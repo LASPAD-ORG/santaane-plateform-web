@@ -23,12 +23,25 @@ export function useCreateGestionManuscrit() {
 
       // Mock implementation - Remove this
       await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
+      const now = new Date().toISOString();
       const mockItem: GestionManuscritItem = {
         id: Math.random().toString(36).substring(7),
-        ...payload,
+        // BaseManuscrit properties (French names)
+        titre: payload.title,
+        description: payload.description || '',
+        auteurId: 'current-user',
+        auteurNom: 'Utilisateur', // TODO: Replace with actual user data
+        auteurPrenom: 'Actuel', // TODO: Replace with actual user data
+        statut: payload.status || 'brouillon',
+        dateCreation: now,
+        dateMiseAJour: now,
+        contenu: payload.contenu,
+        nombreCommentaires: 0,
+        // Alias properties (English names)
+        title: payload.title,
         status: payload.status || 'brouillon',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
         authorId: 'current-user',
         commentairesMentor: {
           forme: [],
@@ -78,12 +91,25 @@ export function useUpdateGestionManuscrit() {
 
       // Mock implementation - Remove this
       await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
+      const now = new Date().toISOString();
       const mockItem: GestionManuscritItem = {
         id,
-        ...payload,
+        // BaseManuscrit properties (French names)
+        titre: payload.title,
+        description: payload.description || '',
+        auteurId: 'current-user',
+        auteurNom: 'Utilisateur', // TODO: Replace with actual user data
+        auteurPrenom: 'Actuel', // TODO: Replace with actual user data
+        statut: payload.status || 'brouillon',
+        dateCreation: now,
+        dateMiseAJour: now,
+        contenu: payload.contenu,
+        nombreCommentaires: 0,
+        // Alias properties (English names)
+        title: payload.title,
         status: payload.status || 'brouillon',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now,
+        updatedAt: now,
         authorId: 'current-user',
         commentairesMentor: {
           forme: [],

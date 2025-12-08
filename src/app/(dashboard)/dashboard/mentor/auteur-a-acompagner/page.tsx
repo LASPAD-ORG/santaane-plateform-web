@@ -15,7 +15,7 @@ export default function AuteurAAcompagnerPage() {
   const router = useRouter();
   const { data: items, loading, fetch } = useFetchAuteurAAcompagner();
   const [loadingCards, setLoadingCards] = useState(true);
-  
+
   // États pour les filtres et la pagination
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: '',
@@ -56,9 +56,9 @@ export default function AuteurAAcompagnerPage() {
     router.push(`/dashboard/mentor/auteur-a-acompagner/${item.id}`);
   };
 
-  const handleCreate = () => {
-    router.push(`/dashboard/mentor/auteur-a-acompagner/new`);
-  };
+  // const handleCreate = () => {
+  //   router.push(`/dashboard/mentor/auteur-a-acompagner/new`);
+  // };
 
   const handleFiltersChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
@@ -93,7 +93,7 @@ export default function AuteurAAcompagnerPage() {
             Gérez vos auteurs et suivez leurs manuscrits
           </Typography>
         </Box>
-        <Button
+        {/* <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleCreate}
@@ -106,7 +106,7 @@ export default function AuteurAAcompagnerPage() {
           }}
         >
           Ajouter un auteur
-        </Button>
+        </Button> */}
       </Box>
 
       {/* Loading state */}
@@ -131,19 +131,19 @@ export default function AuteurAAcompagnerPage() {
             totalResults={paginationData.totalItems}
             availableSpecialites={availableSpecialites}
           />
-          
+
           {paginationData.totalItems > 0 && (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               mb: 3,
               px: 1
             }}>
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 {paginationData.totalItems} auteur{paginationData.totalItems > 1 ? 's' : ''} trouvé{paginationData.totalItems > 1 ? 's' : ''}
               </Typography>
-              
+
               <AuteurSortOptions
                 sortOptions={sortOptions}
                 onSortChange={handleSortChange}
@@ -163,7 +163,7 @@ export default function AuteurAAcompagnerPage() {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 400, mx: 'auto' }}>
             Vous n'avez actuellement aucun auteur assigné. Les nouveaux auteurs à accompagner apparaîtront ici.
           </Typography>
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleCreate}
@@ -175,7 +175,7 @@ export default function AuteurAAcompagnerPage() {
             }}
           >
             Ajouter le premier auteur
-          </Button>
+          </Button> */}
         </Box>
       )}
 

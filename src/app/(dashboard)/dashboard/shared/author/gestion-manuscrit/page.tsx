@@ -7,11 +7,11 @@ import { useFetchGestionManuscrit } from './fetchers/useFetchGestionManuscrit';
 import GestionManuscritCard from './components/GestionManuscritCard';
 import ManuscritFilters, { type ManuscritFilterOptions } from './components/ManuscritFilters';
 import ManuscritPagination from './components/ManuscritPagination';
-import ManuscritSortOptions, { type ManuscritSortOptions } from './components/ManuscritSortOptions';
-import { 
-  useManuscritFilters, 
-  useManuscritSorting, 
-  useManuscritPagination, 
+import ManuscritSortOptionsComponent, { type ManuscritSortOptions } from './components/ManuscritSortOptions';
+import {
+  useManuscritFilters,
+  useManuscritSorting,
+  useManuscritPagination,
   getAvailableAuthors,
   getAvailableSpecialites
 } from './hooks/useManuscritFilters';
@@ -21,7 +21,7 @@ export default function GestionManuscritPage() {
   const router = useRouter();
   const { data: items, loading, fetch } = useFetchGestionManuscrit();
   const [loadingCards, setLoadingCards] = useState(true);
-  
+
   // États pour les filtres et la pagination
   const [filters, setFilters] = useState<ManuscritFilterOptions>({
     searchTerm: '',
@@ -45,7 +45,7 @@ export default function GestionManuscritPage() {
   const filteredItems = useManuscritFilters(items, filters);
   const sortedItems = useManuscritSorting(filteredItems, sortOptions);
   const paginationData = useManuscritPagination(sortedItems, currentPage, itemsPerPage);
-  
+
   // Options pour les filtres
   const availableAuthors = getAvailableAuthors(items);
   const availableSpecialites = getAvailableSpecialites(items);
@@ -67,9 +67,9 @@ export default function GestionManuscritPage() {
     router.push(`/dashboard/shared/author/gestion-manuscrit/${item.id}`);
   };
 
-  const handleCreate = () => {
-    router.push(`/dashboard/shared/author/gestion-manuscrit/new`);
-  };
+  // const handleCreate = () => {
+  //   router.push(`/dashboard/shared/author/gestion-manuscrit/new`);
+  // };
 
   const handleFiltersChange = (newFilters: ManuscritFilterOptions) => {
     setFilters(newFilters);
@@ -104,12 +104,12 @@ export default function GestionManuscritPage() {
             Consultez et commentez les manuscrits soumis par les auteurs
           </Typography>
         </Box>
-        <Button
+        {/* <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleCreate}
           color="primary"
-          sx={{ 
+          sx={{
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
@@ -117,7 +117,7 @@ export default function GestionManuscritPage() {
           }}
         >
           Nouveau manuscrit
-        </Button>
+        </Button> */}
       </Box>
 
       {/* Loading state */}
@@ -143,20 +143,20 @@ export default function GestionManuscritPage() {
             availableAuthors={availableAuthors}
             availableSpecialites={availableSpecialites}
           />
-          
+
           {paginationData.totalItems > 0 && (
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               mb: 3,
               px: 1
             }}>
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 {paginationData.totalItems} manuscrit{paginationData.totalItems > 1 ? 's' : ''} trouvé{paginationData.totalItems > 1 ? 's' : ''}
               </Typography>
-              
-              <ManuscritSortOptions
+
+              <ManuscritSortOptionsComponent
                 sortOptions={sortOptions}
                 onSortChange={handleSortChange}
               />
@@ -175,19 +175,19 @@ export default function GestionManuscritPage() {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 400, mx: 'auto' }}>
             Il n'y a actuellement aucun manuscrit à examiner. Les nouveaux manuscrits soumis par les auteurs apparaîtront ici.
           </Typography>
-          <Button
+          {/* <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleCreate}
             color="primary"
-            sx={{ 
+            sx={{
               borderRadius: 2,
               textTransform: 'none',
               fontWeight: 600
             }}
           >
             Créer un manuscrit
-          </Button>
+          </Button> */}
         </Box>
       )}
 
