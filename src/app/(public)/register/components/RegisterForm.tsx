@@ -11,6 +11,8 @@ import {
   Link as MuiLink,
   InputAdornment,
   IconButton,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { Visibility, VisibilityOff, PersonAdd as RegisterIcon } from '@mui/icons-material';
 import Link from 'next/link';
@@ -31,6 +33,8 @@ export default function RegisterForm() {
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedEthicalCharter, setAcceptedEthicalCharter] = useState(false);
+  const [acceptedAPAStyle, setAcceptedAPAStyle] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -51,6 +55,18 @@ export default function RegisterForm() {
     // Validate password length
     if (formData.password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères.');
+      return;
+    }
+
+    // Validate ethical charter acceptance
+    if (!acceptedEthicalCharter) {
+      setError('Vous devez accepter la charte éthique et les règles de soumission.');
+      return;
+    }
+
+    // Validate APA style acceptance
+    if (!acceptedAPAStyle) {
+      setError('Vous devez accepter le formatage des références selon le style APA.');
       return;
     }
 
@@ -169,6 +185,67 @@ export default function RegisterForm() {
           ),
         }}
       />
+
+      <Box sx={{ mt: 3 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={acceptedEthicalCharter}
+              onChange={(e) => setAcceptedEthicalCharter(e.target.checked)}
+              disabled={isLoading}
+              color="primary"
+            />
+          }
+          label={
+            <Typography variant="body2">
+              J'accepte d'avoir lu et validé la{' '}
+              <MuiLink
+                href="https://www.globalafricasciences.org/fr/ethical-charter"
+                target="_blank"
+                rel="noopener noreferrer"
+                underline="hover"
+              >
+                charte éthique
+              </MuiLink>
+              {' '}et les{' '}
+              <MuiLink
+                href="https://www.globalafricasciences.org/fr/submission"
+                target="_blank"
+                rel="noopener noreferrer"
+                underline="hover"
+              >
+                règles de soumission
+              </MuiLink>
+            </Typography>
+          }
+        />
+      </Box>
+
+      <Box sx={{ mt: 2 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={acceptedAPAStyle}
+              onChange={(e) => setAcceptedAPAStyle(e.target.checked)}
+              disabled={isLoading}
+              color="primary"
+            />
+          }
+          label={
+            <Typography variant="body2">
+              J'accepte d'avoir lu et je m'engage à formater toutes les citations et références bibliographiques selon le{' '}
+              <MuiLink
+                href="https://3452f183-579a-4bee-a22d0677afc123bf.filesusr.com/ugd/526d98_9ea1870e53394ea5b34499481c0aed65.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                underline="hover"
+              >
+                style APA
+              </MuiLink>
+            </Typography>
+          }
+        />
+      </Box>
 
       <Button
         type="submit"
