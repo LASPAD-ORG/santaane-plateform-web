@@ -24,10 +24,10 @@ import NotificationList from './components/NotificationList';
 import {
     filterNotifications,
     sortNotifications,
-    NotificationFilters as FilterType,
+    NotificationFilters as NotificationFiltersType,
     NotificationSortField,
     NotificationSortDirection,
-} from '../auteur-a-acompagner/helpers/notificationUtils';
+} from './helpers/notificationUtils';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -40,7 +40,13 @@ export default function NotificationsPage() {
         deleteNotification
     } = useNotifications();
 
-    const [filters, setFilters] = useState<FilterType>({});
+    const [filters, setFilters] = useState<NotificationFiltersType>({
+        search: '',
+        type: '',
+        priority: '',
+        status: '',
+        dateRange: '',
+    });
     const [sortField, setSortField] = useState<NotificationSortField>('date');
     const [sortDirection, setSortDirection] = useState<NotificationSortDirection>('desc');
     const [currentPage, setCurrentPage] = useState(1);
@@ -61,7 +67,7 @@ export default function NotificationsPage() {
         return sortedNotifications.slice(startIndex, startIndex + ITEMS_PER_PAGE);
     }, [sortedNotifications, currentPage]);
 
-    const handleFiltersChange = (newFilters: FilterType) => {
+    const handleFiltersChange = (newFilters: NotificationFiltersType) => {
         setFilters(newFilters);
         setCurrentPage(1); // Reset to page 1 when filters change
     };

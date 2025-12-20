@@ -9,6 +9,9 @@ export async function GET(request: NextRequest) {
     const token = request.cookies.get('auth_token')?.value;
 
     console.log('/api/auth/me called, token exists:', !!token);
+    console.log('Token length:', token?.length || 0);
+    console.log('Token preview:', token?.substring(0, 20) + '...' || 'none');
+    console.log('API_URL:', API_URL);
 
     if (!token) {
       return NextResponse.json(null, { status: 200 });
@@ -27,6 +30,17 @@ export async function GET(request: NextRequest) {
     console.error('Get current user error:', error);
 
     if (axios.isAxiosError(error)) {
+      console.error('Axios error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers
+        }
+      });
+      
       // If token is invalid, clear the cookie
       if (error.response?.status === 401) {
         const response = NextResponse.json(

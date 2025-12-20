@@ -25,7 +25,7 @@ import {
   Info as InfoIcon,
 } from '@mui/icons-material';
 import { useState, useRef } from 'react';
-import { CreateUserData } from '../types';
+import { CreateUserData } from '../fetchers/useFetchGestionUtilisateurs';
 import { UserRole } from '@/types/auth';
 
 interface UserImportModalProps {
@@ -79,7 +79,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
-    
+
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile && droppedFile.type === 'text/csv') {
       handleFileSelect(droppedFile);
@@ -88,15 +88,15 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
 
   const parseCSV = async (csvFile: File) => {
     setParsing(true);
-    
+
     try {
       const text = await csvFile.text();
       const lines = text.split('\n').filter(line => line.trim());
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-      
+
       const requiredHeaders = ['email', 'prenom', 'nom', 'roles'];
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
-      
+
       if (missingHeaders.length > 0) {
         throw new Error(`Colonnes manquantes: ${missingHeaders.join(', ')}`);
       }
@@ -170,7 +170,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
 
   const parseRoles = (rolesString: string): UserRole[] => {
     if (!rolesString) return [UserRole.AUTHOR];
-    
+
     return rolesString
       .split(/[;,]/)
       .map(role => role.trim().toUpperCase())
@@ -180,7 +180,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
 
   const handleImport = async () => {
     setImporting(true);
-    
+
     try {
       await onImportUsers(parsedData);
       setImportResult({
@@ -268,7 +268,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
               <Typography variant="body2" color="text.secondary">
                 ou cliquez pour sélectionner un fichier
               </Typography>
-              
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -369,7 +369,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
         <Button onClick={handleClose}>
           {step === 'result' ? 'Fermer' : 'Annuler'}
         </Button>
-        
+
         {step === 'preview' && (
           <Button
             variant="contained"

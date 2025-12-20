@@ -33,11 +33,20 @@ import {
   Phone as PhoneIcon,
   Business as BusinessIcon,
   School as SchoolIcon,
+  AdminPanelSettings as AdminPanelSettingsIcon,
+  People as PeopleIcon,
+  PersonAdd as PersonAddIcon,
+  Group as GroupIcon,
 } from '@mui/icons-material';
-import { useState } from 'react';
-import { User, UserStatus, Pagination } from '../types';
-import { UserRole } from '@/types/auth';
+import { useState, useEffect } from 'react';
+import { User, Pagination } from '../fetchers/useFetchGestionUtilisateurs';
 import { ROLE_CONFIGS } from '@/config/roles';
+import { getStatusLabel, getStatusColor } from '../helpers/formatters';
+import { useAuthStore } from '@/stores/authStore';
+import { UserRole } from '@/types/auth';
+import { useMentorApi } from '../fetchers/useMentorApi';
+import { MentorAssignment } from '../fetchers/useMentorApi';
+import { useAssignmentValidation } from '@/hooks/useAssignmentValidation';
 // Utility functions for date formatting
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -67,21 +76,47 @@ interface UserManagementTableProps {
   loading: boolean;
   onEditUser: (userId: string) => void;
   onDeleteUser: (userId: string) => void;
-  onToggleStatus: (userId: string, newStatus: UserStatus) => void;
+  onToggleStatus: (userId: string, currentStatus: boolean) => void;
   onResetPassword: (userId: string) => void;
+  onAssignAuthorToMentor?: (author: User) => void;
+  onViewMentorAuthors?: (mentor: User) => void;
 }
 
 interface ActionMenuProps {
   user: User;
   onEditUser: (userId: string) => void;
   onDeleteUser: (userId: string) => void;
-  onToggleStatus: (userId: string, newStatus: UserStatus) => void;
+  onToggleStatus: (userId: string, currentStatus: boolean) => void;
   onResetPassword: (userId: string) => void;
+  onAssignAuthorToMentor?: (author: User) => void;
+  onViewMentorAuthors?: (mentor: User) => void;
 }
 
-function ActionMenu({ user, onEditUser, onDeleteUser, onToggleStatus, onResetPassword }: ActionMenuProps) {
+function ActionMenu({ 
+  user, 
+  onEditUser, 
+  onDeleteUser, 
+  onToggleStatus, 
+  onResetPassword, 
+  onAssignAuthorToMentor,
+  onViewMentorAuthors 
+}: ActionMenuProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const { user: currentUser } = useAuthStore();
+  const { hasActiveMentor, loading: validationLoading } = useAssignmentValidation();
+  
+  // Vérifier si l'utilisateur connecté a les permissions nécessaires
+  const canManageMentorAssignments = currentUser?.roles.some(role => 
+    role === UserRole.SUPER_ADMIN || role === UserRole.EDITOR
+  );
+  
+  // Vérifier les rôles de l'utilisateur sélectionné
+  const isAuthor = user.roles.includes('AUTHOR');
+  const isMentor = user.roles.includes('MENTOR');
+  
+  // Vérifier si l'auteur est déjà assigné en utilisant le hook centralisé
+  const isAuthorAlreadyAssigned = isAuthor && hasActiveMentor(user.id);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -97,8 +132,7 @@ function ActionMenu({ user, onEditUser, onDeleteUser, onToggleStatus, onResetPas
   };
 
   const handleToggleStatus = () => {
-    const newStatus = user.status === UserStatus.ACTIVE ? UserStatus.INACTIVE : UserStatus.ACTIVE;
-    onToggleStatus(user.id, newStatus);
+    onToggleStatus(user.id, user.isActive);
     handleClose();
   };
 
@@ -109,6 +143,20 @@ function ActionMenu({ user, onEditUser, onDeleteUser, onToggleStatus, onResetPas
 
   const handleDelete = () => {
     onDeleteUser(user.id);
+    handleClose();
+  };
+
+  const handleAssignAuthorToMentor = () => {
+    if (onAssignAuthorToMentor) {
+      onAssignAuthorToMentor(user);
+    }
+    handleClose();
+  };
+
+  const handleViewMentorAuthors = () => {
+    if (onViewMentorAuthors) {
+      onViewMentorAuthors(user);
+    }
     handleClose();
   };
 
@@ -139,14 +187,14 @@ function ActionMenu({ user, onEditUser, onDeleteUser, onToggleStatus, onResetPas
 
         <MenuItem onClick={handleToggleStatus}>
           <ListItemIcon>
-            {user.status === UserStatus.ACTIVE ? (
+            {user.isActive ? (
               <BlockIcon fontSize="small" />
             ) : (
               <CheckCircleIcon fontSize="small" />
             )}
           </ListItemIcon>
           <ListItemText>
-            {user.status === UserStatus.ACTIVE ? 'Désactiver' : 'Activer'}
+            {user.isActive ? 'Désactiver' : 'Activer'}
           </ListItemText>
         </MenuItem>
 
@@ -163,6 +211,34 @@ function ActionMenu({ user, onEditUser, onDeleteUser, onToggleStatus, onResetPas
           </ListItemIcon>
           <ListItemText>Supprimer</ListItemText>
         </MenuItem>
+
+        {/* Actions conditionnelles pour la gestion des mentors */}
+        {canManageMentorAssignments && isAuthor && !isAuthorAlreadyAssigned && onAssignAuthorToMentor && (
+          <MenuItem onClick={handleAssignAuthorToMentor} disabled={validationLoading}>
+            <ListItemIcon>
+              <PersonAddIcon fontSize="small" sx={{ color: 'success.main' }} />
+            </ListItemIcon>
+            <ListItemText>Assigner à un mentor</ListItemText>
+          </MenuItem>
+        )}
+
+        {canManageMentorAssignments && isAuthor && isAuthorAlreadyAssigned && (
+          <MenuItem disabled>
+            <ListItemIcon>
+              <PersonAddIcon fontSize="small" sx={{ color: 'grey.500' }} />
+            </ListItemIcon>
+            <ListItemText sx={{ color: 'grey.500' }}>Déjà assigné à un mentor</ListItemText>
+          </MenuItem>
+        )}
+
+        {canManageMentorAssignments && isMentor && onViewMentorAuthors && (
+          <MenuItem onClick={handleViewMentorAuthors}>
+            <ListItemIcon>
+              <GroupIcon fontSize="small" sx={{ color: 'info.main' }} />
+            </ListItemIcon>
+            <ListItemText>Voir les auteurs assignés</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </>
   );
@@ -186,46 +262,34 @@ function UserAvatar({ user }: { user: User }) {
   );
 }
 
-function StatusChip({ status }: { status: UserStatus }) {
-  const getStatusConfig = (status: UserStatus) => {
-    switch (status) {
-      case UserStatus.ACTIVE:
-        return { label: 'Actif', color: 'success' as const };
-      case UserStatus.INACTIVE:
-        return { label: 'Inactif', color: 'default' as const };
-      case UserStatus.PENDING:
-        return { label: 'En attente', color: 'warning' as const };
-      case UserStatus.SUSPENDED:
-        return { label: 'Suspendu', color: 'error' as const };
-      default:
-        return { label: status, color: 'default' as const };
-    }
-  };
-
-  const config = getStatusConfig(status);
-
+function StatusChip({ isActive }: { isActive: boolean }) {
   return (
     <Chip
-      label={config.label}
-      color={config.color}
+      label={getStatusLabel(isActive)}
+      sx={{
+        bgcolor: getStatusColor(isActive) + '20',
+        color: getStatusColor(isActive),
+        borderColor: getStatusColor(isActive) + '40',
+        fontWeight: 600,
+      }}
       size="small"
       variant="outlined"
     />
   );
 }
 
-function RoleChips({ roles }: { roles: UserRole[] }) {
+function RoleChips({ roles }: { roles: string[] }) {
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
       {roles.map((role) => (
         <Chip
           key={role}
-          label={ROLE_CONFIGS[role]?.label || role}
+          label={role}
           size="small"
           style={{
-            backgroundColor: ROLE_CONFIGS[role]?.color + '20',
-            color: ROLE_CONFIGS[role]?.color,
-            border: `1px solid ${ROLE_CONFIGS[role]?.color}40`,
+            backgroundColor: ((ROLE_CONFIGS as any)[role]?.color || '#757575') + '20',
+            color: (ROLE_CONFIGS as any)[role]?.color || '#757575',
+            border: `1px solid ${(ROLE_CONFIGS as any)[role]?.color || '#757575'}40`,
           }}
         />
       ))}
@@ -242,6 +306,8 @@ export function UserManagementTable({
   onDeleteUser,
   onToggleStatus,
   onResetPassword,
+  onAssignAuthorToMentor,
+  onViewMentorAuthors,
 }: UserManagementTableProps) {
   const handleChangePage = (event: unknown, newPage: number) => {
     onPaginationChange(newPage, pagination.size);
@@ -253,101 +319,154 @@ export function UserManagementTable({
 
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <TableContainer sx={{ maxHeight: 600 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell>Utilisateur</TableCell>
-              <TableCell>Contact</TableCell>
-              <TableCell>Rôles</TableCell>
-              <TableCell>Statut</TableCell>
-              <TableCell>Laboratoire</TableCell>
-              <TableCell>Spécialité</TableCell>
-
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow hover key={user.id}>
-                <TableCell>
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{
+        borderRadius: 4,
+        border: '1px solid',
+        borderColor: 'divider',
+        overflow: 'hidden',
+        bgcolor: 'background.paper'
+      }}
+    >
+      <Table sx={{ minWidth: 800 }}>
+        <TableHead>
+          <TableRow sx={{ bgcolor: 'grey.50' }}>
+            <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Utilisateur</TableCell>
+            <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Contact</TableCell>
+            <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Rôles</TableCell>
+            <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Statut</TableCell>
+            <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Laboratoire</TableCell>
+            <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Spécialité</TableCell>
+            <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {loading && users.length === 0 ? (
+            // Skeleton Loading Rows
+            Array.from(new Array(5)).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell colSpan={7}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1 }}>
+                    <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: 'grey.100' }} />
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{ width: '40%', height: 16, bgcolor: 'grey.100', mb: 1, borderRadius: 1 }} />
+                      <Box sx={{ width: '20%', height: 12, bgcolor: 'grey.100', borderRadius: 1 }} />
+                    </Box>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : users.length > 0 ? (
+            users.map((user) => (
+              <TableRow
+                key={user.id}
+                sx={{
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 156, 0, 0.02)',
+                    '& .row-actions': { opacity: 1 }
+                  }
+                }}
+              >
+                <TableCell sx={{ py: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <UserAvatar user={user} />
                     <Box>
-                      <Typography variant="subtitle2">
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                         {user.prenom} {user.nom}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.7 }}>
                         {user.email}
                       </Typography>
                     </Box>
                   </Box>
                 </TableCell>
 
-                <TableCell>
+                <TableCell sx={{ py: 2 }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <EmailIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      <Typography variant="body2">{user.email}</Typography>
+                      <EmailIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                      <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{user.email}</Typography>
                     </Box>
                     {user.telephone && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <PhoneIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="body2">{user.telephone}</Typography>
+                        <PhoneIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                        <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{user.telephone}</Typography>
                       </Box>
                     )}
                   </Box>
                 </TableCell>
 
-                <TableCell>
+                <TableCell sx={{ py: 2 }}>
                   <RoleChips roles={user.roles} />
                 </TableCell>
 
-                <TableCell>
-                  <StatusChip status={user.status} />
+                <TableCell sx={{ py: 2 }}>
+                  <StatusChip isActive={user.isActive} />
                 </TableCell>
 
-                <TableCell>
+                <TableCell sx={{ py: 2 }}>
                   {user.laboratoire ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <BusinessIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      <Typography variant="body2">{user.laboratoire}</Typography>
+                      <BusinessIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                      <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{user.laboratoire}</Typography>
                     </Box>
                   ) : (
-                    <Typography variant="body2" color="text.secondary">-</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.5 }}>-</Typography>
                   )}
                 </TableCell>
 
-                <TableCell>
+                <TableCell sx={{ py: 2 }}>
                   {user.specialite ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <SchoolIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      <Typography variant="body2">{user.specialite}</Typography>
+                      <SchoolIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                      <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{user.specialite}</Typography>
                     </Box>
                   ) : (
-                    <Typography variant="body2" color="text.secondary">-</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.5 }}>-</Typography>
                   )}
                 </TableCell>
 
-
-
-
-                <TableCell align="center">
-                  <ActionMenu
-                    user={user}
-                    onEditUser={onEditUser}
-                    onDeleteUser={onDeleteUser}
-                    onToggleStatus={onToggleStatus}
-                    onResetPassword={onResetPassword}
-                  />
+                <TableCell align="right" sx={{ py: 2 }}>
+                  <Box className="row-actions" sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: 0.5,
+                    opacity: { xs: 1, md: 0.5 },
+                    transition: 'opacity 0.2s'
+                  }}>
+                    <ActionMenu
+                      user={user}
+                      onEditUser={onEditUser}
+                      onDeleteUser={onDeleteUser}
+                      onToggleStatus={onToggleStatus}
+                      onResetPassword={onResetPassword}
+                      onAssignAuthorToMentor={onAssignAuthorToMentor}
+                      onViewMentorAuthors={onViewMentorAuthors}
+                    />
+                  </Box>
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} sx={{ py: 10, textAlign: 'center' }}>
+                <Box sx={{ color: 'text.disabled', mb: 2 }}>
+                  <PeopleIcon sx={{ fontSize: 48, opacity: 0.2 }} />
+                </Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                  Aucun utilisateur trouvé
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Essayez de modifier vos filtres ou créez un nouvel utilisateur.
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
       <TablePagination
         rowsPerPageOptions={[5, 10, 25, 50]}
         component="div"
@@ -360,7 +479,8 @@ export function UserManagementTable({
         labelDisplayedRows={({ from, to, count }) =>
           `${from}-${to} sur ${count !== -1 ? count : `plus de ${to}`}`
         }
+        sx={{ borderTop: '1px solid', borderColor: 'divider' }}
       />
-    </Paper>
+    </TableContainer>
   );
 }

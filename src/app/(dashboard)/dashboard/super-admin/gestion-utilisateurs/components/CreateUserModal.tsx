@@ -27,9 +27,8 @@ import {
   Business as BusinessIcon,
   School as SchoolIcon,
 } from '@mui/icons-material';
-import { useState } from 'react';
-import { CreateUserData } from '../types';
-import { UserRole } from '@/types/auth';
+import { useState, useEffect } from 'react';
+import { CreateUserData, useFetchRoles } from '../fetchers/useFetchGestionUtilisateurs';
 import { ROLE_CONFIGS } from '@/config/roles';
 
 interface CreateUserModalProps {
@@ -53,24 +52,32 @@ const SPECIALITE_OPTIONS = [
   { value: 'mathematiques', label: 'Mathématiques' },
 ];
 
-const ROLE_OPTIONS = Object.values(UserRole).map(role => ({
-  value: role,
-  label: ROLE_CONFIGS[role]?.label || role,
-  color: ROLE_CONFIGS[role]?.color || '#757575',
-}));
+// ROLE_OPTIONS will be dynamic
 
 export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModalProps) {
   const [formData, setFormData] = useState<CreateUserData>({
     email: '',
     prenom: '',
     nom: '',
-    roles: [UserRole.AUTHOR],
+    roleIds: [],
     laboratoire: '',
     specialite: '',
     telephone: '',
     sendWelcomeEmail: true,
   });
-  
+
+  const { data: availableRoles, fetch: fetchRoles, loading: rolesLoading } = useFetchRoles();
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const roleOptions = availableRoles.map(role => ({
+    id: role.id,
+    label: role.name,
+    color: (ROLE_CONFIGS as any)[role.name]?.color || '#757575',
+  }));
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -79,7 +86,7 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
       ...prev,
       [field]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -106,8 +113,8 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
       newErrors.nom = 'Le nom est requis';
     }
 
-    if (formData.roles.length === 0) {
-      newErrors.roles = 'Au moins un rôle doit être sélectionné';
+    if (formData.roleIds.length === 0) {
+      newErrors.roleIds = 'Au moins un rôle doit être sélectionné';
     }
 
     if (formData.telephone && !/^[\+]?[\d\s\-\(\)\.]{10,}$/.test(formData.telephone)) {
@@ -137,7 +144,7 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
       email: '',
       prenom: '',
       nom: '',
-      roles: [UserRole.AUTHOR],
+      roleIds: [],
       laboratoire: '',
       specialite: '',
       telephone: '',
@@ -147,9 +154,10 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
     onClose();
   };
 
-  const isHighPrivilegeRole = formData.roles.some(role => 
-    [UserRole.SUPER_ADMIN, UserRole.EDITOR].includes(role)
-  );
+  const isHighPrivilegeRole = formData.roleIds.some(roleId => {
+    const role = availableRoles.find(r => r.id === roleId);
+    return role && ['SUPER_ADMIN', 'EDITOR'].includes(role.name);
+  });
 
   return (
     <Dialog
@@ -169,7 +177,7 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
       <DialogContent>
         {isHighPrivilegeRole && (
           <Alert severity="warning" sx={{ mb: 3 }}>
-            Attention : Vous êtes sur le point de créer un utilisateur avec des privilèges élevés 
+            Attention : Vous êtes sur le point de créer un utilisateur avec des privilèges élevés
             (Super Admin ou Éditeur). Assurez-vous que cette personne a l'autorisation nécessaire.
           </Alert>
         )}
@@ -244,17 +252,18 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
           <Grid size={{ xs: 12 }}>
             <Autocomplete
               multiple
-              options={ROLE_OPTIONS}
+              options={roleOptions}
               getOptionLabel={(option) => option.label}
-              value={ROLE_OPTIONS.filter(option => formData.roles.includes(option.value))}
+              value={roleOptions.filter(option => formData.roleIds.includes(option.id))}
               onChange={(event, newValue) => {
-                handleInputChange('roles', newValue.map(v => v.value));
+                handleInputChange('roleIds', newValue.map(v => v.id));
               }}
+              loading={rolesLoading}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip
                     {...getTagProps({ index })}
-                    key={option.value}
+                    key={option.id}
                     label={option.label}
                     style={{
                       backgroundColor: option.color + '20',
@@ -269,8 +278,8 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
                   {...params}
                   label="Rôles *"
                   placeholder="Sélectionner des rôles"
-                  error={!!errors.roles}
-                  helperText={errors.roles || 'Sélectionnez un ou plusieurs rôles pour cet utilisateur'}
+                  error={!!errors.roleIds}
+                  helperText={errors.roleIds || 'Sélectionnez un ou plusieurs rôles pour cet utilisateur'}
                 />
               )}
             />

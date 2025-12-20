@@ -23,9 +23,8 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
-import { useState } from 'react';
-import { UserFilters as UserFiltersType, UserStatus } from '../types';
-import { UserRole } from '@/types/auth';
+import { useState, useEffect } from 'react';
+import { UserFilters as UserFiltersType, useFetchRoles } from '../fetchers/useFetchGestionUtilisateurs';
 import { ROLE_CONFIGS } from '@/config/roles';
 
 interface UserFiltersProps {
@@ -35,18 +34,7 @@ interface UserFiltersProps {
   filteredCount: number;
 }
 
-const STATUS_OPTIONS = [
-  { value: UserStatus.ACTIVE, label: 'Actif', color: 'success' },
-  { value: UserStatus.INACTIVE, label: 'Inactif', color: 'default' },
-  { value: UserStatus.PENDING, label: 'En attente', color: 'warning' },
-  { value: UserStatus.SUSPENDED, label: 'Suspendu', color: 'error' },
-] as const;
-
-const ROLE_OPTIONS = Object.values(UserRole).map(role => ({
-  value: role,
-  label: ROLE_CONFIGS[role]?.label || role,
-  color: ROLE_CONFIGS[role]?.color || '#757575',
-}));
+// ROLE_OPTIONS will be dynamic
 
 const LABORATOIRE_OPTIONS = [
   { value: 'lab1', label: 'Laboratoire de Recherche 1' },
@@ -71,6 +59,11 @@ const DERNIERE_CONNEXION_OPTIONS = [
   { value: 'plus-3-mois', label: 'Plus de 3 mois' },
 ];
 
+const STATUS_OPTIONS = [
+  { value: 'ACTIVE', label: 'Actif' },
+  { value: 'INACTIVE', label: 'Inactif' },
+];
+
 export function UserFilters({
   filters,
   updateFilters,
@@ -78,6 +71,18 @@ export function UserFilters({
   filteredCount,
 }: UserFiltersProps) {
   const [expanded, setExpanded] = useState(false);
+
+  const { data: availableRoles, fetch: fetchRoles, loading: rolesLoading } = useFetchRoles();
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const roleOptions = availableRoles.map(role => ({
+    value: role.name,
+    label: role.name,
+    color: (ROLE_CONFIGS as any)[role.name]?.color || '#757575',
+  }));
 
   const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
     if (key === 'search') return !!value;
@@ -164,7 +169,7 @@ export function UserFilters({
         <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
           {filters.roles.length > 0 && (
             <Chip
-              label={`Rôles: ${filters.roles.map(role => ROLE_CONFIGS[role]?.label).join(', ')}`}
+              label={`Rôles: ${filters.roles.join(', ')}`}
               onDelete={() => updateFilters({ roles: [] })}
               size="small"
               color="primary"
@@ -173,7 +178,7 @@ export function UserFilters({
           )}
           {filters.status && (
             <Chip
-              label={`Statut: ${STATUS_OPTIONS.find(s => s.value === filters.status)?.label}`}
+              label={`Statut: ${filters.status === 'ACTIVE' ? 'Actif' : 'Inactif'}`}
               onDelete={() => updateFilters({ status: '' })}
               size="small"
               color="primary"
@@ -200,12 +205,13 @@ export function UserFilters({
             <Autocomplete
               multiple
               size="small"
-              options={ROLE_OPTIONS}
+              options={roleOptions}
               getOptionLabel={(option) => option.label}
-              value={ROLE_OPTIONS.filter(option => filters.roles.includes(option.value))}
+              value={roleOptions.filter(option => filters.roles.includes(option.value))}
               onChange={(event, newValue) => {
                 updateFilters({ roles: newValue.map(v => v.value) });
               }}
+              loading={rolesLoading}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip
@@ -234,7 +240,7 @@ export function UserFilters({
               <Select
                 value={filters.status}
                 label="Statut"
-                onChange={(e) => updateFilters({ status: e.target.value as UserStatus })}
+                onChange={(e) => updateFilters({ status: e.target.value as any })}
               >
                 <MenuItem value="">
                   <em>Tous les statuts</em>

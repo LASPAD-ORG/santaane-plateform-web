@@ -47,10 +47,11 @@ export default function NotificationFiltersComponent({
 
     const handleApplyFilters = () => {
         const filters: NotificationFilters = {
-            searchTerm: searchTerm || undefined,
-            type: type as any || '',
-            priorite: priorite as any || '',
-            lu: statut === 'lu' ? true : statut === 'non_lu' ? false : null,
+            search: searchTerm || '',
+            type: type || '',
+            priority: priorite || '',
+            status: statut || '',
+            dateRange: '',
         };
         onFiltersChange(filters);
     };
@@ -60,7 +61,13 @@ export default function NotificationFiltersComponent({
         setType('');
         setPriorite('');
         setStatut('');
-        onFiltersChange({});
+        onFiltersChange({
+            search: '',
+            type: '',
+            priority: '',
+            status: '',
+            dateRange: '',
+        });
     };
 
     return (

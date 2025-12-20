@@ -27,17 +27,20 @@ import {
   Business as BusinessIcon,
   School as SchoolIcon,
   History as HistoryIcon,
+  Group as GroupIcon,
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
-import { User, UpdateUserData, UserStatus } from '../types';
-import { UserRole } from '@/types/auth';
+import { User, UpdateUserData, useFetchRoles } from '../fetchers/useFetchGestionUtilisateurs';
 import { ROLE_CONFIGS } from '@/config/roles';
+import { getStatusLabel, getStatusColor } from '../helpers/formatters';
+import { MentorAssignmentsSection } from './MentorAssignmentsSection';
+import { AuthorAssignmentsSection } from './AuthorAssignmentsSection';
 // Utility function for date formatting
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', { 
-    day: '2-digit', 
-    month: 'long', 
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
@@ -48,7 +51,7 @@ interface EditUserModalProps {
   open: boolean;
   onClose: () => void;
   user: User;
-  onUpdateUser: (userId: string, userData: UpdateUserData) => Promise<void>;
+  onUpdateUser: (id: string, data: UpdateUserData, currentRoleIds: number[]) => Promise<any>;
 }
 
 const LABORATOIRE_OPTIONS = [
@@ -66,17 +69,11 @@ const SPECIALITE_OPTIONS = [
   { value: 'mathematiques', label: 'Mathématiques' },
 ];
 
-const ROLE_OPTIONS = Object.values(UserRole).map(role => ({
-  value: role,
-  label: ROLE_CONFIGS[role]?.label || role,
-  color: ROLE_CONFIGS[role]?.color || '#757575',
-}));
+// ROLE_OPTIONS will be dynamic
 
 const STATUS_OPTIONS = [
-  { value: UserStatus.ACTIVE, label: 'Actif', color: 'success' },
-  { value: UserStatus.INACTIVE, label: 'Inactif', color: 'default' },
-  { value: UserStatus.PENDING, label: 'En attente', color: 'warning' },
-  { value: UserStatus.SUSPENDED, label: 'Suspendu', color: 'error' },
+  { value: true, label: 'Actif', color: 'success' },
+  { value: false, label: 'Inactif', color: 'default' },
 ] as const;
 
 export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserModalProps) {
@@ -84,17 +81,30 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [assignmentChanged, setAssignmentChanged] = useState(false);
+
+  const { data: availableRoles, fetch: fetchRoles, loading: rolesLoading } = useFetchRoles();
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const roleOptions = availableRoles.map(role => ({
+    id: role.id,
+    label: role.name,
+    color: (ROLE_CONFIGS as any)[role.name]?.color || '#757575',
+  }));
 
   useEffect(() => {
     if (user) {
       const initialData: UpdateUserData = {
         prenom: user.prenom,
         nom: user.nom,
-        roles: [...user.roles],
+        roleIds: [...user.roleIds],
         laboratoire: user.laboratoire || '',
         specialite: user.specialite || '',
         telephone: user.telephone || '',
-        status: user.status,
+        isActive: user.isActive,
       };
       setFormData(initialData);
       setHasChanges(false);
@@ -106,9 +116,9 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
       ...prev,
       [field]: value,
     }));
-    
+
     setHasChanges(true);
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -129,8 +139,8 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
       newErrors.nom = 'Le nom est requis';
     }
 
-    if (!formData.roles || formData.roles.length === 0) {
-      newErrors.roles = 'Au moins un rôle doit être sélectionné';
+    if (!formData.roleIds || formData.roleIds.length === 0) {
+      newErrors.roleIds = 'Au moins un rôle doit être sélectionné';
     }
 
     if (formData.telephone && !/^[\+]?[\d\s\-\(\)\.]{10,}$/.test(formData.telephone)) {
@@ -146,7 +156,7 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
 
     setLoading(true);
     try {
-      await onUpdateUser(user.id, formData);
+      await onUpdateUser(user.id, formData, user.roleIds);
       onClose();
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
@@ -158,14 +168,31 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
   const handleClose = () => {
     setErrors({});
     setHasChanges(false);
+    setAssignmentChanged(false);
     onClose();
   };
 
-  const isHighPrivilegeRole = formData.roles?.some(role => 
-    [UserRole.SUPER_ADMIN, UserRole.EDITOR].includes(role)
-  );
+  const handleAssignmentChange = () => {
+    setAssignmentChanged(true);
+  };
 
-  const isStatusChange = formData.status !== user.status;
+  // Vérifier si l'utilisateur a des rôles de mentor ou auteur
+  const isMentor = user.roles.includes('MENTOR') || formData.roleIds?.some(roleId => {
+    const role = availableRoles.find(r => r.id === roleId);
+    return role?.name === 'MENTOR';
+  });
+  
+  const isAuthor = user.roles.includes('AUTHOR') || formData.roleIds?.some(roleId => {
+    const role = availableRoles.find(r => r.id === roleId);
+    return role?.name === 'AUTHOR';
+  });
+
+  const isHighPrivilegeRole = formData.roleIds?.some(roleId => {
+    const role = availableRoles.find(r => r.id === roleId);
+    return role && ['SUPER_ADMIN', 'EDITOR'].includes(role.name);
+  });
+
+  const isStatusChange = formData.isActive !== user.isActive;
 
   const getUserInitials = () => {
     return `${user.prenom.charAt(0)}${user.nom.charAt(0)}`.toUpperCase();
@@ -201,7 +228,7 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
           >
             {!user.avatar && getUserInitials()}
           </Avatar>
-          
+
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="h6">
               {user.prenom} {user.nom}
@@ -308,12 +335,12 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
             <FormControl fullWidth>
               <InputLabel>Statut</InputLabel>
               <Select
-                value={formData.status || ''}
+                value={formData.isActive === undefined ? '' : formData.isActive}
                 label="Statut"
-                onChange={(e) => handleInputChange('status', e.target.value as UserStatus)}
+                onChange={(e) => handleInputChange('isActive', e.target.value === 'true' || e.target.value === true)}
               >
                 {STATUS_OPTIONS.map(option => (
-                  <MenuItem key={option.value} value={option.value}>
+                  <MenuItem key={String(option.value)} value={option.value as any}>
                     {option.label}
                   </MenuItem>
                 ))}
@@ -324,17 +351,18 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
           <Grid size={{ xs: 12, md: 8 }}>
             <Autocomplete
               multiple
-              options={ROLE_OPTIONS}
+              options={roleOptions}
               getOptionLabel={(option) => option.label}
-              value={ROLE_OPTIONS.filter(option => formData.roles?.includes(option.value))}
+              value={roleOptions.filter(option => formData.roleIds?.includes(option.id))}
               onChange={(event, newValue) => {
-                handleInputChange('roles', newValue.map(v => v.value));
+                handleInputChange('roleIds', newValue.map(v => v.id));
               }}
+              loading={rolesLoading}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip
                     {...getTagProps({ index })}
-                    key={option.value}
+                    key={option.id}
                     label={option.label}
                     style={{
                       backgroundColor: option.color + '20',
@@ -349,8 +377,8 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
                   {...params}
                   label="Rôles *"
                   placeholder="Sélectionner des rôles"
-                  error={!!errors.roles}
-                  helperText={errors.roles}
+                  error={!!errors.roleIds}
+                  helperText={errors.roleIds}
                 />
               )}
             />
@@ -406,6 +434,37 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
             </FormControl>
           </Grid>
         </Grid>
+
+        {/* Section Assignations - affichée uniquement pour les mentors et auteurs */}
+        {(isMentor || isAuthor) && (
+          <>
+            <Divider sx={{ width: '100%', my: 3 }} />
+            
+            <Grid size={{ xs: 12 }}>
+              
+              
+              {isMentor && (
+                <MentorAssignmentsSection 
+                  user={user} 
+                  onAssignmentChange={handleAssignmentChange}
+                />
+              )}
+              
+              {isAuthor && (
+                <AuthorAssignmentsSection 
+                  user={user} 
+                  onAssignmentChange={handleAssignmentChange}
+                />
+              )}
+              
+              {!isMentor && !isAuthor && (
+                <Alert severity="info">
+                  Les assignations sont disponibles uniquement pour les utilisateurs ayant le rôle Mentor ou Auteur.
+                </Alert>
+              )}
+            </Grid>
+          </>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
@@ -415,7 +474,7 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={loading || !hasChanges}
+          disabled={loading || (!hasChanges && !assignmentChanged)}
         >
           {loading ? 'Mise à jour...' : 'Sauvegarder'}
         </Button>

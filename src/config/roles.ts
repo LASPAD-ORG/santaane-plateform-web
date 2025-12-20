@@ -209,6 +209,12 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: SettingsIcon,
     roles: [UserRole.SUPER_ADMIN],
   },
+  {
+    label: 'Gestion des roles',
+    path: '/dashboard/super-admin/gestion-roles',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
 ];
 
 /**

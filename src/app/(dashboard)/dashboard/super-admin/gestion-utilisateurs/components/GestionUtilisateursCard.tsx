@@ -7,7 +7,7 @@ import {
   Delete as DeleteIcon,
   Settings,
 } from '@mui/icons-material';
-import type { User } from '../types';
+import type { User } from '../fetchers/useFetchGestionUtilisateurs';
 import {
   formatGestionUtilisateursDate,
   getStatusLabel,

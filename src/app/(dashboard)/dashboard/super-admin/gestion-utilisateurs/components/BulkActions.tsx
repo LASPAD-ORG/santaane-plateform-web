@@ -21,9 +21,8 @@ import {
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useState } from 'react';
-import { User, UserStatus } from '../types';
-import { UserRole } from '@/types/auth';
-import { exportUsersToCSV } from '../utils';
+import { User, UserStatus } from '../fetchers/useFetchGestionUtilisateurs';
+import { exportUsersToCSV } from '../helpers/formatters';
 
 interface BulkActionsProps {
   selectedUsers: User[];
@@ -55,20 +54,20 @@ export function BulkActions({
 
   const handleActivateUsers = () => {
     const userIds = selectedUsers.map(user => user.id);
-    onBulkStatusChange(userIds, UserStatus.ACTIVE);
+    onBulkStatusChange(userIds, 'ACTIVE');
     handleClose();
   };
 
   const handleDeactivateUsers = () => {
     const userIds = selectedUsers.map(user => user.id);
-    onBulkStatusChange(userIds, UserStatus.INACTIVE);
+    onBulkStatusChange(userIds, 'INACTIVE');
     handleClose();
   };
 
   const handleSuspendUsers = () => {
     if (window.confirm(`Êtes-vous sûr de vouloir suspendre ${selectedUsers.length} utilisateur(s) ?`)) {
       const userIds = selectedUsers.map(user => user.id);
-      onBulkStatusChange(userIds, UserStatus.SUSPENDED);
+      onBulkStatusChange(userIds, 'INACTIVE'); // Simplified: no SUSPENDED status
     }
     handleClose();
   };
@@ -99,8 +98,8 @@ export function BulkActions({
     handleClose();
   };
 
-  const hasAdminUsers = selectedUsers.some(user => 
-    user.roles.includes(UserRole.SUPER_ADMIN) || user.roles.includes(UserRole.EDITOR)
+  const hasAdminUsers = selectedUsers.some(user =>
+    user.roles.includes('SUPER_ADMIN') || user.roles.includes('EDITOR')
   );
 
   if (selectedUsers.length === 0) {
@@ -226,7 +225,7 @@ export function BulkActions({
 
         <Divider />
 
-        <MenuItem 
+        <MenuItem
           onClick={handleDeleteUsers}
           disabled={hasAdminUsers}
           sx={{ color: hasAdminUsers ? 'text.disabled' : 'error.main' }}

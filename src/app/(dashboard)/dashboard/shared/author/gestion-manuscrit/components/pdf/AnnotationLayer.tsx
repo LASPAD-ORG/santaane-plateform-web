@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Box } from '@mui/material';
-import { Annotation, Tool, DrawingAnnotation, HighlightAnnotation } from './types';
+import { Box, Tooltip, Typography } from '@mui/material';
+import { StickyNote2 as StickyNoteIcon } from '@mui/icons-material';
+import { Annotation, Tool, DrawingAnnotation, HighlightAnnotation, NoteAnnotation } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { NoteDialog } from './NoteDialog';
 
 interface AnnotationLayerProps {
     pageNumber: number;
@@ -24,6 +26,11 @@ export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
     const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
     const [currentRect, setCurrentRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
+    // Note dialog state
+    const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+    const [selectedNote, setSelectedNote] = useState<NoteAnnotation | null>(null);
+    const [pendingNotePosition, setPendingNotePosition] = useState<{ x: number; y: number } | null>(null);
+
     const getCoordinates = (e: React.MouseEvent) => {
         if (!containerRef.current) return { x: 0, y: 0 };
         const rect = containerRef.current.getBoundingClientRect();
@@ -37,6 +44,16 @@ export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
         if (activeTool === 'cursor') return;
 
         const { x, y } = getCoordinates(e);
+
+        // For notes, we use click instead of drag
+        if (activeTool === 'note') {
+            // Use the same coordinate system as drawings/highlights
+            setPendingNotePosition({ x, y });
+            setSelectedNote(null);
+            setNoteDialogOpen(true);
+            return;
+        }
+
         setIsDrawing(true);
         setStartPoint({ x, y });
 
@@ -90,26 +107,52 @@ export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
                 createdAt: new Date().toISOString()
             };
             onAddAnnotation(newAnnotation);
-        } else if (activeTool === 'note') {
-            const { x, y } = getCoordinates(e);
-            // For note, we might want to open a dialog or just place it.
-            // For simplicity, let's just place a marker.
-            const newAnnotation: Annotation = {
-                id: uuidv4(),
-                pageNumber,
-                type: 'note',
-                x,
-                y,
-                content: 'Nouvelle note',
-                author: 'Me',
-                createdAt: new Date().toISOString()
-            };
-            onAddAnnotation(newAnnotation);
         }
 
         setCurrentPath([]);
         setCurrentRect(null);
         setStartPoint(null);
+    };
+
+    const handleNoteClick = (note: NoteAnnotation) => {
+        setSelectedNote(note);
+        setPendingNotePosition(null);
+        setNoteDialogOpen(true);
+    };
+
+    const handleNoteDialogSave = (content: string) => {
+        if (selectedNote) {
+            // Edit existing note
+            const updatedNote: NoteAnnotation = {
+                ...selectedNote,
+                content
+            };
+            // In a real implementation, we would update the annotation
+            // For now, we'll just create a new one (the parent component should handle updates)
+            onAddAnnotation(updatedNote);
+        } else if (pendingNotePosition) {
+            // Create new note
+            const newAnnotation: NoteAnnotation = {
+                id: uuidv4(),
+                pageNumber,
+                type: 'note',
+                x: pendingNotePosition.x,
+                y: pendingNotePosition.y,
+                content,
+                author: 'Me',
+                createdAt: new Date().toISOString()
+            };
+            onAddAnnotation(newAnnotation);
+        }
+        setNoteDialogOpen(false);
+        setSelectedNote(null);
+        setPendingNotePosition(null);
+    };
+
+    const handleNoteDialogClose = () => {
+        setNoteDialogOpen(false);
+        setSelectedNote(null);
+        setPendingNotePosition(null);
     };
 
     return (
@@ -183,32 +226,69 @@ export const AnnotationLayer: React.FC<AnnotationLayerProps> = ({
                         fillOpacity={0.4}
                     />
                 )}
+
+                {/* Render Notes inside SVG using foreignObject */}
+                {annotations.map(ann => {
+                    if (ann.type === 'note') {
+                        return (
+                            <foreignObject
+                                key={ann.id}
+                                x={ann.x * scale - 14}
+                                y={ann.y * scale - 14}
+                                width={28}
+                                height={28}
+                                style={{ overflow: 'visible', pointerEvents: 'auto' }}
+                            >
+                                <Tooltip
+                                    title={
+                                        <Box>
+                                            <Typography variant="caption" fontWeight={600} display="block">
+                                                {ann.author}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                                {ann.content}
+                                            </Typography>
+                                        </Box>
+                                    }
+                                    arrow
+                                >
+                                    <Box
+                                        onClick={() => handleNoteClick(ann)}
+                                        sx={{
+                                            width: 28,
+                                            height: 28,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            transition: 'transform 0.2s',
+                                            '&:hover': {
+                                                transform: 'scale(1.1)'
+                                            }
+                                        }}
+                                    >
+                                        <StickyNoteIcon
+                                            sx={{
+                                                fontSize: 28,
+                                                color: 'warning.main',
+                                                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))'
+                                            }}
+                                        />
+                                    </Box>
+                                </Tooltip>
+                            </foreignObject>
+                        );
+                    }
+                    return null;
+                })}
             </svg>
 
-            {/* Render Notes */}
-            {annotations.map(ann => {
-                if (ann.type === 'note') {
-                    return (
-                        <Box
-                            key={ann.id}
-                            sx={{
-                                position: 'absolute',
-                                left: ann.x * scale,
-                                top: ann.y * scale,
-                                width: 20,
-                                height: 20,
-                                bgcolor: 'warning.main',
-                                borderRadius: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                cursor: 'pointer',
-                                pointerEvents: 'auto'
-                            }}
-                            title={ann.content}
-                        />
-                    );
-                }
-                return null;
-            })}
+            <NoteDialog
+                open={noteDialogOpen}
+                note={selectedNote}
+                onClose={handleNoteDialogClose}
+                onSave={handleNoteDialogSave}
+            />
         </Box>
     );
 };

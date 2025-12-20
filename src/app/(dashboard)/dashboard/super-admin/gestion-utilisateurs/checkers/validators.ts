@@ -1,4 +1,4 @@
-import { UserStatus } from '../types';
+import { UserStatus } from '../fetchers/useFetchGestionUtilisateurs';
 
 export interface ValidationError {
   field: string;

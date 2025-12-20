@@ -1,51 +1,167 @@
 import { useState } from 'react';
-// import { apiClient } from '@/lib/api/client';
-// import { useAlertStore } from '@/stores/alertStore';
-import type { CreateUserData, UpdateUserData, User, UserStatus } from '../types';
+import { apiClient } from '@/lib/api/client';
+import { useAlertStore } from '@/stores/alertStore';
+import {
+  User,
+  CreateUserData,
+  UpdateUserData,
+  BackendUser,
+  UserStatus
+} from './useFetchGestionUtilisateurs';
+import {
+  mapFrontendUserToBackendUpdate,
+  mapFrontendUserToBackendCreate,
+  mapBackendUserToFrontend
+} from '../helpers/formatters';
 
 /**
- * Custom hook to create a new user
+ * Custom hook for write operations in gestion-utilisateurs
  */
 export function useCreateGestionUtilisateurs() {
   const [loading, setLoading] = useState(false);
-  // const { showSuccess, showError } = useAlertStore();
+  const { showSuccess, showError } = useAlertStore();
 
-  const create = async (payload: CreateUserData): Promise<User> => {
+  const createUser = async (data: CreateUserData): Promise<User> => {
     setLoading(true);
     try {
-      // TODO: Replace mock data with real API call
-      // Uncomment the lines below when ready
+      const { payload, temporaryPassword } = mapFrontendUserToBackendCreate(data);
+      const response = await apiClient.post<BackendUser>('/users', payload);
+      const newUser = mapBackendUserToFrontend(response.data);
 
-      // const response = await apiClient.post('/api/v1/users', payload);
-      // showSuccess('Succès', 'L\'utilisateur a été créé avec succès');
-      // return response.data;
+      // Assign roles after creation
+      if (data.roleIds && data.roleIds.length > 0) {
+        for (const roleId of data.roleIds) {
+          await apiClient.post('/roles/assign', {
+            user_id: newUser.id,
+            role_id: roleId,
+          });
+        }
+      }
 
-      // Mock implementation - Remove this
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-      const mockUser: User = {
-        id: Math.random().toString(36).substring(7),
-        email: payload.email,
-        prenom: payload.prenom,
-        nom: payload.nom,
-        roles: payload.roles,
-        status: 'PENDING' as UserStatus,
-        laboratoire: payload.laboratoire,
-        specialite: payload.specialite,
-        telephone: payload.telephone,
-        dateCreation: new Date().toISOString(),
-        emailVerifie: false,
-        isActive: true,
-      };
-      console.log('Mock: Created user', mockUser);
-      return mockUser;
+      // Re-fetch user to get updated roles from backend
+      const updatedResponse = await apiClient.get<BackendUser>(`/users/${newUser.id}`);
+      const userWithRoles = mapBackendUserToFrontend(updatedResponse.data);
 
+      // Envoyer l'email de bienvenue si demandé
+      if (data.sendWelcomeEmail) {
+        try {
+          await apiClient.post('/users/send-welcome-email', {
+            email: data.email,
+            prenom: data.prenom,
+            nom: data.nom,
+            temporaryPassword,
+          });
+          showSuccess('Succès', 'Utilisateur créé avec succès. Un email de bienvenue a été envoyé.');
+        } catch (emailError) {
+          console.error('Erreur lors de l\'envoi de l\'email:', emailError);
+          showSuccess('Succès', 'Utilisateur créé avec succès, mais l\'email n\'a pas pu être envoyé.');
+        }
+      } else {
+        showSuccess('Succès', 'Utilisateur créé avec succès');
+      }
+
+      return userWithRoles;
     } catch (error: any) {
-      // Uncomment when using real API
-      // showError(
-      //   'Erreur de création',
-      //   error.response?.data?.message || 'Impossible de créer l\'utilisateur'
-      // );
-      console.error('Error creating user:', error);
+      showError(
+        'Erreur de création',
+        error.response?.data?.error || 'Impossible de créer l\'utilisateur'
+      );
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUser = async (id: string, data: UpdateUserData, currentRoleIds: number[] = []): Promise<User> => {
+    setLoading(true);
+    try {
+      const payload = mapFrontendUserToBackendUpdate(data);
+      const response = await apiClient.put<BackendUser>(`/users/${id}`, payload);
+
+      // Handle role changes if roleIds are provided
+      if (data.roleIds) {
+        const rolesToAdd = data.roleIds.filter(roleId => !currentRoleIds.includes(roleId));
+        const rolesToRemove = currentRoleIds.filter(roleId => !data.roleIds?.includes(roleId));
+
+        for (const roleId of rolesToAdd) {
+          await apiClient.post('/roles/assign', {
+            user_id: id,
+            role_id: roleId,
+          });
+        }
+
+        for (const roleId of rolesToRemove) {
+          await apiClient.delete(`/roles/remove/${id}/${roleId}`);
+        }
+      }
+
+      // Re-fetch user to get updated roles and data from backend
+      const updatedResponse = await apiClient.get<BackendUser>(`/users/${id}`);
+      const userWithUpdatedRoles = mapBackendUserToFrontend(updatedResponse.data);
+
+      showSuccess('Succès', 'Utilisateur mis à jour avec succès');
+      return userWithUpdatedRoles;
+    } catch (error: any) {
+      showError(
+        'Erreur de mise à jour',
+        error.response?.data?.error || 'Impossible de mettre à jour l\'utilisateur'
+      );
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteUser = async (id: string): Promise<void> => {
+    setLoading(true);
+    try {
+      await apiClient.delete(`/users/${id}`);
+      showSuccess('Succès', 'Utilisateur supprimé avec succès');
+    } catch (error: any) {
+      showError(
+        'Erreur de suppression',
+        error.response?.data?.error || 'Impossible de supprimer l\'utilisateur'
+      );
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleUserStatus = async (id: string, isActive: boolean): Promise<User> => {
+    setLoading(true);
+    try {
+      await apiClient.post<BackendUser>(`/users/${id}/activate`, {
+        isActive,
+      });
+
+      // Re-fetch user to get updated data with roles from backend
+      const updatedResponse = await apiClient.get<BackendUser>(`/users/${id}`);
+      const userWithRoles = mapBackendUserToFrontend(updatedResponse.data);
+
+      showSuccess('Succès', `Utilisateur ${isActive ? 'activé' : 'désactivé'} avec succès`);
+      return userWithRoles;
+    } catch (error: any) {
+      showError(
+        'Erreur de statut',
+        error.response?.data?.error || 'Impossible de modifier le statut'
+      );
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (id: string, password: string): Promise<void> => {
+    setLoading(true);
+    try {
+      await apiClient.put(`/users/${id}/password`, { password });
+      showSuccess('Succès', 'Mot de passe réinitialisé avec succès');
+    } catch (error: any) {
+      showError(
+        'Erreur',
+        error.response?.data?.error || 'Impossible de réinitialiser le mot de passe'
+      );
       throw error;
     } finally {
       setLoading(false);
@@ -53,102 +169,11 @@ export function useCreateGestionUtilisateurs() {
   };
 
   return {
-    create,
     loading,
-  };
-}
-
-/**
- * Custom hook to update an existing user
- */
-export function useUpdateGestionUtilisateurs() {
-  const [loading, setLoading] = useState(false);
-  // const { showSuccess, showError } = useAlertStore();
-
-  const update = async (id: string, payload: UpdateUserData): Promise<User> => {
-    setLoading(true);
-    try {
-      // TODO: Replace mock data with real API call
-      // Uncomment the lines below when ready
-
-      // const response = await apiClient.put(`/api/v1/users/${id}`, payload);
-      // showSuccess('Succès', 'L\'utilisateur a été modifié avec succès');
-      // return response.data;
-
-      // Mock implementation - Remove this
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-      const mockUser: User = {
-        id,
-        email: 'updated@example.com', // This would come from the existing user
-        prenom: payload.prenom || 'Updated',
-        nom: payload.nom || 'User',
-        roles: payload.roles || [],
-        status: payload.status || 'ACTIVE' as UserStatus,
-        laboratoire: payload.laboratoire,
-        specialite: payload.specialite,
-        telephone: payload.telephone,
-        dateCreation: new Date().toISOString(),
-        derniereConnexion: new Date().toISOString(),
-        emailVerifie: true,
-        isActive: true,
-      };
-      console.log('Mock: Updated user', mockUser);
-      return mockUser;
-
-    } catch (error: any) {
-      // Uncomment when using real API
-      // showError(
-      //   'Erreur de modification',
-      //   error.response?.data?.message || 'Impossible de modifier l\'utilisateur'
-      // );
-      console.error('Error updating user:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return {
-    update,
-    loading,
-  };
-}
-
-/**
- * Custom hook to delete a user
- */
-export function useDeleteGestionUtilisateurs() {
-  const [loading, setLoading] = useState(false);
-  // const { showSuccess, showError } = useAlertStore();
-
-  const deleteItem = async (id: string): Promise<void> => {
-    setLoading(true);
-    try {
-      // TODO: Replace mock implementation with real API call
-      // Uncomment the lines below when ready
-
-      // await apiClient.delete(`/api/v1/users/${id}`);
-      // showSuccess('Succès', 'L\'utilisateur a été supprimé avec succès');
-
-      // Mock implementation - Remove this
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-      console.log('Mock: Deleted user with id:', id);
-
-    } catch (error: any) {
-      // Uncomment when using real API
-      // showError(
-      //   'Erreur de suppression',
-      //   error.response?.data?.message || 'Impossible de supprimer l\'utilisateur'
-      // );
-      console.error('Error deleting user:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return {
-    deleteItem,
-    loading,
+    createUser,
+    updateUser,
+    deleteUser,
+    toggleUserStatus,
+    resetPassword,
   };
 }

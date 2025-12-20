@@ -15,7 +15,7 @@ import {
   Block as BlockIcon,
   TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
-import { UserStats as UserStatsType } from '../types';
+import { UserStats as UserStatsType } from '../fetchers/useFetchGestionUtilisateurs';
 import { UserRole } from '@/types/auth';
 import { ROLE_CONFIGS } from '@/config/roles';
 

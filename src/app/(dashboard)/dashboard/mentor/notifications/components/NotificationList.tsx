@@ -29,12 +29,28 @@ import {
     MarkEmailUnread as MarkEmailUnreadIcon,
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { NotificationMentor } from '../../auteur-a-acompagner/fetchers/useFetchAuteurAAcompagner';
-import { formatDernierContact, getPrioriteColor } from '../../auteur-a-acompagner/helpers/formatters';
-import { getNotificationTypeColor } from '../../auteur-a-acompagner/helpers/notificationUtils';
+import { 
+    Notification, 
+    getNotificationTypeColor,
+    formatNotificationDate,
+    getNotificationPriorityColor
+} from '../helpers/notificationUtils';
+
+// Fonctions utilitaires pour la compatibilité
+const getNotificationTitle = (notification: Notification) => 
+    notification.title || notification.titre || 'Notification';
+
+const getNotificationDate = (notification: Notification) => 
+    notification.createdAt || notification.dateCreation || '';
+
+const getNotificationPriority = (notification: Notification) => 
+    notification.priority || notification.priorite || 'LOW';
+
+const isNotificationRead = (notification: Notification) => 
+    notification.status === 'READ' || notification.lu === true;
 
 interface NotificationListProps {
-    notifications: NotificationMentor[];
+    notifications: Notification[];
     onMarkAsRead: (id: string) => void;
     onMarkAsUnread: (id: string) => void;
     onArchive: (id: string) => void;
@@ -108,7 +124,7 @@ export default function NotificationList({
         setExpandedId(expandedId === id ? null : id);
     };
 
-    const handleNotificationClick = (notification: NotificationMentor) => {
+    const handleNotificationClick = (notification: Notification) => {
         if (notification.actionUrl) {
             router.push(notification.actionUrl);
         }
@@ -206,8 +222,8 @@ export default function NotificationList({
                             mb: 1,
                             borderRadius: 2,
                             border: '1px solid',
-                            borderColor: notification.lu ? 'divider' : 'primary.main',
-                            bgcolor: notification.lu ? 'background.paper' : 'primary.50',
+                            borderColor: isNotificationRead(notification) ? 'divider' : 'primary.main',
+                            bgcolor: isNotificationRead(notification) ? 'background.paper' : 'primary.50',
                         }}
                     >
                         <ListItem
@@ -242,19 +258,19 @@ export default function NotificationList({
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                                         <Box sx={{ flexGrow: 1, pr: 2 }}>
                                             <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                                {notification.titre}
+                                                {getNotificationTitle(notification)}
                                             </Typography>
                                             <Typography variant="caption" color="text.secondary">
-                                                {formatDernierContact(notification.dateCreation)}
+                                                {formatNotificationDate(getNotificationDate(notification))}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
                                             <Chip
-                                                label={notification.priorite}
-                                                color={getPrioriteColor(notification.priorite)}
+                                                label={getNotificationPriority(notification)}
+                                                color={getNotificationPriorityColor(getNotificationPriority(notification))}
                                                 size="small"
                                             />
-                                            {!notification.lu && (
+                                            {!isNotificationRead(notification) && (
                                                 <Box
                                                     sx={{
                                                         width: 8,
@@ -299,6 +315,15 @@ export default function NotificationList({
                                                 />
                                             </IconButton>
 
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => isNotificationRead(notification) ? onMarkAsUnread(notification.id) : onMarkAsRead(notification.id)}
+                                                title={isNotificationRead(notification) ? 'Marquer comme non lu' : 'Marquer comme lu'}
+                                                color={isNotificationRead(notification) ? 'default' : 'primary'}
+                                            >
+                                                {isNotificationRead(notification) ? <MarkEmailUnreadIcon fontSize="small" /> : <MarkEmailReadIcon fontSize="small" />}
+                                            </IconButton>
+
                                             {notification.actionUrl && (
                                                 <IconButton
                                                     size="small"
@@ -312,16 +337,9 @@ export default function NotificationList({
 
                                             <IconButton
                                                 size="small"
-                                                onClick={() => notification.lu ? onMarkAsUnread(notification.id) : onMarkAsRead(notification.id)}
-                                                title={notification.lu ? 'Marquer comme non lu' : 'Marquer comme lu'}
-                                            >
-                                                {notification.lu ? <MarkEmailUnreadIcon fontSize="small" /> : <MarkEmailReadIcon fontSize="small" />}
-                                            </IconButton>
-
-                                            <IconButton
-                                                size="small"
                                                 onClick={() => onArchive(notification.id)}
                                                 title="Archiver"
+                                                color="warning"
                                             >
                                                 <ArchiveIcon fontSize="small" />
                                             </IconButton>
