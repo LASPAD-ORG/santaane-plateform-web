@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import {Drawer,List,ListItem, ListItemButton,ListItemIcon, ListItemText,Divider,Box,Typography,Avatar,ListSubheader} from '@mui/material';
+import {Drawer,List,ListItem, ListItemButton,ListItemIcon, ListItemText,Divider,Box,Typography,Avatar} from '@mui/material';
 import { Logout as LogoutIcon } from '@mui/icons-material';
 import { useAuthStore } from '@/stores/authStore';
 import { getMenuItemsForRoles, ROLE_CONFIGS } from '@/config/roles';
@@ -47,158 +47,24 @@ export default function Sidebar() {
       <Divider />
 
       <List sx={styles.list}>
-        {user.roles.includes('super-admin') ? (
-          // Menu organisé par catégories pour Super Admin
-          <>
-            {/* Tableau de Bord */}
-            {menuItems.filter(item => item.path === '/dashboard/super-admin').map((item) => {
-              const isActive = pathname === item.path;
-              const Icon = item.icon;
-              return (
-                <ListItem key={item.path} disablePadding sx={styles.listItem}>
-                  <ListItemButton
-                    onClick={() => handleNavigation(item.path)}
-                    sx={isActive ? styles.activeListItem : styles.listItemButton}
-                  >
-                    <ListItemIcon>
-                      <Icon />
-                    </ListItemIcon>
-                    <ListItemText primary="🏠 Tableau de Bord" />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
+        {menuItems.map((item) => {
+          const isActive = pathname === item.path;
+          const Icon = item.icon;
 
-            {/* Administration */}
-            {(() => {
-              const adminItems = menuItems.filter(item => 
-                item.path.includes('/gestion-utilisateurs') ||
-                item.path.includes('/gestion-des-editeur') ||
-                item.path.includes('/gestion-mentor') ||
-                item.path.includes('/gestion-evaluateur')
-              );
-              return adminItems.length > 0 ? (
-                <>
-                  <ListSubheader component="div" sx={styles.categoryHeader}>
-                    👥 Administration
-                  </ListSubheader>
-                  {adminItems.map((item) => {
-                    const isActive = pathname === item.path;
-                    const Icon = item.icon;
-                    const cleanLabel = item.label.replace(/^(Gestion\s+)/i, '');
-                    return (
-                      <ListItem key={item.path} disablePadding sx={styles.categoryItem}>
-                        <ListItemButton
-                          onClick={() => handleNavigation(item.path)}
-                          sx={isActive ? styles.activeListItem : styles.listItemButton}
-                        >
-                          <ListItemIcon>
-                            <Icon />
-                          </ListItemIcon>
-                          <ListItemText primary={cleanLabel} />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </>
-              ) : null;
-            })()}
-
-            {/* Supervision Contenu */}
-            {(() => {
-              const contentItems = menuItems.filter(item => 
-                item.path.includes('/gestion-manuscrit') ||
-                item.path.includes('/gestion-soummission') ||
-                item.path.includes('/auteur-a-acompagner')
-              );
-              return contentItems.length > 0 ? (
-                <>
-                  <ListSubheader component="div" sx={styles.categoryHeader}>
-                    📚 Supervision Contenu
-                  </ListSubheader>
-                  {contentItems.map((item) => {
-                    const isActive = pathname === item.path;
-                    const Icon = item.icon;
-                    let cleanLabel = item.label;
-                    if (item.path.includes('/gestion-manuscrit')) cleanLabel = 'Manuscrits';
-                    if (item.path.includes('/gestion-soummission')) cleanLabel = 'Soumissions';
-                    if (item.path.includes('/auteur-a-acompagner')) cleanLabel = 'Mentorat';
-                    return (
-                      <ListItem key={item.path} disablePadding sx={styles.categoryItem}>
-                        <ListItemButton
-                          onClick={() => handleNavigation(item.path)}
-                          sx={isActive ? styles.activeListItem : styles.listItemButton}
-                        >
-                          <ListItemIcon>
-                            <Icon />
-                          </ListItemIcon>
-                          <ListItemText primary={cleanLabel} />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </>
-              ) : null;
-            })()}
-
-            {/* Système & Tests */}
-            {(() => {
-              const systemItems = menuItems.filter(item => 
-                item.path.includes('/settings') ||
-                item.path.includes('/test-page') ||
-                item.path.includes('/analytics') ||
-                item.path.includes('/test-composant')
-              );
-              return systemItems.length > 0 ? (
-                <>
-                  <ListSubheader component="div" sx={styles.categoryHeader}>
-                    ⚙️ Système & Tests
-                  </ListSubheader>
-                  {systemItems.map((item) => {
-                    const isActive = pathname === item.path;
-                    const Icon = item.icon;
-                    let cleanLabel = item.label;
-                    if (item.path.includes('/test-page')) cleanLabel = 'Tests & Debug';
-                    if (item.path.includes('/test-composant')) cleanLabel = 'Test Composants';
-                    return (
-                      <ListItem key={item.path} disablePadding sx={styles.categoryItem}>
-                        <ListItemButton
-                          onClick={() => handleNavigation(item.path)}
-                          sx={isActive ? styles.activeListItem : styles.listItemButton}
-                        >
-                          <ListItemIcon>
-                            <Icon />
-                          </ListItemIcon>
-                          <ListItemText primary={cleanLabel} />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </>
-              ) : null;
-            })()}
-          </>
-        ) : (
-          // Menu standard pour les autres rôles
-          menuItems.map((item) => {
-            const isActive = pathname === item.path;
-            const Icon = item.icon;
-
-            return (
-              <ListItem key={item.path} disablePadding sx={styles.listItem}>
-                <ListItemButton
-                  onClick={() => handleNavigation(item.path)}
-                  sx={isActive ? styles.activeListItem : styles.listItemButton}
-                >
-                  <ListItemIcon>
-                    <Icon />
-                  </ListItemIcon>
-                  <ListItemText primary={item.label} />
-                </ListItemButton>
-              </ListItem>
-            );
-          })
-        )}
+          return (
+            <ListItem key={item.path} disablePadding sx={styles.listItem}>
+              <ListItemButton
+                onClick={() => handleNavigation(item.path)}
+                sx={isActive ? styles.activeListItem : styles.listItemButton}
+              >
+                <ListItemIcon>
+                  <Icon />
+                </ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
 
       <Divider />
@@ -230,7 +96,7 @@ const styles = {
       boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
       overflowY: 'auto',
       overflowX: 'hidden',
-      height: 'calc(100vh - 16px)', // Ajuste la hauteur pour le margin
+      height: 'calc(100vh - 16px)',
       display: 'flex',
       flexDirection: 'column',
     },
@@ -256,7 +122,7 @@ const styles = {
     flexGrow: 1,
     p: 1,
     overflowY: 'auto',
-    minHeight: 0, // Important pour permettre le flex shrink
+    minHeight: 0,
   },
   listItem: {
     mb: 1,
@@ -289,26 +155,5 @@ const styles = {
       },
       boxShadow: '0 4px 14px rgba(255,0,0,0.3)',
     },
-  },
-  categoryHeader: {
-    bgcolor: 'transparent',
-    color: 'text.secondary',
-    fontWeight: 700,
-    fontSize: '0.875rem',
-    px: 2,
-    py: 1.5,
-    mt: 1.5,
-    lineHeight: 1.2,
-    textTransform: 'none',
-    borderBottom: '1px solid',
-    borderBottomColor: 'divider',
-    position: 'sticky',
-    top: 0,
-    bgcolor: 'background.paper',
-    zIndex: 1,
-  },
-  categoryItem: {
-    mb: 0.5,
-    pl: 1,
   },
 };

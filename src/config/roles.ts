@@ -11,7 +11,7 @@ import {
   Create as CreateIcon,
   Dashboard as DashboardIcon,
   Groups as GroupsIcon,
-  Mail,
+  Translate as TranslateIcon,
   People as PeopleIcon,
   School as SchoolIcon,
   Settings as SettingsIcon,
@@ -63,19 +63,19 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
   [UserRole.EVALUATOR]: {
     role: UserRole.EVALUATOR,
     label: 'Évaluateur',
-    defaultRoute: '/dashboard/shared',
+    defaultRoute: '/dashboard/evaluator',
     color: '#7b1fa2', // Purple
   },
   [UserRole.MENTOR]: {
     role: UserRole.MENTOR,
     label: 'Mentor',
-    defaultRoute: '/dashboard/shared',
+    defaultRoute: '/dashboard/mentor',
     color: '#388e3c', // Green
   },
   [UserRole.AUTHOR]: {
     role: UserRole.AUTHOR,
     label: 'Auteur',
-    defaultRoute: '/dashboard/shared',
+    defaultRoute: '/dashboard/author',
     color: '#f57c00', // Orange
   },
 };
@@ -99,17 +99,30 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.SUPER_ADMIN],
   },
   {
-    label: 'Gestion utilisateurs',
+    label: 'Utilisateurs',
     path: '/dashboard/super-admin/gestion-utilisateurs',
-    icon: SettingsIcon,
+    icon: PeopleIcon,
     roles: [UserRole.SUPER_ADMIN],
   },
   {
-    label: 'Gestion des Poulets',
-    path: '/dashboard/editor/gestion-poulet',
-    icon: AdbIcon,
-    roles: [UserRole.EDITOR, UserRole.AUTHOR],
+    label: 'Themes',
+    path: '/dashboard/super-admin/gestion-themes',
+    icon: Book,
+    roles: [UserRole.SUPER_ADMIN],
   },
+  {
+    label: 'Rubriques',
+    path: '/dashboard/super-admin/gestion-rubriques',
+    icon: ArticleIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Langues',
+    path: '/dashboard/super-admin/gestion-langues',
+    icon: TranslateIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+ 
 
   // ===== EDITOR MENUS =====
   {
@@ -129,92 +142,16 @@ export const MENU_ITEMS: MenuItem[] = [
 
   // AUTHOR menus (base level - everyone has these)
   {
-    label: 'Dashboard',
-    path: '/dashboard/shared',
-    icon: DashboardIcon,
-    roles: [UserRole.AUTHOR, UserRole.MENTOR, UserRole.EVALUATOR],
-  },
-  {
-    label: 'Mes Articles',
-    path: '/dashboard/articles',
-    icon: ArticleIcon,
-    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
-  },
-  {
-    label: 'Créer un Article',
-    path: '/dashboard/articles/create',
-    icon: CreateIcon,
-    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
-  },
-  {
     label: 'Mon Profil',
     path: '/dashboard/profile',
     icon: PeopleIcon,
     roles: [UserRole.AUTHOR, UserRole.MENTOR, UserRole.EVALUATOR],
-  },
+  }
 
   // MENTOR menus (AUTHOR + MENTOR features)
-  {
-    label: 'Mes Mentorats',
-    path: '/dashboard/mentoring',
-    icon: SchoolIcon,
-    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
-  },
+
   // EVALUATOR menus (AUTHOR + MENTOR + EVALUATOR features)
-  {
-    label: 'Évaluations',
-    path: '/dashboard/evaluations',
-    icon: AssignmentIcon,
-    roles: [UserRole.EVALUATOR],
-  },
-  {
-    label: 'Articles à Évaluer',
-    path: '/dashboard/evaluations/pending',
-    icon: AssignmentIcon,
-    roles: [UserRole.EVALUATOR],
-  },
-  {
-    label: 'Gestion des doucourer',
-    path: '/dashboard/shared/author/gestion-des-doucourer',
-    icon: SettingsIcon,
-    roles: [UserRole.AUTHOR],
-  },
-  {
-    label: 'Gestion soummission',
-    path: '/dashboard/shared/author/gestion-soummission',
-    icon: SettingsIcon,
-    roles: [UserRole.EDITOR, UserRole.EVALUATOR, UserRole.AUTHOR],
-  },
-  {
-    label: 'Gestion manuscrit',
-    path: '/dashboard/shared/author/gestion-manuscrit',
-    icon: SettingsIcon,
-    roles: [UserRole.MENTOR, UserRole.AUTHOR],
-  },
-  {
-    label: 'Mes auteurs',
-    path: '/dashboard/mentor/auteur-a-acompagner',
-    icon: SettingsIcon,
-    roles: [UserRole.MENTOR],
-  },
-  {
-    label: 'Parametrage revue',
-    path: '/dashboard/super-admin/parametrage-revue',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Gestion volume',
-    path: '/dashboard/super-admin/gestion-volumes',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Gestion des roles',
-    path: '/dashboard/super-admin/gestion-roles',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
+  
 ];
 
 /**
@@ -263,14 +200,14 @@ export function getDefaultRouteForRoles(userRoles: UserRole[]): string {
     }
   }
 
-  return '/dashboard/shared'; // Fallback
+  return '/dashboard/author'; // Fallback
 }
 
 /**
  * Get default route for a single role
  */
 export function getDefaultRouteForRole(role: UserRole): string {
-  return ROLE_CONFIGS[role]?.defaultRoute || '/dashboard/shared';
+  return ROLE_CONFIGS[role]?.defaultRoute || '/dashboard/author';
 }
 
 /**

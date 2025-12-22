@@ -143,9 +143,9 @@ async function main() {
       {
         type: 'input',
         name: 'pathParent',
-        message: 'Chemin après /dashboard/ (ex: super-admin, shared/author, editor):',
+        message: 'Chemin après /dashboard/ (ex: super-admin, mentor, evaluator, author, editor):',
         validate: validatePathParent,
-        filter: (input) => input.trim().toLowerCase().replace(/\\/g, '/'),
+        filter: (input) => input.trim().toLowerCase().replace(/\//g, '/'),
       },
       {
         type: 'input',
