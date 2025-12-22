@@ -111,10 +111,19 @@ export const MENU_ITEMS: MenuItem[] = [
   // AUTHOR menus (base level - everyone has these)
   {
     label: 'Mon Profil',
-    path: '/dashboard/profile',
+    path: '/dashboard/author',
     icon: PeopleIcon,
-    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
+    roles: [UserRole.AUTHOR],
   },
+
+  {
+    label: 'Mon Profil',
+    path: '/dashboard/profil',
+    icon: PeopleIcon,
+    roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR],
+  },
+
+
   {
     label: 'Gestion des thèmes',
     path: '/dashboard/super-admin/gestion-theme',

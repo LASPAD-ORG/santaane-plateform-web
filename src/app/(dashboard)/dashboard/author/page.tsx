@@ -21,7 +21,7 @@ export default function AuthorDashboard() {
           Dashboard
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Bienvenue, {user?.fullName} - Gestion de votre laboratoire
+          Bienvenue, {user?.fullName} 
         </Typography>
 
         <Grid container spacing={3}>
