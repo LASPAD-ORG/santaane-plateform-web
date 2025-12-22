@@ -18,7 +18,7 @@ export default function AuthorDashboard() {
     <RoleGuard allowedRoles={[UserRole.AUTHOR]}>
       <Box>
         <Typography variant="h4" gutterBottom>
-          Dashboard Laboratoire
+          Dashboard
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
           Bienvenue, {user?.fullName} - Gestion de votre laboratoire
