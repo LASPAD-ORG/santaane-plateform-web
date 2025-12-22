@@ -10,6 +10,8 @@ import {
   Typography,
   CircularProgress,
   Divider,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
 import {
   Save,
@@ -19,6 +21,9 @@ import {
   Business,
   Description,
   Link as LinkIcon,
+  Lock,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import { useAuthStore } from '@/stores/authStore';
 import { useAlertStore } from '@/stores/alertStore';
@@ -38,6 +43,10 @@ export default function ProfilPage() {
   const { showSuccess, showError } = useAlertStore();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState<ProfileData>({
     fullName: '',
     email: '',
@@ -45,6 +54,11 @@ export default function ProfilPage() {
     bio: '',
     position: '',
     institution: '',
+  });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   useEffect(() => {
@@ -72,15 +86,6 @@ export default function ProfilPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleChange = (field: keyof ProfileData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: e.target.value,
-    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,6 +129,72 @@ export default function ProfilPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handlePasswordChange = (field: keyof typeof passwordData) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPasswordData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      showError('Les nouveaux mots de passe ne correspondent pas');
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      showError('Le mot de passe doit contenir au moins 8 caractères');
+      return;
+    }
+
+    try {
+      setChangingPassword(true);
+
+      const response = await axios.put('/api/users/change-password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      console.log('Password change response:', response.data);
+
+      showSuccess('Mot de passe changé avec succès');
+      
+      // Reset form
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.detail || 
+                          error.response?.data?.errorCode ||
+                          'Erreur lors du changement de mot de passe';
+      
+      showError(errorMessage);
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  const handleChange = (field: keyof ProfileData) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
   };
 
   if (loading) {
@@ -270,6 +341,116 @@ export default function ProfilPage() {
           </CardContent>
         </Card>
       </form>
+
+      {/* Section changement de mot de passe */}
+      <Card elevation={2} sx={{ mt: 3 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h6" gutterBottom fontWeight="600" mb={2}>
+            Changer le mot de passe
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mb={3}>
+            Le mot de passe doit contenir au moins 8 caractères
+          </Typography>
+
+          <form onSubmit={handlePasswordSubmit}>
+            <Box display="flex" flexDirection="column" gap={3}>
+              <TextField
+                fullWidth
+                required
+                type={showCurrentPassword ? 'text' : 'password'}
+                label="Mot de passe actuel"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange('currentPassword')}
+                InputProps={{
+                  startAdornment: <Lock sx={{ mr: 1, color: 'text.secondary' }} />,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        edge="end"
+                      >
+                        {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Box display="flex" gap={2} flexWrap="wrap">
+                <Box flex={1} minWidth={{ xs: '100%', md: 'calc(50% - 8px)' }}>
+                  <TextField
+                    fullWidth
+                    required
+                    type={showNewPassword ? 'text' : 'password'}
+                    label="Nouveau mot de passe"
+                    value={passwordData.newPassword}
+                    onChange={handlePasswordChange('newPassword')}
+                    InputProps={{
+                      startAdornment: <Lock sx={{ mr: 1, color: 'text.secondary' }} />,
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            edge="end"
+                          >
+                            {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Box>
+
+                <Box flex={1} minWidth={{ xs: '100%', md: 'calc(50% - 8px)' }}>
+                  <TextField
+                    fullWidth
+                    required
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    label="Confirmer le mot de passe"
+                    value={passwordData.confirmPassword}
+                    onChange={handlePasswordChange('confirmPassword')}
+                    error={
+                      passwordData.confirmPassword !== '' &&
+                      passwordData.newPassword !== passwordData.confirmPassword
+                    }
+                    helperText={
+                      passwordData.confirmPassword !== '' &&
+                      passwordData.newPassword !== passwordData.confirmPassword
+                        ? 'Les mots de passe ne correspondent pas'
+                        : ''
+                    }
+                    InputProps={{
+                      startAdornment: <Lock sx={{ mr: 1, color: 'text.secondary' }} />,
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                          >
+                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Box>
+              </Box>
+
+              <Box display="flex" justifyContent="flex-end">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={changingPassword}
+                  startIcon={changingPassword ? <CircularProgress size={20} /> : <Lock />}
+                >
+                  {changingPassword ? 'Changement...' : 'Changer le mot de passe'}
+                </Button>
+              </Box>
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
     </Box>
   );
 }

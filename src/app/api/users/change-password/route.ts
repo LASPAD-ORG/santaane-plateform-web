@@ -4,23 +4,15 @@ import axios from 'axios';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 /**
- * POST /api/users/change-password
- * Change user password (for first login or password reset)
- * 
- * Body: { 
- *   currentPassword: string, 
- *   newPassword: string 
- * }
+ * PUT /api/users/change-password
+ * Change authenticated user's own password
  */
-export async function POST(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
     const token = request.cookies.get('auth_token')?.value;
 
     if (!token) {
-      return NextResponse.json(
-        { error: 'Non authentifié' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -33,19 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation du nouveau mot de passe
-    if (newPassword.length < 8) {
-      return NextResponse.json(
-        { error: 'Le nouveau mot de passe doit contenir au moins 8 caractères' },
-        { status: 400 }
-      );
-    }
-
     console.log('Changing password for user');
 
-    // Appel à l'API backend pour changer le mot de passe
-    const response = await axios.post(
-      `${API_URL}/api/v1/users/change-password`,
+    const response = await axios.put(
+      `${API_URL}/api/v1/users/me/password`,
       {
         currentPassword,
         newPassword,
@@ -53,45 +36,27 @@ export async function POST(request: NextRequest) {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
       }
     );
 
     console.log('Password changed successfully');
-    return NextResponse.json(
-      { message: 'Mot de passe changé avec succès' },
-      { status: 200 }
-    );
+    return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
     console.error('Change password error:', error);
 
     if (axios.isAxiosError(error)) {
-      if (error.response?.status === 401) {
-        return NextResponse.json(
-          { error: 'Mot de passe actuel incorrect' },
-          { status: 401 }
-        );
-      }
-
-      if (error.response?.status === 403) {
-        return NextResponse.json(
-          { error: 'Permissions insuffisantes' },
-          { status: 403 }
-        );
-      }
-
+      const errorMessage = error.response?.data?.errorCode || error.response?.data?.detail;
+      
+      console.log('Sending error response:', { error: errorMessage, status: error.response?.status });
+      
       return NextResponse.json(
-        {
-          error: error.response?.data?.detail || 'Erreur lors du changement de mot de passe'
-        },
+        { error: errorMessage || 'Erreur lors du changement de mot de passe' },
         { status: error.response?.status || 500 }
       );
     }
 
-    return NextResponse.json(
-      { error: 'Erreur serveur' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
+
