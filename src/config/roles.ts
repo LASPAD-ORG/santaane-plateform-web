@@ -16,6 +16,7 @@ import {
   School as SchoolIcon,
   Settings as SettingsIcon,
   SupervisorAccount as SupervisorIcon,
+  AccountCircle as AccountCircleIcon,
 } from '@mui/icons-material';
 
 export type IconComponent = OverridableComponent<SvgIconTypeMap<object, 'svg'>> & {
@@ -110,18 +111,32 @@ export const MENU_ITEMS: MenuItem[] = [
 
   // AUTHOR menus (base level - everyone has these)
   {
-    label: 'Mon Profil',
+    label: 'Dashboard',
     path: '/dashboard/author',
-    icon: PeopleIcon,
+    icon: DashboardIcon,
+    roles: [UserRole.AUTHOR],
+  },
+  {
+    label: 'Soumission',
+    path: '/dashboard/author/soumission',
+    icon: ArticleIcon,
+    roles: [UserRole.AUTHOR],
+  },
+  {
+    label: 'Manuscripts',
+    path: '/dashboard/author/manuscripts',
+    icon: ArticleIcon,
     roles: [UserRole.AUTHOR],
   },
 
+  // Common Profile Menu Item
   {
-    label: 'Mon Profil',
+    label: 'Profil',
     path: '/dashboard/profil',
-    icon: PeopleIcon,
+    icon: AccountCircleIcon,
     roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR],
   },
+
 
 
   {
