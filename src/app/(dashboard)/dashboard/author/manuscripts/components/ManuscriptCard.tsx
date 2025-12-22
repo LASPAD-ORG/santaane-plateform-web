@@ -36,6 +36,12 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
     }
   };
 
+  const handleDownloadPdf = () => {
+    if (manuscript.pdfFilename) {
+      window.open(`/api/files/download/${manuscript.pdfFilename}`, '_blank');
+    }
+  };
+
   return (
     <Card elevation={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardContent sx={{ flex: 1 }}>
@@ -120,8 +126,8 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title="Télécharger PDF">
-            <IconButton size="small">
+          <Tooltip title={`Télécharger ${manuscript.pdfFilename.split('/').pop()}`}>
+            <IconButton size="small" onClick={handleDownloadPdf}>
               <PictureAsPdf fontSize="small" />
             </IconButton>
           </Tooltip>
