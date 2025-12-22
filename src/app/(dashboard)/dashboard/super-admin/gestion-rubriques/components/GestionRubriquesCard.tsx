@@ -1,33 +1,27 @@
 'use client';
 
-import { Card, CardContent, CardActions, Typography, Box, Button, Chip } from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Box, Button } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Settings,
+  Category,
 } from '@mui/icons-material';
-import type { Volume } from '../fetchers/useFetchGestionVolumes';
-import {
-  formatGestionVolumesDate,
-  getStatusLabel,
-  getStatusColor,
-  truncateContent,
-} from '../helpers/formatters';
+import type { GestionRubriquesItem } from '../fetchers/useFetchGestionRubriques';
 
-interface GestionVolumesCardProps {
-  item: Volume;
-  onView?: (item: Volume) => void;
-  onEdit?: (item: Volume) => void;
-  onDelete?: (item: Volume) => void;
+interface GestionRubriquesCardProps {
+  item: GestionRubriquesItem;
+  onView?: (item: GestionRubriquesItem) => void;
+  onEdit?: (item: GestionRubriquesItem) => void;
+  onDelete?: (item: GestionRubriquesItem) => void;
 }
 
-export default function GestionVolumesCard({
+export default function GestionRubriquesCard({
   item,
   onView,
   onEdit,
   onDelete,
-}: GestionVolumesCardProps) {
+}: GestionRubriquesCardProps) {
   return (
     <Card
       sx={{
@@ -42,33 +36,41 @@ export default function GestionVolumesCard({
       }}
     >
       <CardContent sx={{ flexGrow: 1 }}>
-        {/* Header with icon and status */}
+        {/* Header with icon */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Settings sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Chip
-            label={getStatusLabel(item.status)}
-            color={getStatusColor(item.status)}
-            size="small"
-          />
+          <Category sx={{ fontSize: 32, color: 'primary.main' }} />
         </Box>
 
-        {/* Title */}
+        {/* Name */}
         <Typography variant="h6" component="h3" gutterBottom>
-          {item.title}
+          {item.name}
         </Typography>
 
-        {/* Description */}
-        {item.description && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {truncateContent(item.description, 150)}
+        {/* Signes range */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Signes: {item.signe_min} - {item.signe_max}
           </Typography>
-        )}
+        </Box>
 
         {/* Metadata */}
         <Box sx={{ mt: 'auto' }}>
           <Typography variant="caption" color="text.secondary" display="block">
-            Année {item.year}
+            Créé le {new Date(item.created_at).toLocaleDateString('fr-FR', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            })}
           </Typography>
+          {item.updated_at !== item.created_at && (
+            <Typography variant="caption" color="text.secondary" display="block">
+              Modifié le {new Date(item.updated_at).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+              })}
+            </Typography>
+          )}
         </Box>
       </CardContent>
 

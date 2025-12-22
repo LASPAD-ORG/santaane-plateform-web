@@ -1,33 +1,27 @@
 'use client';
 
-import { Card, CardContent, CardActions, Typography, Box, Button, Chip } from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Box, Button } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Settings,
+  Language,
 } from '@mui/icons-material';
-import type { Volume } from '../fetchers/useFetchGestionVolumes';
-import {
-  formatGestionVolumesDate,
-  getStatusLabel,
-  getStatusColor,
-  truncateContent,
-} from '../helpers/formatters';
+import type { LangueItem } from '../fetchers/useFetchLangue';
 
-interface GestionVolumesCardProps {
-  item: Volume;
-  onView?: (item: Volume) => void;
-  onEdit?: (item: Volume) => void;
-  onDelete?: (item: Volume) => void;
+interface LangueCardProps {
+  item: LangueItem;
+  onView?: (item: LangueItem) => void;
+  onEdit?: (item: LangueItem) => void;
+  onDelete?: (item: LangueItem) => void;
 }
 
-export default function GestionVolumesCard({
+export default function LangueCard({
   item,
   onView,
   onEdit,
   onDelete,
-}: GestionVolumesCardProps) {
+}: LangueCardProps) {
   return (
     <Card
       sx={{
@@ -42,33 +36,41 @@ export default function GestionVolumesCard({
       }}
     >
       <CardContent sx={{ flexGrow: 1 }}>
-        {/* Header with icon and status */}
+        {/* Header with icon */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Settings sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Chip
-            label={getStatusLabel(item.status)}
-            color={getStatusColor(item.status)}
-            size="small"
-          />
+          <Language sx={{ fontSize: 32, color: 'primary.main' }} />
         </Box>
 
-        {/* Title */}
+        {/* Name */}
         <Typography variant="h6" component="h3" gutterBottom>
-          {item.title}
+          {item.name}
         </Typography>
 
-        {/* Description */}
-        {item.description && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {truncateContent(item.description, 150)}
+        {/* Code */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+            Code: {item.code.toUpperCase()}
           </Typography>
-        )}
+        </Box>
 
         {/* Metadata */}
         <Box sx={{ mt: 'auto' }}>
           <Typography variant="caption" color="text.secondary" display="block">
-            Année {item.year}
+            Créé le {new Date(item.created_at).toLocaleDateString('fr-FR', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            })}
           </Typography>
+          {item.updated_at !== item.created_at && (
+            <Typography variant="caption" color="text.secondary" display="block">
+              Modifié le {new Date(item.updated_at).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+              })}
+            </Typography>
+          )}
         </Box>
       </CardContent>
 

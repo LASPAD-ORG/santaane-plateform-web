@@ -33,8 +33,6 @@ import { useState, useEffect } from 'react';
 import { User, UpdateUserData, useFetchRoles } from '../fetchers/useFetchGestionUtilisateurs';
 import { ROLE_CONFIGS } from '@/config/roles';
 import { getStatusLabel, getStatusColor } from '../helpers/formatters';
-import { MentorAssignmentsSection } from './MentorAssignmentsSection';
-import { AuthorAssignmentsSection } from './AuthorAssignmentsSection';
 // Utility function for date formatting
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -176,12 +174,6 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
     setAssignmentChanged(true);
   };
 
-  // Vérifier si l'utilisateur a des rôles de mentor ou auteur
-  const isMentor = user.roles.includes('MENTOR') || formData.roleIds?.some(roleId => {
-    const role = availableRoles.find(r => r.id === roleId);
-    return role?.name === 'MENTOR';
-  });
-  
   const isAuthor = user.roles.includes('AUTHOR') || formData.roleIds?.some(roleId => {
     const role = availableRoles.find(r => r.id === roleId);
     return role?.name === 'AUTHOR';
@@ -435,37 +427,7 @@ export function EditUserModal({ open, onClose, user, onUpdateUser }: EditUserMod
           </Grid>
         </Grid>
 
-        {/* Section Assignations - affichée uniquement pour les mentors et auteurs */}
-        {(isMentor || isAuthor) && (
-          <>
-            <Divider sx={{ width: '100%', my: 3 }} />
-            
-            <Grid size={{ xs: 12 }}>
-              
-              
-              {isMentor && (
-                <MentorAssignmentsSection 
-                  user={user} 
-                  onAssignmentChange={handleAssignmentChange}
-                />
-              )}
-              
-              {isAuthor && (
-                <AuthorAssignmentsSection 
-                  user={user} 
-                  onAssignmentChange={handleAssignmentChange}
-                />
-              )}
-              
-              {!isMentor && !isAuthor && (
-                <Alert severity="info">
-                  Les assignations sont disponibles uniquement pour les utilisateurs ayant le rôle Mentor ou Auteur.
-                </Alert>
-              )}
-            </Grid>
-          </>
-        )}
-      </DialogContent>
+              </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
         <Button onClick={handleClose} disabled={loading}>

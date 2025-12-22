@@ -45,8 +45,8 @@ export default function GestionUtilisateursCard({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
           <Settings sx={{ fontSize: 32, color: 'primary.main' }} />
           <Chip
-            label={getStatusLabel(item.status)}
-            color={getStatusColor(item.status)}
+            label={getStatusLabel(item.isActive)}
+            color={getStatusColor(item.isActive) as any}
             size="small"
           />
         </Box>

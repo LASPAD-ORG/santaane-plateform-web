@@ -36,7 +36,6 @@ import {
   AdminPanelSettings as AdminPanelSettingsIcon,
   People as PeopleIcon,
   PersonAdd as PersonAddIcon,
-  Group as GroupIcon,
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { User, Pagination } from '../fetchers/useFetchGestionUtilisateurs';
@@ -44,9 +43,7 @@ import { ROLE_CONFIGS } from '@/config/roles';
 import { getStatusLabel, getStatusColor } from '../helpers/formatters';
 import { useAuthStore } from '@/stores/authStore';
 import { UserRole } from '@/types/auth';
-import { useMentorApi } from '../fetchers/useMentorApi';
-import { MentorAssignment } from '../fetchers/useMentorApi';
-import { useAssignmentValidation } from '@/hooks/useAssignmentValidation';
+
 // Utility functions for date formatting
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -78,8 +75,6 @@ interface UserManagementTableProps {
   onDeleteUser: (userId: string) => void;
   onToggleStatus: (userId: string, currentStatus: boolean) => void;
   onResetPassword: (userId: string) => void;
-  onAssignAuthorToMentor?: (author: User) => void;
-  onViewMentorAuthors?: (mentor: User) => void;
 }
 
 interface ActionMenuProps {
@@ -88,8 +83,6 @@ interface ActionMenuProps {
   onDeleteUser: (userId: string) => void;
   onToggleStatus: (userId: string, currentStatus: boolean) => void;
   onResetPassword: (userId: string) => void;
-  onAssignAuthorToMentor?: (author: User) => void;
-  onViewMentorAuthors?: (mentor: User) => void;
 }
 
 function ActionMenu({ 
@@ -97,26 +90,11 @@ function ActionMenu({
   onEditUser, 
   onDeleteUser, 
   onToggleStatus, 
-  onResetPassword, 
-  onAssignAuthorToMentor,
-  onViewMentorAuthors 
+  onResetPassword
 }: ActionMenuProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const { user: currentUser } = useAuthStore();
-  const { hasActiveMentor, loading: validationLoading } = useAssignmentValidation();
-  
-  // Vérifier si l'utilisateur connecté a les permissions nécessaires
-  const canManageMentorAssignments = currentUser?.roles.some(role => 
-    role === UserRole.SUPER_ADMIN || role === UserRole.EDITOR
-  );
-  
-  // Vérifier les rôles de l'utilisateur sélectionné
-  const isAuthor = user.roles.includes('AUTHOR');
-  const isMentor = user.roles.includes('MENTOR');
-  
-  // Vérifier si l'auteur est déjà assigné en utilisant le hook centralisé
-  const isAuthorAlreadyAssigned = isAuthor && hasActiveMentor(user.id);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -143,20 +121,6 @@ function ActionMenu({
 
   const handleDelete = () => {
     onDeleteUser(user.id);
-    handleClose();
-  };
-
-  const handleAssignAuthorToMentor = () => {
-    if (onAssignAuthorToMentor) {
-      onAssignAuthorToMentor(user);
-    }
-    handleClose();
-  };
-
-  const handleViewMentorAuthors = () => {
-    if (onViewMentorAuthors) {
-      onViewMentorAuthors(user);
-    }
     handleClose();
   };
 
@@ -211,34 +175,6 @@ function ActionMenu({
           </ListItemIcon>
           <ListItemText>Supprimer</ListItemText>
         </MenuItem>
-
-        {/* Actions conditionnelles pour la gestion des mentors */}
-        {canManageMentorAssignments && isAuthor && !isAuthorAlreadyAssigned && onAssignAuthorToMentor && (
-          <MenuItem onClick={handleAssignAuthorToMentor} disabled={validationLoading}>
-            <ListItemIcon>
-              <PersonAddIcon fontSize="small" sx={{ color: 'success.main' }} />
-            </ListItemIcon>
-            <ListItemText>Assigner à un mentor</ListItemText>
-          </MenuItem>
-        )}
-
-        {canManageMentorAssignments && isAuthor && isAuthorAlreadyAssigned && (
-          <MenuItem disabled>
-            <ListItemIcon>
-              <PersonAddIcon fontSize="small" sx={{ color: 'grey.500' }} />
-            </ListItemIcon>
-            <ListItemText sx={{ color: 'grey.500' }}>Déjà assigné à un mentor</ListItemText>
-          </MenuItem>
-        )}
-
-        {canManageMentorAssignments && isMentor && onViewMentorAuthors && (
-          <MenuItem onClick={handleViewMentorAuthors}>
-            <ListItemIcon>
-              <GroupIcon fontSize="small" sx={{ color: 'info.main' }} />
-            </ListItemIcon>
-            <ListItemText>Voir les auteurs assignés</ListItemText>
-          </MenuItem>
-        )}
       </Menu>
     </>
   );
@@ -297,7 +233,7 @@ function RoleChips({ roles }: { roles: string[] }) {
   );
 }
 
-export function UserManagementTable({
+export default function UserManagementTable({
   users,
   pagination,
   onPaginationChange,
@@ -306,8 +242,6 @@ export function UserManagementTable({
   onDeleteUser,
   onToggleStatus,
   onResetPassword,
-  onAssignAuthorToMentor,
-  onViewMentorAuthors,
 }: UserManagementTableProps) {
   const handleChangePage = (event: unknown, newPage: number) => {
     onPaginationChange(newPage, pagination.size);
@@ -443,8 +377,6 @@ export function UserManagementTable({
                       onDeleteUser={onDeleteUser}
                       onToggleStatus={onToggleStatus}
                       onResetPassword={onResetPassword}
-                      onAssignAuthorToMentor={onAssignAuthorToMentor}
-                      onViewMentorAuthors={onViewMentorAuthors}
                     />
                   </Box>
                 </TableCell>

@@ -37,17 +37,9 @@ export interface RoleConfig {
   color: string; // For UI display
 }
 
-/**
- * Role configuration with default routes
- *
- * Role hierarchy (for shared dashboard):
- * - EVALUATOR can do: AUTHOR + MENTOR + EVALUATOR features
- * - MENTOR can do: AUTHOR + MENTOR features
- * - AUTHOR can do: AUTHOR features only
- *
- * SUPER_ADMIN and EDITOR have completely separate dashboards
- */
+
 export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
+
   [UserRole.SUPER_ADMIN]: {
     role: UserRole.SUPER_ADMIN,
     label: 'Super Admin',
@@ -66,12 +58,6 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
     defaultRoute: '/dashboard/evaluator',
     color: '#7b1fa2', // Purple
   },
-  [UserRole.MENTOR]: {
-    role: UserRole.MENTOR,
-    label: 'Mentor',
-    defaultRoute: '/dashboard/mentor',
-    color: '#388e3c', // Green
-  },
   [UserRole.AUTHOR]: {
     role: UserRole.AUTHOR,
     label: 'Auteur',
@@ -87,8 +73,6 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
  * - SUPER_ADMIN: Platform management, all laboratories, analytics
  * - EDITOR: Manage researchers, assign roles, lab settings
  * - AUTHOR: My articles, create article, profile
- * - MENTOR: AUTHOR menus + mentoring features
- * - EVALUATOR: AUTHOR + MENTOR menus + evaluation features
  */
 export const MENU_ITEMS: MenuItem[] = [
   // ===== SUPER_ADMIN MENUS =====
@@ -105,25 +89,11 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.SUPER_ADMIN],
   },
   {
-    label: 'Themes',
-    path: '/dashboard/super-admin/gestion-themes',
-    icon: Book,
-    roles: [UserRole.SUPER_ADMIN],
+    label:'Gestion des roles',
+    path:'/dashboard/super-admin/gestion-roles',
+    icon:SettingsIcon,
+    roles:[UserRole.SUPER_ADMIN]
   },
-  {
-    label: 'Rubriques',
-    path: '/dashboard/super-admin/gestion-rubriques',
-    icon: ArticleIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Langues',
-    path: '/dashboard/super-admin/gestion-langues',
-    icon: TranslateIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
- 
-
   // ===== EDITOR MENUS =====
   {
     label: 'Dashboard Labo',
@@ -138,20 +108,31 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.EDITOR],
   },
 
-  // ===== SHARED DASHBOARD MENUS (AUTHOR/MENTOR/EVALUATOR) =====
-
   // AUTHOR menus (base level - everyone has these)
   {
     label: 'Mon Profil',
     path: '/dashboard/profile',
     icon: PeopleIcon,
-    roles: [UserRole.AUTHOR, UserRole.MENTOR, UserRole.EVALUATOR],
-  }
-
-  // MENTOR menus (AUTHOR + MENTOR features)
-
-  // EVALUATOR menus (AUTHOR + MENTOR + EVALUATOR features)
-  
+    roles: [UserRole.AUTHOR, UserRole.EVALUATOR],
+  },
+  {
+    label: 'Gestion des thèmes',
+    path: '/dashboard/super-admin/gestion-theme',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Gestion des rubriques',
+    path: '/dashboard/super-admin/gestion-rubriques',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Langues',
+    path: '/dashboard/super-admin/langue',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
 ];
 
 /**
@@ -182,7 +163,6 @@ export function getMenuItemsForRoles(userRoles: UserRole[]): MenuItem[] {
 
 /**
  * Get default route for a user with multiple roles
- * Priority: SUPER_ADMIN > EDITOR > EVALUATOR > MENTOR > AUTHOR
  */
 export function getDefaultRouteForRoles(userRoles: UserRole[]): string {
   // Priority order
@@ -190,7 +170,6 @@ export function getDefaultRouteForRoles(userRoles: UserRole[]): string {
     UserRole.SUPER_ADMIN,
     UserRole.EDITOR,
     UserRole.EVALUATOR,
-    UserRole.MENTOR,
     UserRole.AUTHOR,
   ];
 

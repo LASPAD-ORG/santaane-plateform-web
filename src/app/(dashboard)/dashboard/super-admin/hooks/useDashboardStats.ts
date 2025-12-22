@@ -37,8 +37,8 @@ export interface Activity {
 
 // Dashboard Statistics - Consistent with user distribution
 export const dashboardStats: DashboardStats = {
-    totalUsers: 373, // Total matches sum of userDistribution
-    activeUsers: 350,
+    totalUsers: 331, // Total matches sum of userDistribution
+    activeUsers: 310,
     totalLaboratoires: 4,
     publishedManuscripts: 5432,
     monthlyGrowth: 0,
@@ -54,10 +54,9 @@ export const monthlySubmissions: MonthlySubmission[] = [
     { month: 'Novembre', submissions: 67, accepted: 38, rejected: 16, pending: 13 },
 ];
 
-// User distribution by role - Total must equal dashboardStats.totalUsers (373)
+// User distribution by role - Total must equal dashboardStats.totalUsers (331)
 export const userDistribution: UserDistribution[] = [
     { role: 'Auteurs', count: 245, color: '#f57c00' },
-    { role: 'Mentors', count: 42, color: '#388e3c' },
     { role: 'Évaluateurs', count: 68, color: '#7b1fa2' },
     { role: 'Éditeurs', count: 15, color: '#1976d2' },
     { role: 'Super Admins', count: 3, color: '#d32f2f' },

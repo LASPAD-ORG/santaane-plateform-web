@@ -12,7 +12,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user && user.roles.length > 0) {
-      // Redirect based on role priority: SUPER_ADMIN > EDITOR > EVALUATOR > MENTOR > AUTHOR
+      // Redirect based on role priority: SUPER_ADMIN > EDITOR > EVALUATOR > AUTHOR
       const defaultRoute = getDefaultRouteForRoles(user.roles);
       router.replace(defaultRoute);
     }

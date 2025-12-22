@@ -113,7 +113,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
             email: getValue(values, headers, 'email'),
             prenom: getValue(values, headers, 'prenom'),
             nom: getValue(values, headers, 'nom'),
-            roles: parseRoles(getValue(values, headers, 'roles')),
+            roleIds: parseRoles(getValue(values, headers, 'roles')),
             laboratoire: getValue(values, headers, 'laboratoire') || undefined,
             specialite: getValue(values, headers, 'specialite') || undefined,
             telephone: getValue(values, headers, 'telephone') || undefined,
@@ -124,7 +124,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
           if (!userData.email) throw new Error('Email requis');
           if (!userData.prenom) throw new Error('Prénom requis');
           if (!userData.nom) throw new Error('Nom requis');
-          if (userData.roles.length === 0) throw new Error('Au moins un rôle requis');
+          if (userData.roleIds.length === 0) throw new Error('Au moins un rôle requis');
 
           users.push(userData);
         } catch (error) {
@@ -168,14 +168,22 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
     return index >= 0 ? values[index] || '' : '';
   };
 
-  const parseRoles = (rolesString: string): UserRole[] => {
-    if (!rolesString) return [UserRole.AUTHOR];
+  const parseRoles = (rolesString: string): number[] => {
+    if (!rolesString) return [1]; // Default to AUTHOR role ID (assuming 1 = AUTHOR)
+
+    // Map role names to IDs - this should match your backend role mapping
+    const roleMap: Record<string, number> = {
+      'AUTHOR': 1,
+      'EVALUATOR': 2,
+      'EDITOR': 3,
+      'SUPER_ADMIN': 4
+    };
 
     return rolesString
       .split(/[;,]/)
       .map(role => role.trim().toUpperCase())
-      .filter(role => Object.values(UserRole).includes(role as UserRole))
-      .map(role => role as UserRole);
+      .filter(role => roleMap[role])
+      .map(role => roleMap[role]);
   };
 
   const handleImport = async () => {
@@ -311,7 +319,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
                     </ListItemIcon>
                     <ListItemText
                       primary={`${user.prenom} ${user.nom}`}
-                      secondary={`${user.email} - Rôles: ${user.roles.join(', ')}`}
+                      secondary={`${user.email} - Rôles: ${user.roleIds.join(', ')}`}
                     />
                   </ListItem>
                 ))}

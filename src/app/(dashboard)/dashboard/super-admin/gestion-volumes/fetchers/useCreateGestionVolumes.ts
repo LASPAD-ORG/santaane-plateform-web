@@ -2,7 +2,7 @@ import { useState } from 'react';
 // import { apiClient } from '@/lib/api/client';
 // import { useAlertStore } from '@/stores/alertStore';
 import type { GestionVolumesPayload } from '../checkers/validators';
-import type { GestionVolumesItem } from './useFetchGestionVolumes';
+import type { Volume, VolumeStatus } from './useFetchGestionVolumes';
 
 /**
  * Custom hook to create a new gestion-volumes
@@ -11,7 +11,7 @@ export function useCreateGestionVolumes() {
   const [loading, setLoading] = useState(false);
   // const { showSuccess, showError } = useAlertStore();
 
-  const create = async (payload: GestionVolumesPayload): Promise<GestionVolumesItem> => {
+  const create = async (payload: GestionVolumesPayload): Promise<Volume> => {
     setLoading(true);
     try {
       // TODO: Replace mock data with real API call
@@ -23,13 +23,13 @@ export function useCreateGestionVolumes() {
 
       // Mock implementation - Remove this
       await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-      const mockItem: GestionVolumesItem = {
+      const mockItem: Volume = {
         id: Math.random().toString(36).substring(7),
-        ...payload,
-        status: payload.status || 'draft',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        authorId: 'current-user',
+        title: payload.title || 'Untitled Volume',
+        year: new Date().getFullYear(),
+        status: (payload.status || 'draft') as VolumeStatus,
+        description: payload.description,
+        issues: []
       };
       console.log('Mock: Created gestion-volumes', mockItem);
       return mockItem;
@@ -60,7 +60,7 @@ export function useUpdateGestionVolumes() {
   const [loading, setLoading] = useState(false);
   // const { showSuccess, showError } = useAlertStore();
 
-  const update = async (id: string, payload: GestionVolumesPayload): Promise<GestionVolumesItem> => {
+  const update = async (id: string, payload: GestionVolumesPayload): Promise<Volume> => {
     setLoading(true);
     try {
       // TODO: Replace mock data with real API call
@@ -72,13 +72,13 @@ export function useUpdateGestionVolumes() {
 
       // Mock implementation - Remove this
       await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-      const mockItem: GestionVolumesItem = {
+      const mockItem: Volume = {
         id,
-        ...payload,
-        status: payload.status || 'draft',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        authorId: 'current-user',
+        title: payload.title || 'Updated Volume',
+        year: new Date().getFullYear(),
+        status: (payload.status || 'draft') as VolumeStatus,
+        description: payload.description,
+        issues: []
       };
       console.log('Mock: Updated gestion-volumes', mockItem);
       return mockItem;

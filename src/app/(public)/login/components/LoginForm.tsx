@@ -39,7 +39,7 @@ export default function LoginForm() {
       // Get user roles and redirect to appropriate dashboard
       const currentUser = useAuthStore.getState().user;
       if (currentUser && currentUser.roles.length > 0) {
-        // Redirect based on role priority: SUPER_ADMIN > EDITOR > EVALUATOR > MENTOR > AUTHOR
+        // Redirect based on role priority: SUPER_ADMIN > EDITOR > EVALUATOR > AUTHOR
         const defaultRoute = getDefaultRouteForRoles(currentUser.roles);
         router.push(defaultRoute);
       } else {

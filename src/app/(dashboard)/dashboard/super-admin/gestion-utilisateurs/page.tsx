@@ -14,15 +14,13 @@ import {
   Upload as UploadIcon,
 } from '@mui/icons-material';
 
-import { UserManagementTable } from './components/UserManagementTable';
+import UserManagementTable from './components/UserManagementTable';
 import { UserFilters } from './components/UserFilters';
 import { CreateUserModal } from './components/CreateUserModal';
 import { EditUserModal } from './components/EditUserModal';
 import { BulkActions } from './components/BulkActions';
 import { UserImportModal } from './components/UserImportModal';
 import { ChangePasswordDialog } from './components/ChangePasswordDialog';
-import { AssignAuthorToMentorModal } from './components/AssignAuthorToMentorModal';
-import { MentorAuthorsModal } from './components/MentorAuthorsModal';
 
 import {
   useFetchGestionUtilisateurs,
@@ -61,13 +59,9 @@ export default function GestionUtilisateursPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-  const [assignAuthorModalOpen, setAssignAuthorModalOpen] = useState(false);
-  const [mentorAuthorsModalOpen, setMentorAuthorsModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [selectedAuthor, setSelectedAuthor] = useState<User | null>(null);
-  const [selectedMentor, setSelectedMentor] = useState<User | null>(null);
-
+  
   // Data State
   const [users, setUsers] = useState<User[]>([]);
   const [filters, setFilters] = useState<UserFiltersType>(initialFilters);
@@ -330,30 +324,6 @@ export default function GestionUtilisateursPage() {
     }
   };
 
-  // Handlers pour les nouvelles fonctionnalités de mentor
-  const handleAssignAuthorToMentor = (author: User) => {
-    setSelectedAuthor(author);
-    setAssignAuthorModalOpen(true);
-  };
-
-  const handleViewMentorAuthors = (mentor: User) => {
-    setSelectedMentor(mentor);
-    setMentorAuthorsModalOpen(true);
-  };
-
-  const handleAssignmentSuccess = () => {
-    // Rafraîchir la liste des utilisateurs si nécessaire
-    // Pour l'instant, on ferme simplement le modal
-    setAssignAuthorModalOpen(false);
-    setSelectedAuthor(null);
-  };
-
-  const handleAssignmentRemoved = () => {
-    // Rafraîchir la liste des utilisateurs si nécessaire
-    // Pour l'instant, on ferme simplement le modal
-    setMentorAuthorsModalOpen(false);
-    setSelectedMentor(null);
-  };
 
   const selectedUser = selectedUserId ? users.find(u => u.id === selectedUserId) : null;
 
@@ -472,12 +442,10 @@ export default function GestionUtilisateursPage() {
         pagination={pagination}
         onPaginationChange={updatePagination}
         loading={loading}
-        onEditUser={(id) => { setSelectedUserId(id); setEditModalOpen(true); }}
+        onEditUser={(id: string) => { setSelectedUserId(id); setEditModalOpen(true); }}
         onDeleteUser={handleDeleteUser}
         onToggleStatus={handleToggleStatus}
-        onResetPassword={(id) => { setSelectedUserId(id); setPasswordDialogOpen(true); }}
-        onAssignAuthorToMentor={handleAssignAuthorToMentor}
-        onViewMentorAuthors={handleViewMentorAuthors}
+        onResetPassword={(id: string) => { setSelectedUserId(id); setPasswordDialogOpen(true); }}
       />
 
       {/* Modals */}
@@ -514,30 +482,6 @@ export default function GestionUtilisateursPage() {
         />
       )}
 
-      {/* Modals pour la gestion des mentors */}
-      {selectedAuthor && (
-        <AssignAuthorToMentorModal
-          open={assignAuthorModalOpen}
-          onClose={() => {
-            setAssignAuthorModalOpen(false);
-            setSelectedAuthor(null);
-          }}
-          author={selectedAuthor}
-          onAssignmentSuccess={handleAssignmentSuccess}
-        />
-      )}
-
-      {selectedMentor && (
-        <MentorAuthorsModal
-          open={mentorAuthorsModalOpen}
-          onClose={() => {
-            setMentorAuthorsModalOpen(false);
-            setSelectedMentor(null);
-          }}
-          mentor={selectedMentor}
-          onAssignmentRemoved={handleAssignmentRemoved}
-        />
-      )}
 
       {/* Actions en lot */}
       <BulkActions

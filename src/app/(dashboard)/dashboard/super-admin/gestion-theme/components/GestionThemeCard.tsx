@@ -1,33 +1,28 @@
 'use client';
 
-import { Card, CardContent, CardActions, Typography, Box, Button, Chip } from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Box, Button } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Settings,
+  Palette,
 } from '@mui/icons-material';
-import type { Volume } from '../fetchers/useFetchGestionVolumes';
-import {
-  formatGestionVolumesDate,
-  getStatusLabel,
-  getStatusColor,
-  truncateContent,
-} from '../helpers/formatters';
+import type { GestionThemeItem } from '../fetchers/useFetchGestionTheme';
+import { truncateContent } from '../helpers/formatters';
 
-interface GestionVolumesCardProps {
-  item: Volume;
-  onView?: (item: Volume) => void;
-  onEdit?: (item: Volume) => void;
-  onDelete?: (item: Volume) => void;
+interface GestionThemeCardProps {
+  item: GestionThemeItem;
+  onView?: (item: GestionThemeItem) => void;
+  onEdit?: (item: GestionThemeItem) => void;
+  onDelete?: (item: GestionThemeItem) => void;
 }
 
-export default function GestionVolumesCard({
+export default function GestionThemeCard({
   item,
   onView,
   onEdit,
   onDelete,
-}: GestionVolumesCardProps) {
+}: GestionThemeCardProps) {
   return (
     <Card
       sx={{
@@ -42,14 +37,9 @@ export default function GestionVolumesCard({
       }}
     >
       <CardContent sx={{ flexGrow: 1 }}>
-        {/* Header with icon and status */}
+        {/* Header with icon */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Settings sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Chip
-            label={getStatusLabel(item.status)}
-            color={getStatusColor(item.status)}
-            size="small"
-          />
+          <Palette sx={{ fontSize: 32, color: 'primary.main' }} />
         </Box>
 
         {/* Title */}
@@ -67,8 +57,21 @@ export default function GestionVolumesCard({
         {/* Metadata */}
         <Box sx={{ mt: 'auto' }}>
           <Typography variant="caption" color="text.secondary" display="block">
-            Année {item.year}
+            Créé le {new Date(item.created_at).toLocaleDateString('fr-FR', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            })}
           </Typography>
+          {item.updated_at !== item.created_at && (
+            <Typography variant="caption" color="text.secondary" display="block">
+              Modifié le {new Date(item.updated_at).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+              })}
+            </Typography>
+          )}
         </Box>
       </CardContent>
 

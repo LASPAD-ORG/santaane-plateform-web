@@ -13,7 +13,6 @@ export interface BaseManuscrit {
   dateMiseAJour: string;
   contenu?: string;
   nombreCommentaires: number;
-  mentorId?: string;
   // Métadonnées pour la gestion
   metadata?: {
     specialites?: string[];
@@ -35,7 +34,6 @@ export const MANUSCRITS_DATABASE: BaseManuscrit[] = [
     dateCreation: '2024-01-15T10:00:00Z',
     dateMiseAJour: '2024-01-20T16:30:00Z',
     nombreCommentaires: 5,
-    mentorId: 'mentor-1',
     contenu: `# Les Voix du Sahel
 
 ## Préface
@@ -74,7 +72,6 @@ Les jeunes générations doivent apprendre à écouter ces voix ancestrales pour
     dateCreation: '2024-01-18T09:15:00Z',
     dateMiseAJour: '2024-01-22T11:45:00Z',
     nombreCommentaires: 2,
-    mentorId: 'mentor-1',
     contenu: `# Contes de Grand-mère
 
 ## Introduction
@@ -111,7 +108,6 @@ Le vieux baobab détient tous les secrets de la savane. Un jeune homme impatient
     dateCreation: '2024-01-05T14:20:00Z',
     dateMiseAJour: '2024-01-12T10:15:00Z',
     nombreCommentaires: 8,
-    mentorId: 'mentor-1',
     contenu: `# Mémoires d'un Village
 
 ## Prologue
@@ -170,7 +166,6 @@ Sanankoro n'est pas seulement mon village natal. C'est le symbole de l'Afrique m
     dateCreation: '2024-01-12T08:00:00Z',
     dateMiseAJour: '2024-01-23T15:20:00Z',
     nombreCommentaires: 7,
-    mentorId: 'mentor-1',
     contenu: `# Entre Deux Mondes
 
 ## Partie I : Le Départ
@@ -251,7 +246,6 @@ Son dernier livre se termine par cette phrase : "Je ne suis pas à moitié malie
     dateCreation: '2024-01-16T13:30:00Z',
     dateMiseAJour: '2024-01-21T17:45:00Z',
     nombreCommentaires: 3,
-    mentorId: 'mentor-1',
     contenu: `# La Maison Jaune
 
 La maison jaune de mon enfance se dresse encore dans ma mémoire, intacte malgré les années qui ont passé. Ses murs couleur soleil couchant, sa véranda ombragée où grand-père fumait sa pipe, son jardin où poussaient les goyaviers et les manguiers...
@@ -300,7 +294,6 @@ J'ai compris ce jour-là que nous ne quittons jamais vraiment la maison de notre
     dateCreation: '2024-01-20T10:45:00Z',
     dateMiseAJour: '2024-01-24T14:30:00Z',
     nombreCommentaires: 1,
-    mentorId: 'mentor-1',
     contenu: `# Réflexions sur l'Éducation Moderne
 
 ## Introduction
@@ -376,20 +369,17 @@ export function getManuscritById(id: string): BaseManuscrit | undefined {
 }
 
 // Fonction pour obtenir tous les manuscrits avec filtres optionnels
-export function getAllManuscrits(filters?: {
+export interface ManuscritFilter {
   statut?: BaseManuscrit['statut'];
-  mentorId?: string;
   auteurId?: string;
-}): BaseManuscrit[] {
+}
+export function getAllManuscrits(filters?: ManuscritFilter): BaseManuscrit[] {
   let results = [...MANUSCRITS_DATABASE];
   
   if (filters?.statut) {
     results = results.filter(m => m.statut === filters.statut);
   }
   
-  if (filters?.mentorId) {
-    results = results.filter(m => m.mentorId === filters.mentorId);
-  }
   
   if (filters?.auteurId) {
     results = results.filter(m => m.auteurId === filters.auteurId);
