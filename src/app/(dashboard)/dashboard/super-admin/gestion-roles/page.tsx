@@ -177,7 +177,7 @@ export default function GestionRolesPage() {
         </Box>
       </Box>
 
-      {/* Main Content - Premium Table */}
+      {/* Main Content -  Table */}
       <TableContainer
         component={Paper}
         elevation={0}
