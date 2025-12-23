@@ -82,7 +82,7 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
 
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="caption" color="text.secondary" fontWeight="600">
-              Section:
+              Rubrique:
             </Typography>
             <Typography variant="caption">{manuscript.sectionName}</Typography>
           </Box>

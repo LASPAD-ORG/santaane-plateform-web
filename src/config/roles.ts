@@ -95,17 +95,42 @@ export const MENU_ITEMS: MenuItem[] = [
     icon:SettingsIcon,
     roles:[UserRole.SUPER_ADMIN]
   },
+
+  {
+    label: 'Gestion des thèmes',
+    path: '/dashboard/super-admin/gestion-theme',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Gestion des rubriques',
+    path: '/dashboard/super-admin/gestion-rubriques',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
+  {
+    label: 'Langues',
+    path: '/dashboard/super-admin/langue',
+    icon: SettingsIcon,
+    roles: [UserRole.SUPER_ADMIN],
+  },
   // ===== EDITOR MENUS =====
   {
-    label: 'Dashboard Labo',
+    label: 'Dashboard',
     path: '/dashboard/editor',
     icon: DashboardIcon,
     roles: [UserRole.EDITOR],
   },
   {
-    label: 'Chercheurs',
-    path: '/dashboard/editor/researchers',
-    icon: GroupsIcon,
+    label: 'Manuscrits',
+    path: '/dashboard/editor/manuscripts',
+    icon: ArticleIcon,
+    roles: [UserRole.EDITOR],
+  },
+  {
+    label: 'Evaluateurs',
+    path: '/dashboard/editor/evaluators',
+    icon: PeopleIcon,
     roles: [UserRole.EDITOR],
   },
 
@@ -137,26 +162,6 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR],
   },
 
-
-
-  {
-    label: 'Gestion des thèmes',
-    path: '/dashboard/super-admin/gestion-theme',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Gestion des rubriques',
-    path: '/dashboard/super-admin/gestion-rubriques',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
-  {
-    label: 'Langues',
-    path: '/dashboard/super-admin/langue',
-    icon: SettingsIcon,
-    roles: [UserRole.SUPER_ADMIN],
-  },
 ];
 
 /**

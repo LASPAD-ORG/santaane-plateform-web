@@ -23,9 +23,9 @@ interface AlertState {
   showConfirm: (
     title: string,
     message: string,
-    onConfirm: () => void,
+    onConfirm?: () => void,
     onCancel?: () => void
-  ) => void;
+  ) => Promise<boolean>;
   closeAlert: () => void;
 }
 
@@ -107,28 +107,37 @@ export const useAlertStore = create<AlertState>((set, get) => ({
 
   /**
    * Show confirmation dialog
+   * Returns a promise that resolves to true if confirmed, false if cancelled
    */
   showConfirm: (
     title: string,
     message: string,
-    onConfirm: () => void,
+    onConfirm?: () => void,
     onCancel?: () => void
-  ) => {
-    const alert: Alert = {
-      id: Date.now().toString(),
-      type: 'warning',
-      title,
-      message,
-      onConfirm,
-      onCancel,
-      confirmText: 'Confirmer',
-      cancelText: 'Annuler',
-    };
+  ): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const alert: Alert = {
+        id: Date.now().toString(),
+        type: 'warning',
+        title,
+        message,
+        onConfirm: () => {
+          onConfirm?.();
+          resolve(true);
+        },
+        onCancel: () => {
+          onCancel?.();
+          resolve(false);
+        },
+        confirmText: 'Confirmer',
+        cancelText: 'Annuler',
+      };
 
-    set((state) => ({
-      alerts: [...state.alerts, alert],
-      currentAlert: state.currentAlert || alert,
-    }));
+      set((state) => ({
+        alerts: [...state.alerts, alert],
+        currentAlert: state.currentAlert || alert,
+      }));
+    });
   },
 
   /**

@@ -11,32 +11,36 @@ import {
   Chip,
   Divider,
   IconButton,
-  Tooltip,
   Tabs,
   Tab,
+  Avatar,
 } from '@mui/material';
 import {
   ArrowBack,
-  Edit,
   PictureAsPdf,
   CalendarToday,
   Category,
   Language,
   Label,
   Visibility,
+  Email,
+  Person,
+  Business,
+  Work,
+  Info,
 } from '@mui/icons-material';
 import { useState } from 'react';
-import { useManuscriptDetails } from './hooks/useManuscriptDetails';
+import { useManuscriptStaffDetails } from './hooks/useManuscriptStaffDetails';
 import { MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
-import PdfViewer from './components/PdfViewer';
+import PdfViewer from '../../../author/manuscripts/[id]/components/PdfViewer';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function ManuscriptDetailsPage() {
+export default function EditorManuscriptDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { loading, manuscript } = useManuscriptDetails(id);
+  const { loading, manuscript } = useManuscriptStaffDetails(id);
   const [currentTab, setCurrentTab] = useState(0);
 
   const formatDate = (dateString: string) => {
@@ -82,7 +86,7 @@ export default function ManuscriptDetailsPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 1000, mx: 'auto', p: 3 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
       {/* Header */}
       <Box display="flex" alignItems="center" gap={2} mb={3}>
         <IconButton onClick={() => router.back()}>
@@ -97,24 +101,14 @@ export default function ManuscriptDetailsPage() {
           </Typography>
         </Box>
         <Chip
-          label={MANUSCRIPT_STATUS_LABELS[manuscript.status]}
-          color={MANUSCRIPT_STATUS_COLORS[manuscript.status]}
+          label={MANUSCRIPT_STATUS_LABELS[manuscript.status as keyof typeof MANUSCRIPT_STATUS_LABELS]}
+          color={MANUSCRIPT_STATUS_COLORS[manuscript.status as keyof typeof MANUSCRIPT_STATUS_COLORS]}
           size="medium"
         />
       </Box>
 
       {/* Actions */}
       <Box display="flex" gap={2} mb={3}>
-        {manuscript.status === 'revision_requested' && (
-          <Button
-            variant="contained"
-            color="warning"
-            startIcon={<Edit />}
-            onClick={() => router.push(`/dashboard/author/manuscripts/${id}/edit`)}
-          >
-            Modifier le manuscrit
-          </Button>
-        )}
         <Button variant="outlined" startIcon={<PictureAsPdf />} onClick={handleDownloadPdf}>
           Télécharger le PDF
         </Button>
@@ -124,6 +118,7 @@ export default function ManuscriptDetailsPage() {
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
           <Tab label="Informations" />
+          <Tab label="Auteur" icon={<Person />} iconPosition="start" />
           <Tab label="Prévisualisation PDF" icon={<Visibility />} iconPosition="start" />
         </Tabs>
       </Box>
@@ -254,6 +249,93 @@ export default function ManuscriptDetailsPage() {
                   </Box>
                 </Box>
               </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      ) : currentTab === 1 ? (
+        // Onglet Auteur
+        <Card elevation={2}>
+          <CardContent sx={{ p: 4 }}>
+            <Box display="flex" alignItems="center" gap={3} mb={4}>
+              <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', fontSize: 32 }}>
+                {manuscript.author.fullName.charAt(0).toUpperCase()}
+              </Avatar>
+              <Box>
+                <Typography variant="h5" fontWeight="600">
+                  {manuscript.author.fullName}
+                </Typography>
+                {manuscript.author.position && (
+                  <Typography variant="body2" color="text.secondary">
+                    {manuscript.author.position}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Box display="flex" flexDirection="column" gap={3}>
+              {/* Email */}
+              <Box display="flex" alignItems="center" gap={2}>
+                <Email sx={{ color: 'text.secondary' }} />
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    Email
+                  </Typography>
+                  <Typography variant="body1">{manuscript.author.email}</Typography>
+                </Box>
+              </Box>
+
+              {/* Institution */}
+              {manuscript.author.institution && (
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Business sx={{ color: 'text.secondary' }} />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      Institution
+                    </Typography>
+                    <Typography variant="body1">{manuscript.author.institution}</Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Position */}
+              {manuscript.author.position && (
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Work sx={{ color: 'text.secondary' }} />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      Poste
+                    </Typography>
+                    <Typography variant="body1">{manuscript.author.position}</Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {/* ORCID */}
+              {manuscript.author.orcidId && (
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Info sx={{ color: 'text.secondary' }} />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      ORCID ID
+                    </Typography>
+                    <Typography variant="body1">{manuscript.author.orcidId}</Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Bio */}
+              {manuscript.author.bio && (
+                <Box>
+                  <Typography variant="h6" fontWeight="600" mb={2}>
+                    Biographie
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+                    {manuscript.author.bio}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           </CardContent>
         </Card>

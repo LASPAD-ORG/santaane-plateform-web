@@ -1,391 +1,213 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Typography,
   Button,
+  Card,
+  CardContent,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  IconButton,
-  Tooltip,
-  Paper,
-  Avatar,
-  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  IconButton,
+  Tooltip,
+  Pagination,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
-import {
-  Add,
-  Refresh,
-  Edit,
-  Delete,
-  Category,
-} from '@mui/icons-material';
-import { useFetchGestionRubriques, GestionRubriquesItem } from './fetchers/useFetchGestionRubriques';
-import { useCreateGestionRubriques, useUpdateGestionRubriques, useDeleteGestionRubriques } from './fetchers/useCreateGestionRubriques';
-import { validateGestionRubriques, ValidationError } from './checkers/validators';
+import { Add, Search, Edit, Delete } from '@mui/icons-material';
+import { useFetchSections } from './fetchers/useFetchSections';
+import { useSectionActions } from './fetchers/useSectionActions';
+import CreateSectionDialog from './components/CreateSectionDialog';
+import EditSectionDialog from './components/EditSectionDialog';
 import { useAlertStore } from '@/stores/alertStore';
+import type { Section } from './fetchers/useFetchSections';
 
 export default function GestionRubriquesPage() {
-  const { data: items, loading, fetch } = useFetchGestionRubriques();
-  const { create, loading: creating } = useCreateGestionRubriques();
-  const { update, loading: updating } = useUpdateGestionRubriques();
-  const { deleteItem, loading: deleting } = useDeleteGestionRubriques();
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedSection, setSelectedSection] = useState<Section | null>(null);
+  const pageSize = 20;
+
+  const { data: sections, loading, fetch } = useFetchSections();
+  const { deleteSection, loading: actionLoading } = useSectionActions();
   const { showConfirm } = useAlertStore();
 
-  const [open, setOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<GestionRubriquesItem | null>(null);
-  const [formData, setFormData] = useState({ name: '', signe_min: 1, signe_max: 10 });
-  const [errors, setErrors] = useState<ValidationError[]>([]);
+  // Filtrage côté client
+  const filteredSections = (sections || []).filter((section) =>
+    section.name.toLowerCase().includes(search.toLowerCase())
+  );
 
-  useEffect(() => {
-    fetch();
-  }, []);
+  // Pagination côté client
+  const totalPages = Math.ceil(filteredSections.length / pageSize);
+  const paginatedSections = filteredSections.slice((page - 1) * pageSize, page * pageSize);
 
-  const handleOpen = (item?: GestionRubriquesItem) => {
-    if (item) {
-      setEditingItem(item);
-      setFormData({ name: item.name, signe_min: item.signe_min, signe_max: item.signe_max });
-    } else {
-      setEditingItem(null);
-      setFormData({ name: '', signe_min: 1, signe_max: 10 });
-    }
-    setErrors([]);
-    setOpen(true);
+  const handleEdit = (section: Section) => {
+    setSelectedSection(section);
+    setOpenEditDialog(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = async () => {
-    const validationErrors = validateGestionRubriques(formData);
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    try {
-      if (editingItem) {
-        await update(editingItem.id, formData);
-      } else {
-        await create(formData);
-      }
-      handleClose();
-      fetch();
-    } catch (error) {
-      // Error handled by hook
-    }
-  };
-
-  const handleDelete = (item: GestionRubriquesItem) => {
-    showConfirm(
-      'Supprimer la section',
-      `Êtes-vous sûr de vouloir supprimer la section "${item.name}" ? Cette action est irréversible.`,
-      async () => {
-        try {
-          await deleteItem(item.id);
-          fetch();
-        } catch (error) {
-          // Error handled by hook
-        }
-      }
+  const handleDelete = async (section: Section) => {
+    const confirmed = await showConfirm(
+      `Êtes-vous sûr de vouloir supprimer la rubrique "${section.name}" ?`,
+      'Cette action est irréversible.'
     );
+
+    if (confirmed) {
+      try {
+        await deleteSection(section.id);
+        fetch();
+      } catch (error) {
+        // Error handled by hook
+      }
+    }
   };
 
-  const getError = (field: string) => errors.find((e) => e.field === field)?.message;
+  const handleSuccess = () => {
+    fetch();
+  };
+
+  if (loading && !sections.length) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1400, mx: 'auto' }}>
-      {/* Header */}
-      <Box sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'space-between',
-        alignItems: { xs: 'flex-start', sm: 'center' },
-        mb: 5,
-        gap: 2
-      }}>
-        <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-            <Box sx={{
-              p: 1,
-              borderRadius: 1.5,
-              bgcolor: 'primary.main',
-              color: 'white',
-              display: 'flex',
-              boxShadow: '0 4px 12px rgba(255, 156, 0, 0.3)'
-            }}>
-              <Category fontSize="small" />
-            </Box>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
-              Gestion des Sections
-            </Typography>
-          </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ opacity: 0.8 }}>
-            Définissez et gérez les sections de votre plateforme
-          </Typography>
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 1.5 }}>
-          <Tooltip title="Actualiser la liste">
-            <IconButton
-              onClick={() => fetch()}
-              disabled={loading}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-                bgcolor: 'background.paper'
-              }}
-            >
-              <Refresh fontSize="small" sx={{ animation: loading ? 'spin 2s linear infinite' : 'none' }} />
-            </IconButton>
-          </Tooltip>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => handleOpen()}
-            disabled={loading}
-            sx={{
-              borderRadius: 2.5,
-              px: 3,
-              py: 1,
-              fontWeight: 600,
-              boxShadow: '0 8px 16px rgba(255, 156, 0, 0.2)',
-              '&:hover': {
-                boxShadow: '0 12px 20px rgba(255, 156, 0, 0.3)',
-                transform: 'translateY(-2px)'
-              },
-              transition: 'all 0.2s ease-in-out'
-            }}
-          >
-            Nouvelle Section
-          </Button>
-        </Box>
+    <Box>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h4">Gestion des Rubriques</Typography>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => setOpenCreateDialog(true)}
+        >
+          Nouvelle rubrique
+        </Button>
       </Box>
 
-      {/* Main Content - Premium Table */}
-      <TableContainer
-        component={Paper}
-        elevation={0}
-        sx={{
-          borderRadius: 4,
-          border: '1px solid',
-          borderColor: 'divider',
-          overflow: 'hidden',
-          bgcolor: 'background.paper'
-        }}
-      >
-        <Table sx={{ minWidth: 800 }}>
-          <TableHead>
-            <TableRow sx={{ bgcolor: 'grey.50' }}>
-              <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Nom</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Plage de signes</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Date de création</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 700, color: 'text.secondary', py: 2.5 }}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading && !items ? (
-              // Skeleton Loading Rows
-              Array.from(new Array(5)).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Skeleton variant="circular" width={40} height={40} />
-                      <Skeleton variant="text" width={120} height={24} />
-                    </Box>
-                  </TableCell>
-                  <TableCell><Skeleton variant="text" width="80%" height={20} /></TableCell>
-                  <TableCell><Skeleton variant="text" width={100} height={20} /></TableCell>
-                  <TableCell align="right"><Skeleton variant="circular" width={32} height={32} sx={{ ml: 'auto' }} /></TableCell>
+      <Card>
+        <CardContent>
+          <TextField
+            fullWidth
+            placeholder="Rechercher par nom..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ mb: 3 }}
+          />
+
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Nom</TableCell>
+                  <TableCell align="center">Signes Min</TableCell>
+                  <TableCell align="center">Signes Max</TableCell>
+                  <TableCell align="right">Actions</TableCell>
                 </TableRow>
-              ))
-            ) : items && items.length > 0 ? (
-              items.map((item) => (
-                <TableRow
-                  key={item.id}
-                  sx={{
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      bgcolor: alpha('#ff9c00', 0.02),
-                      '& .row-actions': { opacity: 1 }
-                    }
-                  }}
-                >
-                  <TableCell sx={{ py: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Avatar
-                        sx={{
-                          bgcolor: 'primary.lighter',
-                          color: 'primary.main',
-                          width: 40,
-                          height: 40,
-                          borderRadius: 1.5,
-                          fontWeight: 700,
-                          fontSize: '0.9rem'
-                        }}
-                      >
-                        <Category fontSize="small" />
-                      </Avatar>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                        {item.name}
+              </TableHead>
+              <TableBody>
+                {paginatedSections.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center">
+                      <Typography variant="body2" color="text.secondary">
+                        Aucune rubrique trouvée
                       </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{
-                      maxWidth: 400,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {item.signe_min} - {item.signe_max}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {new Date(item.created_at).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right" sx={{ py: 2 }}>
-                    <Box className="row-actions" sx={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      gap: 1,
-                      opacity: { xs: 1, md: 0.4 },
-                      transition: 'opacity 0.2s'
-                    }}>
-                      <Tooltip title="Modifier">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleOpen(item)}
-                          sx={{ '&:hover': { color: 'primary.main', bgcolor: 'primary.lighter' } }}
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Supprimer">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDelete(item)}
-                          sx={{ '&:hover': { color: 'error.main', bgcolor: 'error.lighter' } }}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              // Empty State Row
-              <TableRow>
-                <TableCell colSpan={4} sx={{ py: 10, textAlign: 'center' }}>
-                  <Box sx={{ color: 'text.disabled', mb: 2 }}>
-                    <Category sx={{ fontSize: 48, opacity: 0.2 }} />
-                  </Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    Aucune section trouvée
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Commencez par créer une nouvelle section.
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginatedSections.map((section) => (
+                    <TableRow key={section.id} hover>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={600}>
+                          {section.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2">
+                          {section.signe_min.toLocaleString()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2">
+                          {section.signe_max.toLocaleString()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Tooltip title="Modifier">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEdit(section)}
+                            disabled={actionLoading}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Supprimer">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(section)}
+                            disabled={actionLoading}
+                            color="error"
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      {/* Create/Edit Dialog */}
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        fullWidth
-        maxWidth="sm"
-        PaperProps={{
-          sx: {
-            borderRadius: 4,
-            p: 1,
-            boxShadow: '0 24px 48px rgba(0,0,0,0.1)'
-          }
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 800, fontSize: '1.5rem', pb: 1 }}>
-          {editingItem ? 'Modifier la section' : 'Nouvelle section'}
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {editingItem
-              ? "Modifiez les informations de la section ci-dessous."
-              : "Remplissez les informations pour créer une nouvelle section."}
-          </Typography>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField
-              label="Nom de la section"
-              fullWidth
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              error={!!getError('name')}
-              helperText={getError('name')}
-              required
-            />
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                label="Signe minimum"
-                type="number"
-                fullWidth
-                value={formData.signe_min}
-                onChange={(e) => setFormData({ ...formData, signe_min: parseInt(e.target.value) || 1 })}
-                error={!!getError('signe_min')}
-                helperText={getError('signe_min')}
-                required
-                inputProps={{ min: 1, max: 100 }}
-              />
-              <TextField
-                label="Signe maximum"
-                type="number"
-                fullWidth
-                value={formData.signe_max}
-                onChange={(e) => setFormData({ ...formData, signe_max: parseInt(e.target.value) || 1 })}
-                error={!!getError('signe_max')}
-                helperText={getError('signe_max')}
-                required
-                inputProps={{ min: 1, max: 100 }}
+          {totalPages > 1 && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={(_, value) => setPage(value)}
+                color="primary"
               />
             </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={handleClose} disabled={creating || updating}>
-            Annuler
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            disabled={creating || updating}
-          >
-            {editingItem ? 'Modifier' : 'Créer'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+          )}
+        </CardContent>
+      </Card>
+
+      <CreateSectionDialog
+        open={openCreateDialog}
+        onClose={() => setOpenCreateDialog(false)}
+        onSuccess={handleSuccess}
+      />
+
+      <EditSectionDialog
+        open={openEditDialog}
+        onClose={() => {
+          setOpenEditDialog(false);
+          setSelectedSection(null);
+        }}
+        onSuccess={handleSuccess}
+        section={selectedSection}
+      />
     </Box>
   );
 }

@@ -12,16 +12,19 @@ import {
   Alert,
 } from '@mui/material';
 import { ArrowBack, Save } from '@mui/icons-material';
-import { useManuscriptDetails } from '../hooks/useManuscriptDetails';
-import { useManuscriptRevision } from './hooks/useManuscriptRevision';
+import { useManuscriptStaffDetails } from '../hooks/useManuscriptStaffDetails';
+import { useManuscriptStaffEdit } from './hooks/useManuscriptStaffEdit';
 import GeneralInfoSection from './components/GeneralInfoSection';
+import ClassificationSection from './components/ClassificationSection';
 import PdfUploadSection from './components/PdfUploadSection';
+import { useManuscriptData } from '../../../../author/soumission/hooks/useManuscriptData';
 
-export default function EditManuscriptPage() {
+export default function EditManuscriptStaffPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { loading: loadingDetails, manuscript } = useManuscriptDetails(id);
+  const { loading: loadingDetails, manuscript } = useManuscriptStaffDetails(id);
+  const { themes, sections, languages } = useManuscriptData();
   const {
     formData,
     handleFieldChange,
@@ -29,7 +32,7 @@ export default function EditManuscriptPage() {
     handleSubmit,
     uploading,
     submitting,
-  } = useManuscriptRevision(id);
+  } = useManuscriptStaffEdit(id);
 
   if (loadingDetails) {
     return (
@@ -52,19 +55,6 @@ export default function EditManuscriptPage() {
     );
   }
 
-  if (manuscript.status !== 'revision_requested') {
-    return (
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="60vh" gap={2}>
-        <Alert severity="warning">
-          Ce manuscrit ne peut pas être révisé. Seuls les manuscrits avec le statut "Révision demandée" peuvent être modifiés.
-        </Alert>
-        <Button variant="contained" onClick={() => router.back()}>
-          Retour
-        </Button>
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto', p: 3 }}>
       {/* Header */}
@@ -74,7 +64,7 @@ export default function EditManuscriptPage() {
         </IconButton>
         <Box flex={1}>
           <Typography variant="h4" fontWeight="bold">
-            Réviser le Manuscrit
+            Modifier le Manuscrit
           </Typography>
           <Typography variant="body2" color="text.secondary">
             ID: {manuscript.id}
@@ -83,7 +73,7 @@ export default function EditManuscriptPage() {
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Vous pouvez modifier le titre, le résumé, les mots-clés et le fichier PDF. Le thème, la section et la langue ne peuvent pas être modifiés.
+        Vous pouvez modifier tous les champs sauf le statut. Pour changer le statut, utilisez le menu d&apos;actions sur la liste des manuscrits.
       </Alert>
 
       <form onSubmit={handleSubmit}>
@@ -95,36 +85,16 @@ export default function EditManuscriptPage() {
           onFieldChange={handleFieldChange}
         />
 
-        {/* Informations de classification (lecture seule) */}
-        <Card elevation={2} sx={{ mb: 3 }}>
-          <CardContent sx={{ p: 3 }}>
-            <Typography variant="h6" fontWeight="600" mb={2}>
-              Classification (Non modifiable)
-            </Typography>
-            <Box display="flex" flexDirection="column" gap={2}>
-              {manuscript.themeName && (
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Thème
-                  </Typography>
-                  <Typography variant="body1">{manuscript.themeName}</Typography>
-                </Box>
-              )}
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  Rubrique
-                </Typography>
-                <Typography variant="body1">{manuscript.sectionName}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  Langue
-                </Typography>
-                <Typography variant="body1">{manuscript.languageName}</Typography>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
+        {/* Classification */}
+        <ClassificationSection
+          themeId={formData.themeId}
+          sectionId={formData.sectionId}
+          languageId={formData.languageId}
+          themes={themes}
+          sections={sections}
+          languages={languages}
+          onFieldChange={handleFieldChange}
+        />
 
         {/* Upload PDF */}
         <PdfUploadSection

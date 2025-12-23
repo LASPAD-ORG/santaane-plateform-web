@@ -31,9 +31,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const skip = parseInt(searchParams.get('skip') || '0', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
-    const role = searchParams.get('role') || '';
+    const email = searchParams.get('email') || undefined;
+    const fullName = searchParams.get('fullName') || undefined;
+    const role = searchParams.get('role') || undefined;
+    const isActiveParam = searchParams.get('isActive');
+    const isActive = isActiveParam ? isActiveParam === 'true' : undefined;
 
-    console.log('Fetching users with pagination and filters:', { skip, limit, role });
+    console.log('Fetching users with pagination and filters:', { skip, limit, email, fullName, role, isActive });
 
     // Build params object
     const params: any = {
@@ -41,10 +45,11 @@ export async function GET(request: NextRequest) {
       limit,
     };
 
-    // Add role filter if specified
-    if (role) {
-      params.role = role;
-    }
+    // Add optional filters if specified
+    if (email) params.email = email;
+    if (fullName) params.fullName = fullName;
+    if (role) params.role = role;
+    if (isActive !== undefined) params.isActive = isActive;
 
     // Call backend API with token
     const response = await axios.get(`${API_URL}/api/v1/users`, {

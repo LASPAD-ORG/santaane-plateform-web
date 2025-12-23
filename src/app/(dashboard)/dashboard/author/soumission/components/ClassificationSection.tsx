@@ -74,7 +74,7 @@ export default function ClassificationSection({
               select
               fullWidth
               required
-              label="Section"
+              label="Rubrique"
               value={formData.sectionId}
               onChange={onChange('sectionId')}
               InputProps={{

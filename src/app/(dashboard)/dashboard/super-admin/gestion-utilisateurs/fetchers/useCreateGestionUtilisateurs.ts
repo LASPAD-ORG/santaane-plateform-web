@@ -152,10 +152,10 @@ export function useCreateGestionUtilisateurs() {
     }
   };
 
-  const resetPassword = async (id: string, password: string): Promise<void> => {
+  const resetPassword = async (id: string, newPassword: string): Promise<void> => {
     setLoading(true);
     try {
-      await apiClient.put(`/users/${id}/password`, { password });
+      await apiClient.put(`/users/${id}/reset-password`, { newPassword });
       showSuccess('Succès', 'Mot de passe réinitialisé avec succès');
     } catch (error: any) {
       showError(

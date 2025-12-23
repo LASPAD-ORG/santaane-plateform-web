@@ -20,8 +20,14 @@ export async function GET(request: NextRequest) {
 
     console.log('Fetching available roles from backend:', `${API_URL}/api/v1/roles/`);
 
-    // Call backend API - Backend usually expects trailing slash for DRF
+    // Get pagination parameters
+    const { searchParams } = new URL(request.url);
+    const skip = parseInt(searchParams.get('skip') || '0', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
+
+    // Call backend API with pagination
     const response = await axios.get(`${API_URL}/api/v1/roles/`, {
+      params: { skip, limit },
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -30,15 +36,8 @@ export async function GET(request: NextRequest) {
     console.log('Roles fetched successfully. Data type:', typeof response.data);
     console.log('Full response data:', JSON.stringify(response.data, null, 2));
 
-    // Ensure we return an array to the client
-    let roles = response.data;
-    if (!Array.isArray(roles)) {
-      roles = response.data.results || response.data.items || [];
-    }
-
-    console.log('Returning roles array of length:', roles.length);
-
-    return NextResponse.json(roles, { status: 200 });
+    // Return paginated response as-is
+    return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
     console.error('GET /api/roles error:', error);
     // ... (rest of the error handling remains the same)
