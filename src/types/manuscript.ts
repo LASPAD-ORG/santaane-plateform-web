@@ -1,5 +1,6 @@
 export type ManuscriptStatus = 
   | 'submitted'
+  | 're_submitted'
   | 'under_review'
   | 'revised'
   | 'accepted'
@@ -33,6 +34,7 @@ export interface ManuscriptsResponse {
 
 export const MANUSCRIPT_STATUS_LABELS: Record<ManuscriptStatus, string> = {
   submitted: 'Soumis',
+  re_submitted: 'Re-soumis',
   under_review: 'En révision',
   revised: 'Révisé',
   accepted: 'Accepté',
@@ -40,13 +42,13 @@ export const MANUSCRIPT_STATUS_LABELS: Record<ManuscriptStatus, string> = {
   revision_requested: 'Révision demandée',
   published: 'Publié',
 };
-
 export const MANUSCRIPT_STATUS_COLORS: Record<ManuscriptStatus, 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
   submitted: 'info',
+  re_submitted: 'info',
   under_review: 'primary',
   revised: 'secondary',
   accepted: 'success',
   rejected: 'error',
   revision_requested: 'warning',
   published: 'success',
-};
+}

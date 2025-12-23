@@ -112,7 +112,7 @@ export default function ManuscriptDetailsPage() {
             startIcon={<Edit />}
             onClick={() => router.push(`/dashboard/author/manuscripts/${id}/edit`)}
           >
-            Réviser le manuscrit
+            Modifier le manuscrit
           </Button>
         )}
         <Button variant="outlined" startIcon={<PictureAsPdf />} onClick={handleDownloadPdf}>
