@@ -25,17 +25,7 @@ import {
   AccessTime,
   Event,
 } from '@mui/icons-material';
-
-interface Evaluator {
-  evaluatorId: number;
-  evaluatorName: string;
-  evaluatorEmail: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'completed';
-  assignedAt: string;
-  assignedBy?: string;
-  responseAt?: string;
-  evaluationDeadline?: string;
-}
+import { Evaluator } from '@/types/manuscript';
 
 interface EvaluatorHistoryDialogProps {
   open: boolean;
@@ -217,18 +207,6 @@ export default function EvaluatorHistoryDialog({
                             {formatDateTime(evaluator.assignedAt)}
                           </Typography>
                         </Box>
-
-                        {evaluator.assignedBy && (
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <PersonAdd fontSize="small" sx={{ color: 'text.secondary' }} />
-                            <Typography variant="body2" color="text.secondary">
-                              Assigné par:
-                            </Typography>
-                            <Typography variant="body2" fontWeight="500">
-                              {evaluator.assignedBy}
-                            </Typography>
-                          </Box>
-                        )}
 
                         {evaluator.evaluationDeadline && (
                           <Box display="flex" alignItems="center" gap={1}>

@@ -162,6 +162,20 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR],
   },
 
+    {
+    label: 'Dashboard',
+    path: '/dashboard/evaluator',
+    icon: DashboardIcon,
+    roles: [UserRole.EVALUATOR],
+  },
+     {
+    label: 'Manuscrits',
+    path: '/dashboard/evaluator/manuscripts',
+    icon: DashboardIcon,
+    roles: [UserRole.EVALUATOR],
+  },
+  
+
 ];
 
 /**

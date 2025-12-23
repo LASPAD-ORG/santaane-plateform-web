@@ -36,3 +36,28 @@ export interface CreateEvaluatorRequest {
   position?: string;
   institution?: string;
 }
+
+// Evaluator Manuscript Assignment Types
+export type AssignmentStatus = 'pending' | 'accepted' | 'declined';
+
+export interface EvaluatorManuscript {
+  id: number;
+  title: string;
+  abstract: string;
+  keywords: string;
+  themeName: string;
+  sectionName: string;
+  languageName: string;
+  status: string;
+  pdfFilename: string;
+  assignmentStatus: AssignmentStatus;
+  assignedAt: string;
+  evaluationDeadline: string | null;
+  responseAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EvaluatorResponse {
+  accept: boolean;
+}

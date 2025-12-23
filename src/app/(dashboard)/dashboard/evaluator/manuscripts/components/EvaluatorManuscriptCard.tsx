@@ -1,0 +1,260 @@
+'use client';
+
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Chip,
+  Button,
+  Stack,
+  Divider,
+} from '@mui/material';
+import {
+  CalendarToday,
+  CheckCircle,
+  Cancel,
+  HourglassEmpty,
+  Schedule,
+} from '@mui/icons-material';
+import { EvaluatorManuscript } from '@/types/evaluator';
+import { useState } from 'react';
+import axios from 'axios';
+import { useAlertStore } from '@/stores/alertStore';
+
+interface EvaluatorManuscriptCardProps {
+  manuscript: EvaluatorManuscript;
+  onUpdate: () => void;
+}
+
+export default function EvaluatorManuscriptCard({
+  manuscript,
+  onUpdate,
+}: EvaluatorManuscriptCardProps) {
+  const { showSuccess, showError } = useAlertStore();
+  const [responding, setResponding] = useState(false);
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (manuscript.assignmentStatus) {
+      case 'pending':
+        return 'warning';
+      case 'accepted':
+        return 'success';
+      case 'declined':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
+  const getStatusLabel = () => {
+    switch (manuscript.assignmentStatus) {
+      case 'pending':
+        return 'En attente de réponse';
+      case 'accepted':
+        return 'Accepté';
+      case 'declined':
+        return 'Refusé';
+      default:
+        return manuscript.assignmentStatus;
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (manuscript.assignmentStatus) {
+      case 'pending':
+        return <HourglassEmpty fontSize="small" />;
+      case 'accepted':
+        return <CheckCircle fontSize="small" />;
+      case 'declined':
+        return <Cancel fontSize="small" />;
+      default:
+        return null;
+    }
+  };
+
+  const handleResponse = async (accept: boolean) => {
+    setResponding(true);
+    try {
+      await axios.put(`/api/evaluator/manuscripts/${manuscript.id}/response`, {
+        accept,
+      });
+
+      showSuccess(
+        accept
+          ? 'Évaluation acceptée avec succès'
+          : 'Évaluation refusée avec succès'
+      );
+      onUpdate();
+    } catch (error) {
+      console.error('Erreur lors de la réponse:', error);
+      showError('Erreur lors de la réponse à l\'assignation');
+    } finally {
+      setResponding(false);
+    }
+  };
+
+  const isDeadlinePassed = () => {
+    if (!manuscript.evaluationDeadline) return false;
+    return new Date(manuscript.evaluationDeadline) < new Date();
+  };
+
+  return (
+    <Card
+      elevation={2}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'all 0.2s',
+        '&:hover': {
+          boxShadow: 4,
+        },
+      }}
+    >
+      <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Header */}
+        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+          <Chip
+            label={getStatusLabel()}
+            color={getStatusColor() as any}
+            size="small"
+            icon={getStatusIcon() || undefined}
+          />
+          {manuscript.evaluationDeadline && (
+            <Chip
+              label={`Échéance: ${formatDate(manuscript.evaluationDeadline)}`}
+              size="small"
+              icon={<Schedule fontSize="small" />}
+              color={isDeadlinePassed() ? 'error' : 'default'}
+              variant="outlined"
+            />
+          )}
+        </Box>
+
+        {/* Titre */}
+        <Typography
+          variant="h6"
+          fontWeight="600"
+          mb={1}
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {manuscript.title}
+        </Typography>
+
+        {/* Résumé */}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          mb={2}
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            flex: 1,
+          }}
+        >
+          {manuscript.abstract}
+        </Typography>
+
+        {/* Métadonnées */}
+        <Box display="flex" flexDirection="column" gap={1} mb={2}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography variant="caption" color="text.secondary">
+              Thème:
+            </Typography>
+            <Typography variant="caption" fontWeight="500">
+              {manuscript.themeName}
+            </Typography>
+          </Box>
+
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography variant="caption" color="text.secondary">
+              Rubrique:
+            </Typography>
+            <Typography variant="caption" fontWeight="500">
+              {manuscript.sectionName}
+            </Typography>
+          </Box>
+
+          <Box display="flex" alignItems="center" gap={1}>
+            <Typography variant="caption" color="text.secondary">
+              Langue:
+            </Typography>
+            <Typography variant="caption" fontWeight="500">
+              {manuscript.languageName}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Footer avec dates et actions */}
+        <Box>
+          <Box display="flex" alignItems="center" gap={0.5} mb={2}>
+            <CalendarToday sx={{ fontSize: 14, color: 'text.secondary' }} />
+            <Typography variant="caption" color="text.secondary">
+              Assigné le {formatDate(manuscript.assignedAt)}
+            </Typography>
+          </Box>
+
+          {/* Boutons d'action pour les manuscrits en attente */}
+          {manuscript.assignmentStatus === 'pending' && (
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="contained"
+                color="success"
+                size="small"
+                fullWidth
+                startIcon={<CheckCircle />}
+                onClick={() => handleResponse(true)}
+                disabled={responding}
+              >
+                Accepter
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                size="small"
+                fullWidth
+                startIcon={<Cancel />}
+                onClick={() => handleResponse(false)}
+                disabled={responding}
+              >
+                Refuser
+              </Button>
+            </Stack>
+          )}
+
+          {/* Afficher la date de réponse si déjà répondu */}
+          {manuscript.responseAt && (
+            <Typography variant="caption" color="text.secondary" display="block">
+              Répondu le {formatDate(manuscript.responseAt)}
+            </Typography>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
