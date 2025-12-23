@@ -8,13 +8,25 @@ export type ManuscriptStatus =
   | 'revision_requested'
   | 'published';
 
+export type EvaluatorStatus = 'pending' | 'accepted' | 'rejected' | 'completed';
+
+export interface Evaluator {
+  evaluatorId: number;
+  evaluatorName: string;
+  evaluatorEmail: string;
+  status: EvaluatorStatus;
+  assignedAt: string;
+  responseAt: string | null;
+  evaluationDeadline: string | null;
+}
+
 export interface Manuscript {
   id: number;
   title: string;
   abstract: string;
   keywords: string;
-  authorId: number;
-  authorName: string;
+  authorId?: number;
+  authorName?: string;
   themeId: number | null;
   themeName: string | null;
   sectionId: number;
@@ -23,6 +35,7 @@ export interface Manuscript {
   languageName: string;
   status: ManuscriptStatus;
   pdfFilename: string;
+  evaluators?: Evaluator[];
   createdAt: string;
   updatedAt: string;
 }

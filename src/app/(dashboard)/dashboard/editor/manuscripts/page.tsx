@@ -9,8 +9,19 @@ import {
   MenuItem,
   CircularProgress,
   Alert,
+  Paper,
+  Stack,
+  Chip,
 } from '@mui/material';
-import { Search, FilterList } from '@mui/icons-material';
+import { 
+  Search, 
+  FilterList,
+  HourglassEmpty,
+  ThumbUp,
+  ThumbDown,
+  CheckCircleOutline,
+  PersonAdd,
+} from '@mui/icons-material';
 import { useAllManuscripts } from './hooks/useAllManuscripts';
 import { useManuscriptData } from '../../author/soumission/hooks/useManuscriptData';
 import ManuscriptCard from './components/ManuscriptCard';
@@ -68,6 +79,22 @@ export default function EditorManuscriptsPage() {
               }}
             />
 
+            {/* Filtre Statut Évaluateur */}
+            <TextField
+              select
+              label="Évaluateurs"
+              value={filters.evaluatorStatus || 'all'}
+              onChange={(e) => handleFilterChange('evaluatorStatus', e.target.value)}
+              sx={{ minWidth: 220 }}
+            >
+              <MenuItem value="all">Tous les manuscrits</MenuItem>
+              <MenuItem value="none">Sans évaluateur</MenuItem>
+              <MenuItem value="pending">En attente de réponse</MenuItem>
+              <MenuItem value="accepted">Évaluation acceptée</MenuItem>
+              <MenuItem value="rejected">Évaluation refusée</MenuItem>
+              <MenuItem value="completed">Évaluation terminée</MenuItem>
+            </TextField>
+
             {/* Filtre Langue */}
             <TextField
               select
@@ -118,6 +145,50 @@ export default function EditorManuscriptsPage() {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Légende des statuts évaluateurs */}
+      <Paper elevation={1} sx={{ p: 2, mb: 3, bgcolor: 'background.default' }}>
+        <Typography variant="caption" fontWeight="600" mb={1} display="block" color="text.secondary">
+          Légende des statuts d'évaluateurs :
+        </Typography>
+        <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+          <Chip
+            icon={<PersonAdd fontSize="small" />}
+            label="Aucun évaluateur"
+            size="small"
+            variant="outlined"
+            color="default"
+          />
+          <Chip
+            icon={<HourglassEmpty fontSize="small" />}
+            label="En attente de réponse"
+            size="small"
+            variant="outlined"
+            color="warning"
+          />
+          <Chip
+            icon={<ThumbUp fontSize="small" />}
+            label="Évaluation acceptée"
+            size="small"
+            variant="outlined"
+            color="info"
+          />
+          <Chip
+            icon={<ThumbDown fontSize="small" />}
+            label="Évaluation refusée"
+            size="small"
+            variant="outlined"
+            color="error"
+          />
+          <Chip
+            icon={<CheckCircleOutline fontSize="small" />}
+            label="Évaluation terminée"
+            size="small"
+            variant="outlined"
+            color="success"
+          />
+        </Stack>
+      </Paper>
 
       {/* Résultats */}
       <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">

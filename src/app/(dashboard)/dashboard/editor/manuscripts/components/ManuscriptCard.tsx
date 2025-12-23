@@ -11,13 +11,31 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Badge,
+  Stack,
 } from '@mui/material';
-import { Visibility, PictureAsPdf, CalendarToday, MoreVert, Edit, CheckCircle, Cancel, RateReview, PersonAdd } from '@mui/icons-material';
+import { 
+  Visibility, 
+  PictureAsPdf, 
+  CalendarToday, 
+  MoreVert, 
+  Edit, 
+  CheckCircle, 
+  Cancel, 
+  RateReview, 
+  PersonAdd,
+  HourglassEmpty,
+  ThumbUp,
+  ThumbDown,
+  CheckCircleOutline,
+  History,
+} from '@mui/icons-material';
 import { Manuscript, MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import { useState } from 'react';
 import axios from 'axios';
 import { useAlertStore } from '@/stores/alertStore';
 import AssignEvaluatorDialog from './AssignEvaluatorDialog';
+import EvaluatorHistoryDialog from './EvaluatorHistoryDialog';
 
 interface ManuscriptCardProps {
   manuscript: Manuscript;
@@ -30,6 +48,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [updating, setUpdating] = useState(false);
   const [openAssignDialog, setOpenAssignDialog] = useState(false);
+  const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
 
   const formatDate = (dateString: string) => {
     try {
@@ -90,6 +109,72 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
 
   const handleCloseAssignDialog = () => {
     setOpenAssignDialog(false);
+  };
+
+  const handleOpenHistoryDialog = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenHistoryDialog(true);
+  };
+
+  const handleCloseHistoryDialog = () => {
+    setOpenHistoryDialog(false);
+  };
+
+  // Statistiques des évaluateurs
+  const evaluators = manuscript.evaluators || [];
+  const totalEvaluators = evaluators.length;
+  const pendingEvaluators = evaluators.filter(e => e.status === 'pending').length;
+  const acceptedEvaluators = evaluators.filter(e => e.status === 'accepted').length;
+  const rejectedEvaluators = evaluators.filter(e => e.status === 'rejected').length;
+  const completedEvaluators = evaluators.filter(e => e.status === 'completed').length;
+
+  const getEvaluatorStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'warning';
+      case 'accepted': return 'info';
+      case 'rejected': return 'error';
+      case 'completed': return 'success';
+      default: return 'default';
+    }
+  };
+
+  const getEvaluatorStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending': return <HourglassEmpty fontSize="small" />;
+      case 'accepted': return <ThumbUp fontSize="small" />;
+      case 'rejected': return <ThumbDown fontSize="small" />;
+      case 'completed': return <CheckCircleOutline fontSize="small" />;
+      default: return null;
+    }
+  };
+
+  const getEvaluatorStatusLabel = (status: string) => {
+    switch (status) {
+      case 'pending': return 'En attente de réponse';
+      case 'accepted': return 'Évaluation acceptée';
+      case 'rejected': return 'Évaluation refusée';
+      case 'completed': return 'Évaluation terminée';
+      default: return 'Statut inconnu';
+    }
+  };
+
+  const getEvaluatorTooltip = (evaluator: any) => {
+    const statusLabel = getEvaluatorStatusLabel(evaluator.status);
+    const assignedDate = formatDate(evaluator.assignedAt);
+    const responseDate = evaluator.responseAt ? formatDate(evaluator.responseAt) : null;
+    const deadline = evaluator.evaluationDeadline ? formatDate(evaluator.evaluationDeadline) : null;
+
+    let tooltip = `${evaluator.evaluatorName}\n${evaluator.evaluatorEmail}\n\nStatut: ${statusLabel}\nAssigné le: ${assignedDate}`;
+    
+    if (responseDate) {
+      tooltip += `\nRéponse le: ${responseDate}`;
+    }
+    
+    if (deadline) {
+      tooltip += `\nDate limite: ${deadline}`;
+    }
+
+    return tooltip;
   };
 
   return (
@@ -237,6 +322,58 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
           </Box>
         </Box>
 
+        {/* Évaluateurs - Nouveaux badges */}
+        {totalEvaluators > 0 && (
+          <Box mb={2}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+              <Typography variant="caption" color="text.secondary">
+                Évaluateurs ({totalEvaluators})
+              </Typography>
+              <Tooltip title="Voir l'historique des évaluateurs">
+                <IconButton 
+                  size="small" 
+                  onClick={handleOpenHistoryDialog}
+                  sx={{ p: 0.5 }}
+                >
+                  <History fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {evaluators.map((evaluator) => (
+                <Tooltip 
+                  key={evaluator.evaluatorId} 
+                  title={
+                    <Box sx={{ whiteSpace: 'pre-line' }}>
+                      {getEvaluatorTooltip(evaluator)}
+                    </Box>
+                  }
+                  arrow
+                >
+                  <Chip
+                    label={evaluator.evaluatorName}
+                    color={getEvaluatorStatusColor(evaluator.status) as any}
+                    size="small"
+                    variant="outlined"
+                  />
+                </Tooltip>
+              ))}
+            </Stack>
+          </Box>
+        )}
+
+        {totalEvaluators === 0 && (
+          <Box mb={2}>
+            <Chip
+              icon={<PersonAdd />}
+              label="Aucun évaluateur assigné"
+              color="default"
+              size="small"
+              variant="outlined"
+            />
+          </Box>
+        )}
+
         {/* Footer */}
         <Box
           display="flex"
@@ -264,6 +401,14 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
         manuscriptId={manuscript.id}
         manuscriptTitle={manuscript.title}
         onSuccess={onUpdate}
+      />
+
+      {/* Evaluator History Dialog */}
+      <EvaluatorHistoryDialog
+        open={openHistoryDialog}
+        onClose={handleCloseHistoryDialog}
+        manuscriptTitle={manuscript.title}
+        evaluators={evaluators}
       />
     </Card>
   );

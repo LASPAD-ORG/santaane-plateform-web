@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Manuscript } from '@/types/manuscript';
+import { Manuscript, EvaluatorStatus } from '@/types/manuscript';
 
 interface Filters {
   themeId: number | null;
   sectionId: number | null;
   languageId: number | null;
+  evaluatorStatus: EvaluatorStatus | 'all' | 'none';
 }
 
 export function useAllManuscripts() {
@@ -18,6 +19,7 @@ export function useAllManuscripts() {
     themeId: null,
     sectionId: null,
     languageId: null,
+    evaluatorStatus: 'all',
   });
 
   // Fetch manuscripts
@@ -54,33 +56,45 @@ export function useAllManuscripts() {
 
   // Client-side search filter
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredManuscripts(manuscripts);
-      setTotal(manuscripts.length);
-      return;
+    let filtered = manuscripts;
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((manuscript) => {
+        return (
+          manuscript.title.toLowerCase().includes(query) ||
+          manuscript.abstract.toLowerCase().includes(query) ||
+          manuscript.keywords.toLowerCase().includes(query) ||
+          manuscript.themeName?.toLowerCase().includes(query) ||
+          manuscript.sectionName.toLowerCase().includes(query) ||
+          manuscript.languageName.toLowerCase().includes(query)
+        );
+      });
     }
 
-    const query = searchQuery.toLowerCase();
-    const filtered = manuscripts.filter((manuscript) => {
-      return (
-        manuscript.title.toLowerCase().includes(query) ||
-        manuscript.abstract.toLowerCase().includes(query) ||
-        manuscript.keywords.toLowerCase().includes(query) ||
-        manuscript.themeName?.toLowerCase().includes(query) ||
-        manuscript.sectionName.toLowerCase().includes(query) ||
-        manuscript.languageName.toLowerCase().includes(query)
-      );
-    });
+    // Filter by evaluator status
+    if (filters.evaluatorStatus !== 'all') {
+      if (filters.evaluatorStatus === 'none') {
+        // Manuscripts without evaluators
+        filtered = filtered.filter((m) => !m.evaluators || m.evaluators.length === 0);
+      } else {
+        // Manuscripts with at least one evaluator with the specified status
+        filtered = filtered.filter((m) => 
+          m.evaluators && m.evaluators.some((e) => e.status === filters.evaluatorStatus)
+        );
+      }
+    }
 
     setFilteredManuscripts(filtered);
     setTotal(filtered.length);
-  }, [searchQuery, manuscripts]);
+  }, [searchQuery, manuscripts, filters.evaluatorStatus]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
   };
 
-  const handleFilterChange = (filterKey: keyof Filters, value: number | null) => {
+  const handleFilterChange = (filterKey: keyof Filters, value: number | string | null) => {
     setFilters((prev) => ({ ...prev, [filterKey]: value }));
   };
 
