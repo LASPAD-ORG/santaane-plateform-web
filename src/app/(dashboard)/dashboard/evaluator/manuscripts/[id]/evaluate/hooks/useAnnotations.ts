@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { mockAnnotationService } from '@/services/mockAnnotationService';
+import { annotationService } from '@/services/annotationService';
 import {
   EvaluatorHighlight,
   BackendAnnotation,
@@ -23,7 +23,7 @@ export function useAnnotations({ manuscriptId }: UseAnnotationsOptions) {
   const loadAnnotations = useCallback(async () => {
     setLoading(true);
     try {
-      const backendAnnotations = await mockAnnotationService.getAnnotations(manuscriptId);
+      const backendAnnotations = await annotationService.getAnnotations(manuscriptId);
       const frontendHighlights = backendAnnotations.map(backendAnnotationToHighlight);
       setHighlights(frontendHighlights);
     } catch (error: any) {
@@ -51,7 +51,7 @@ export function useAnnotations({ manuscriptId }: UseAnnotationsOptions) {
       const backendData = highlightToBackendAnnotation(highlight, manuscriptId);
 
       // 3. Appel API
-      const createdAnnotation = await mockAnnotationService.createAnnotation(
+      const createdAnnotation = await annotationService.createAnnotation(
         manuscriptId,
         backendData
       );
@@ -94,7 +94,7 @@ export function useAnnotations({ manuscriptId }: UseAnnotationsOptions) {
       setSaving(true);
 
       // 2. Appel API
-      await mockAnnotationService.updateAnnotation(annotationId, {
+      await annotationService.updateAnnotation(annotationId, {
         comment: updatedComment,
       });
 
@@ -120,7 +120,7 @@ export function useAnnotations({ manuscriptId }: UseAnnotationsOptions) {
       setSaving(true);
 
       // 2. Appel API
-      await mockAnnotationService.deleteAnnotation(annotationId);
+      await annotationService.deleteAnnotation(annotationId);
 
       useAlertStore.getState().showSuccess('Annotation supprimée');
     } catch (error: any) {
