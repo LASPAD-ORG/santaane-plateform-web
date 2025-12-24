@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useRef, MouseEvent } from 'react';
+import React, { useState, useCallback, useRef, MouseEvent, useEffect } from 'react';
 import {
   PdfLoader,
   PdfHighlighter,
@@ -18,45 +18,22 @@ import {
 } from 'react-pdf-highlighter-plus';
 import 'pdfjs-dist/web/pdf_viewer.css';
 import 'react-pdf-highlighter-plus/style/style.css';
-import {
-  Box,
-  Paper,
-  TextField,
-  Button,
-  IconButton,
-  Chip,
-  Stack,
-  Typography,
-} from '@mui/material';
-import {
-  Close as CloseIcon,
-  ThumbUp,
-  ThumbDown,
-  HelpOutline,
-  Lightbulb,
-} from '@mui/icons-material';
+import { Box } from '@mui/material';
 import type { EvaluatorHighlight } from '@/types/evaluator';
+import { SelectionTip } from './SelectionTip';
+import { HighlightTooltip } from './HighlightTooltip';
 
 interface PdfAnnotatorProps {
   pdfUrl: string;
   initialHighlights?: EvaluatorHighlight[];
   onHighlightsChange?: (highlights: EvaluatorHighlight[]) => void;
   authToken?: string;
+  pdfScaleValue?: number | string;
+  utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
 }
 
-const categoryColors = {
-  positive: '#4caf50',
-  negative: '#f44336',
-  question: '#2196f3',
-  suggestion: '#ff9800',
-};
-
-const categoryIcons = {
-  positive: <ThumbUp fontSize="small" />,
-  negative: <ThumbDown fontSize="small" />,
-  question: <HelpOutline fontSize="small" />,
-  suggestion: <Lightbulb fontSize="small" />,
-};
+// Couleur unique pour tous les highlights (jaune)
+const HIGHLIGHT_COLOR = 'rgba(255, 235, 59, 0.4)';
 
 const getNextId = () => String(Math.random()).slice(2);
 
@@ -72,34 +49,47 @@ function HighlightContainer({
     useHighlightContainerContext<EvaluatorHighlight>();
   const { toggleEditInProgress } = usePdfHighlighterContext();
 
-  // DEBUG: Vérifier le type du highlight
-  console.log('🎨 Rendu highlight:', { id: highlight.id, type: highlight.type, category: highlight.category });
-
-  const getHighlightColor = () => {
-    if (highlight.category) {
-      return categoryColors[highlight.category];
-    }
-    return 'rgba(255, 226, 143, 0.5)';
+  // Créer le tooltip avec le commentaire
+  const highlightTip = {
+    position: highlight.position,
+    content: <HighlightTooltip comment={highlight.comment} />,
   };
 
   if (highlight.type === 'text') {
     return (
-      <MonitoredHighlightContainer>
+      <MonitoredHighlightContainer highlightTip={highlightTip}>
         <TextHighlight
           highlight={highlight}
           isScrolledTo={isScrolledTo}
-          style={{ background: getHighlightColor() }}
+          style={{
+            background: HIGHLIGHT_COLOR,
+            transition: 'all 0.3s ease-in-out',
+            ...(isScrolledTo && {
+              background: 'rgba(255, 235, 59, 0.8)',
+              outline: '2px solid #fbc02d',
+              animation: 'pulse 1s ease-in-out',
+            }),
+          }}
           onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
         />
       </MonitoredHighlightContainer>
     );
   } else if (highlight.type === 'area') {
     return (
-      <MonitoredHighlightContainer>
+      <MonitoredHighlightContainer highlightTip={highlightTip}>
         <AreaHighlight
           highlight={highlight}
           isScrolledTo={isScrolledTo}
-          style={{ background: getHighlightColor(), border: `2px solid ${getHighlightColor()}` }}
+          style={{
+            background: HIGHLIGHT_COLOR,
+            border: `2px solid #fbc02d`,
+            transition: 'all 0.3s ease-in-out',
+            ...(isScrolledTo && {
+              background: 'rgba(255, 235, 59, 0.8)',
+              border: '3px solid #fbc02d',
+              boxShadow: '0 0 10px rgba(251, 192, 45, 0.5)',
+            }),
+          }}
           onChange={(boundingRect) => {
             editHighlight(highlight.id, {
               position: {
@@ -118,7 +108,7 @@ function HighlightContainer({
     );
   } else if (highlight.type === 'freetext') {
     return (
-      <MonitoredHighlightContainer>
+      <MonitoredHighlightContainer highlightTip={highlightTip}>
         <FreetextHighlight
           highlight={highlight}
           isScrolledTo={isScrolledTo}
@@ -139,7 +129,7 @@ function HighlightContainer({
           onEditStart={() => toggleEditInProgress(true)}
           onEditEnd={() => toggleEditInProgress(false)}
           color="#333333"
-          backgroundColor={getHighlightColor()}
+          backgroundColor={HIGHLIGHT_COLOR}
           onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
         />
       </MonitoredHighlightContainer>
@@ -150,100 +140,24 @@ function HighlightContainer({
   }
 }
 
-interface CommentFormProps {
-  onSubmit: (comment: string, category: EvaluatorHighlight['category']) => void;
-  onCancel: () => void;
-}
-
-function CommentForm({ onSubmit, onCancel }: CommentFormProps) {
-  const [comment, setComment] = useState('');
-  const [category, setCategory] = useState<EvaluatorHighlight['category']>('positive');
-
-  const handleSubmit = () => {
-    if (comment.trim()) {
-      onSubmit(comment, category);
-      setComment('');
-    }
-  };
-
-  return (
-    <Paper
-      elevation={8}
-      sx={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        p: 3,
-        zIndex: 2000,
-        maxWidth: '90vw',
-      }}
-    >
-      <Stack spacing={2}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">Ajouter un commentaire</Typography>
-          <IconButton size="small" onClick={onCancel}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Box>
-
-        <TextField
-          fullWidth
-          multiline
-          rows={4}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Votre commentaire..."
-          autoFocus
-        />
-
-        <Box>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Catégorie :
-          </Typography>
-          <Stack direction="row" spacing={1} mt={1}>
-            {(['positive', 'negative', 'question', 'suggestion'] as const).map((cat) => (
-              <Chip
-                key={cat}
-                icon={categoryIcons[cat]}
-                label={cat}
-                onClick={() => setCategory(cat)}
-                color={category === cat ? 'primary' : 'default'}
-                variant={category === cat ? 'filled' : 'outlined'}
-                size="small"
-              />
-            ))}
-          </Stack>
-        </Box>
-
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <Button onClick={onCancel} variant="outlined" size="small">
-            Annuler
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            size="small"
-            disabled={!comment.trim()}
-          >
-            Valider
-          </Button>
-        </Stack>
-      </Stack>
-    </Paper>
-  );
-}
 
 export default function PdfAnnotator({
   pdfUrl,
   initialHighlights = [],
   onHighlightsChange,
   authToken,
+  pdfScaleValue,
+  utilsRef,
 }: PdfAnnotatorProps) {
   const [highlights, setHighlights] = useState<EvaluatorHighlight[]>(initialHighlights);
-  const [pendingHighlight, setPendingHighlight] = useState<GhostHighlight | null>(null);
-  const highlighterUtilsRef = useRef<PdfHighlighterUtils | null>(null);
+  const currentSelectionRef = useRef<PdfSelection | null>(null);
+  const internalUtilsRef = useRef<PdfHighlighterUtils | null>(null);
+  const highlighterUtilsRef = utilsRef || internalUtilsRef;
+
+  // Synchroniser les highlights quand initialHighlights change (par ex. après suppression)
+  useEffect(() => {
+    setHighlights(initialHighlights);
+  }, [initialHighlights]);
 
   const updateHighlights = useCallback(
     (newHighlights: EvaluatorHighlight[]) => {
@@ -262,45 +176,41 @@ export default function PdfAnnotator({
   );
 
   const addHighlight = useCallback(
-    (highlight: GhostHighlight, comment: string, category: EvaluatorHighlight['category']) => {
-      console.log('Ajout highlight:', highlight);
+    (comment: string) => {
+      if (!currentSelectionRef.current) {
+        console.error('Aucune sélection active');
+        return;
+      }
 
-      // Vérifier que le type existe
-      if (!highlight.type) {
-        console.error('❌ Le highlight n\'a pas de type!', highlight);
+      const ghostHighlight = currentSelectionRef.current.makeGhostHighlight();
+
+      if (!ghostHighlight.type) {
+        console.error('Le highlight n\'a pas de type', ghostHighlight);
         return;
       }
 
       const newHighlight: EvaluatorHighlight = {
-        ...highlight,
+        ...ghostHighlight,
         id: getNextId(),
         comment,
-        category,
       };
 
-      console.log('✅ Nouveau highlight créé:', newHighlight);
       updateHighlights([newHighlight, ...highlights]);
-      setPendingHighlight(null);
+      currentSelectionRef.current = null;
+
+      // Supprimer le tip (bouton "+") après ajout du commentaire
+      if (highlighterUtilsRef.current) {
+        highlighterUtilsRef.current.setTip(null);
+      }
     },
     [highlights, updateHighlights]
   );
 
   const handleSelection = useCallback(
     (selection: PdfSelection) => {
-      console.log('Sélection détectée:', selection);
-      const ghostHighlight = selection.makeGhostHighlight();
-      setPendingHighlight(ghostHighlight);
+      currentSelectionRef.current = selection;
     },
     []
-  );
-
-  const handleCommentSubmit = useCallback(
-    (comment: string, category: EvaluatorHighlight['category']) => {
-      if (pendingHighlight) {
-        addHighlight(pendingHighlight, comment, category);
-      }
-    },
-    [pendingHighlight, addHighlight]
   );
 
   const pdfDocument = authToken
@@ -324,6 +234,8 @@ export default function PdfAnnotator({
             utilsRef={(utils) => {
               highlighterUtilsRef.current = utils;
             }}
+            pdfScaleValue={pdfScaleValue}
+            selectionTip={<SelectionTip onAddComment={addHighlight} />}
             style={{
               height: '100%',
               width: '100%',
@@ -333,13 +245,6 @@ export default function PdfAnnotator({
           </PdfHighlighter>
         )}
       </PdfLoader>
-
-      {pendingHighlight && (
-        <CommentForm
-          onSubmit={handleCommentSubmit}
-          onCancel={() => setPendingHighlight(null)}
-        />
-      )}
     </Box>
   );
 }

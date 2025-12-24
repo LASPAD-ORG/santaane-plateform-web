@@ -11,24 +11,25 @@ import {
   Alert,
   Chip,
   Stack,
-  List,
-  ListItem,
   IconButton,
-  Divider,
   Tooltip,
   CircularProgress,
+  Drawer,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   ArrowBack,
   Download,
   Send,
-  Delete as DeleteIcon,
-  ThumbUp,
-  ThumbDown,
-  HelpOutline,
-  Lightbulb,
+  MenuOpen,
+  Menu,
 } from '@mui/icons-material';
 import type { EvaluatorHighlight } from '@/types/evaluator';
+import { CommentsSidebar } from './components/CommentsSidebar';
+import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
+import { PdfZoomControls } from './components/PdfZoomControls';
+import { useAnnotations } from './hooks/useAnnotations';
 
 // Chargement dynamique pour éviter les erreurs SSR avec pdfjs
 const PdfAnnotator = dynamic(() => import('./components'), {
@@ -41,20 +42,6 @@ const PdfAnnotator = dynamic(() => import('./components'), {
 });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-const categoryIcons = {
-  positive: <ThumbUp fontSize="small" />,
-  negative: <ThumbDown fontSize="small" />,
-  question: <HelpOutline fontSize="small" />,
-  suggestion: <Lightbulb fontSize="small" />,
-};
-
-const categoryColors = {
-  positive: '#4caf50',
-  negative: '#f44336',
-  question: '#2196f3',
-  suggestion: '#ff9800',
-};
 
 // Fonction utilitaire pour obtenir les cookies
 function getCookie(name: string): string | undefined {
@@ -72,12 +59,27 @@ export default function EvaluateManuscriptPage({
   const router = useRouter();
   const resolvedParams = use(params);
   const manuscriptId = resolvedParams.id;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [manuscript, setManuscript] = useState<any>(null);
-  const [highlights, setHighlights] = useState<EvaluatorHighlight[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authToken, setAuthToken] = useState<string>('');
+  const [highlightToDelete, setHighlightToDelete] = useState<string | null>(null);
+  const [pdfScaleValue, setPdfScaleValue] = useState<number | string>('auto');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const highlighterUtilsRef = React.useRef<any>(null);
+
+  // Hook pour gérer la persistance des annotations
+  const {
+    highlights,
+    loading: loadingAnnotations,
+    saving: savingAnnotations,
+    createAnnotation,
+    updateAnnotation,
+    deleteAnnotation,
+  } = useAnnotations({ manuscriptId: parseInt(manuscriptId) });
 
   useEffect(() => {
     const token = getCookie('auth_token');
@@ -155,7 +157,25 @@ export default function EvaluateManuscriptPage({
   };
 
   const handleDeleteHighlight = (id: string) => {
-    setHighlights((prev) => prev.filter((h) => h.id !== id));
+    setHighlightToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (highlightToDelete) {
+      await deleteAnnotation(highlightToDelete);
+      setHighlightToDelete(null);
+    }
+  };
+
+  const handleHighlightClick = (highlightId: string) => {
+    const highlight = highlights.find((h) => h.id === highlightId);
+    if (highlight && highlighterUtilsRef.current) {
+      // Fermer la sidebar sur mobile après clic
+      if (isMobile) {
+        setSidebarOpen(false);
+      }
+      highlighterUtilsRef.current.scrollToHighlight(highlight);
+    }
   };
 
   if (error && !manuscript) {
@@ -173,10 +193,13 @@ export default function EvaluateManuscriptPage({
     );
   }
 
-  if (!manuscript) {
+  if (!manuscript || loadingAnnotations) {
     return (
-      <Box p={3}>
-        <Typography>Chargement...</Typography>
+      <Box display="flex" alignItems="center" justifyContent="center" height="100vh">
+        <CircularProgress />
+        <Typography ml={2}>
+          {!manuscript ? 'Chargement du manuscrit...' : 'Chargement des annotations...'}
+        </Typography>
       </Box>
     );
   }
@@ -189,22 +212,27 @@ export default function EvaluateManuscriptPage({
       <Paper
         elevation={2}
         sx={{
-          p: 2,
+          p: { xs: 1.5, sm: 2 },
           borderRadius: 0,
           borderBottom: '1px solid',
           borderColor: 'divider',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" spacing={2}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          justifyContent="space-between"
+          spacing={{ xs: 1, sm: 0 }}
+        >
+          <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }}>
             <IconButton onClick={() => router.push('/dashboard/evaluator/manuscripts')}>
               <ArrowBack />
             </IconButton>
-            <Box>
-              <Typography variant="h6" gutterBottom>
+            <Box flex={1}>
+              <Typography variant={{ xs: 'subtitle1', sm: 'h6' }} gutterBottom>
                 {manuscript.title}
               </Typography>
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
                 <Chip label={manuscript.themeName} size="small" />
                 <Chip label={manuscript.sectionName} size="small" />
                 <Chip label={manuscript.languageName} size="small" variant="outlined" />
@@ -212,7 +240,15 @@ export default function EvaluateManuscriptPage({
             </Box>
           </Stack>
 
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" spacing={1} justifyContent={{ xs: 'flex-end', sm: 'flex-start' }} alignItems="center">
+            {savingAnnotations && (
+              <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 1 }}>
+                <CircularProgress size={16} />
+                <Typography variant="caption" color="text.secondary">
+                  Sauvegarde...
+                </Typography>
+              </Stack>
+            )}
             <Tooltip title="Télécharger le PDF">
               <IconButton onClick={handleDownload} color="primary">
                 <Download />
@@ -238,116 +274,110 @@ export default function EvaluateManuscriptPage({
 
       {/* Contenu principal - Layout en 2 colonnes */}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* PDF Viewer - 70% */}
-        <Box sx={{ width: '70%', height: '100%', borderRight: '1px solid', borderColor: 'divider' }}>
-          <PdfAnnotator
-            pdfUrl={pdfUrl}
-            initialHighlights={highlights}
-            onHighlightsChange={setHighlights}
-            authToken={authToken}
-          />
-        </Box>
-
-        {/* Panneau de commentaires - 30% */}
-        <Paper
-          elevation={0}
+        {/* PDF Viewer */}
+        <Box
           sx={{
-            width: '30%',
+            flex: 1,
             height: '100%',
-            overflow: 'auto',
-            p: 2,
-            borderRadius: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            transition: 'all 0.3s ease-in-out',
           }}
         >
-          <Typography variant="h6" gutterBottom>
-            Commentaires ({highlights.length})
-          </Typography>
+          {/* Contrôles de zoom et toggle sidebar */}
+          <Box sx={{
+            p: 2,
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+            <PdfZoomControls
+              currentZoom={pdfScaleValue}
+              onZoomChange={setPdfScaleValue}
+            />
 
-          <Typography variant="body2" color="text.secondary" paragraph>
-            Sélectionnez du texte ou maintenez Alt et faites glisser pour créer une zone
-            d&apos;annotation.
-          </Typography>
+            <Tooltip title={sidebarOpen ? 'Masquer les commentaires' : 'Afficher les commentaires'}>
+              <IconButton
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                color="primary"
+                sx={{ ml: 2 }}
+              >
+                {sidebarOpen ? <MenuOpen /> : <Menu />}
+              </IconButton>
+            </Tooltip>
+          </Box>
 
-          <Divider sx={{ my: 2 }} />
+          {/* PDF Viewer */}
+          <Box sx={{ flex: 1, overflow: 'hidden' }}>
+            <PdfAnnotator
+              pdfUrl={pdfUrl}
+              initialHighlights={highlights}
+              onHighlightsChange={(newHighlights) => {
+                // Détecter si c'est un ajout d'annotation
+                const addedHighlight = newHighlights.find(
+                  (h) => !highlights.some((old) => old.id === h.id)
+                );
 
-          {highlights.length === 0 ? (
-            <Alert severity="info">
-              Aucun commentaire pour le moment. Commencez à annoter le PDF !
-            </Alert>
-          ) : (
-            <List>
-              {highlights.map((highlight, index) => (
-                <React.Fragment key={highlight.id}>
-                  <ListItem
-                    sx={{
-                      display: 'block',
-                      bgcolor: 'background.default',
-                      borderRadius: 1,
-                      mb: 1,
-                      borderLeft: `4px solid ${
-                        highlight.category
-                          ? categoryColors[highlight.category]
-                          : '#999'
-                      }`,
-                    }}
-                  >
-                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                      <Box flex={1}>
-                        <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                          {highlight.category && categoryIcons[highlight.category]}
-                          <Chip
-                            label={highlight.category || 'général'}
-                            size="small"
-                            sx={{
-                              bgcolor: highlight.category
-                                ? categoryColors[highlight.category]
-                                : '#999',
-                              color: 'white',
-                            }}
-                          />
-                        </Stack>
+                if (addedHighlight) {
+                  createAnnotation(addedHighlight);
+                }
+              }}
+              authToken={authToken}
+              pdfScaleValue={pdfScaleValue}
+              utilsRef={highlighterUtilsRef}
+            />
+          </Box>
+        </Box>
 
-                        <Typography variant="body2" paragraph>
-                          {highlight.comment}
-                        </Typography>
-
-                        {highlight.content?.text && (
-                          <Paper
-                            variant="outlined"
-                            sx={{
-                              p: 1,
-                              bgcolor: 'grey.50',
-                              borderLeft: '3px solid',
-                              borderColor: 'primary.main',
-                            }}
-                          >
-                            <Typography variant="caption" color="text.secondary">
-                              Texte sélectionné:
-                            </Typography>
-                            <Typography variant="body2" sx={{ fontStyle: 'italic', mt: 0.5 }}>
-                              &quot;{highlight.content.text.substring(0, 100)}
-                              {highlight.content.text.length > 100 ? '...' : ''}&quot;
-                            </Typography>
-                          </Paper>
-                        )}
-                      </Box>
-
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteHighlight(highlight.id)}
-                        color="error"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                  </ListItem>
-                  {index < highlights.length - 1 && <Divider sx={{ my: 1 }} />}
-                </React.Fragment>
-              ))}
-            </List>
-          )}
-        </Paper>
+        {/* Sidebar avec commentaires - Desktop: Box fixe, Mobile: Drawer */}
+        {isMobile ? (
+          <Drawer
+            anchor="right"
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            sx={{
+              '& .MuiDrawer-paper': {
+                width: '90vw',
+                maxWidth: 400,
+              },
+            }}
+          >
+            <CommentsSidebar
+              highlights={highlights}
+              onHighlightClick={handleHighlightClick}
+              onDelete={handleDeleteHighlight}
+            />
+          </Drawer>
+        ) : (
+          <Box
+            sx={{
+              width: sidebarOpen ? '350px' : 0,
+              minWidth: sidebarOpen ? '300px' : 0,
+              maxWidth: sidebarOpen ? '400px' : 0,
+              height: '100%',
+              overflow: 'hidden',
+              transition: 'all 0.3s ease-in-out',
+            }}
+          >
+            {sidebarOpen && (
+              <CommentsSidebar
+                highlights={highlights}
+                onHighlightClick={handleHighlightClick}
+                onDelete={handleDeleteHighlight}
+              />
+            )}
+          </Box>
+        )}
       </Box>
+
+      {/* Dialog de confirmation de suppression */}
+      <DeleteConfirmDialog
+        open={Boolean(highlightToDelete)}
+        onConfirm={confirmDelete}
+        onCancel={() => setHighlightToDelete(null)}
+      />
     </Box>
   );
 }
