@@ -62,10 +62,10 @@ function HighlightContainer({
           highlight={highlight}
           isScrolledTo={isScrolledTo}
           style={{
-            background: HIGHLIGHT_COLOR,
+            backgroundColor: HIGHLIGHT_COLOR,
             transition: 'all 0.3s ease-in-out',
             ...(isScrolledTo && {
-              background: 'rgba(255, 235, 59, 0.8)',
+              backgroundColor: 'rgba(255, 235, 59, 0.8)',
               outline: '2px solid #fbc02d',
               animation: 'pulse 1s ease-in-out',
             }),
@@ -81,11 +81,11 @@ function HighlightContainer({
           highlight={highlight}
           isScrolledTo={isScrolledTo}
           style={{
-            background: HIGHLIGHT_COLOR,
+            backgroundColor: HIGHLIGHT_COLOR,
             border: `2px solid #fbc02d`,
             transition: 'all 0.3s ease-in-out',
             ...(isScrolledTo && {
-              background: 'rgba(255, 235, 59, 0.8)',
+              backgroundColor: 'rgba(255, 235, 59, 0.8)',
               border: '3px solid #fbc02d',
               boxShadow: '0 0 10px rgba(251, 192, 45, 0.5)',
             }),
