@@ -61,3 +61,18 @@ export interface EvaluatorManuscript {
 export interface EvaluatorResponse {
   accept: boolean;
 }
+
+// Types pour react-pdf-highlighter-plus
+import type { Highlight as BaseHighlight, ScaledPosition } from 'react-pdf-highlighter-plus';
+
+export interface EvaluatorHighlight extends BaseHighlight {
+  type: 'text' | 'area' | 'freetext';
+  comment: string;
+  category?: 'positive' | 'negative' | 'question' | 'suggestion';
+  author?: string;
+}
+
+export interface HighlightWithComment {
+  highlight: EvaluatorHighlight;
+  timestamp: string;
+}

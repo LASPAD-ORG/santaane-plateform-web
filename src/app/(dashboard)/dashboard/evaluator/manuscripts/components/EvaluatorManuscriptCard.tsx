@@ -16,11 +16,15 @@ import {
   Cancel,
   HourglassEmpty,
   Schedule,
+  PictureAsPdf,
+  Visibility,
+  Download,
 } from '@mui/icons-material';
 import { EvaluatorManuscript } from '@/types/evaluator';
 import { useState } from 'react';
 import axios from 'axios';
 import { useAlertStore } from '@/stores/alertStore';
+import { useRouter } from 'next/navigation';
 
 interface EvaluatorManuscriptCardProps {
   manuscript: EvaluatorManuscript;
@@ -31,6 +35,7 @@ export default function EvaluatorManuscriptCard({
   manuscript,
   onUpdate,
 }: EvaluatorManuscriptCardProps) {
+  const router = useRouter();
   const { showSuccess, showError } = useAlertStore();
   const [responding, setResponding] = useState(false);
 
@@ -110,6 +115,19 @@ export default function EvaluatorManuscriptCard({
   const isDeadlinePassed = () => {
     if (!manuscript.evaluationDeadline) return false;
     return new Date(manuscript.evaluationDeadline) < new Date();
+  };
+
+  const handleDownloadPdf = () => {
+    // Télécharger le PDF
+    const link = document.createElement('a');
+    link.href = `/api/manuscripts/pdf/${manuscript.pdfFilename}`;
+    link.download = manuscript.pdfFilename;
+    link.click();
+  };
+
+  const handlePreviewPdf = () => {
+    // Ouvrir la prévisualisation du PDF dans un nouvel onglet
+    window.open(`/api/manuscripts/pdf/${manuscript.pdfFilename}`, '_blank');
   };
 
   return (
@@ -210,6 +228,28 @@ export default function EvaluatorManuscriptCard({
 
         <Divider sx={{ my: 2 }} />
 
+        {/* Actions PDF - Disponibles pour tous */}
+        <Stack direction="row" spacing={1} mb={2}>
+          <Button
+            variant="outlined"
+            size="small"
+            fullWidth
+            startIcon={<Visibility />}
+            onClick={handlePreviewPdf}
+          >
+            Prévisualiser
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            fullWidth
+            startIcon={<Download />}
+            onClick={handleDownloadPdf}
+          >
+            Télécharger
+          </Button>
+        </Stack>
+
         {/* Footer avec dates et actions */}
         <Box>
           <Box display="flex" alignItems="center" gap={0.5} mb={2}>
@@ -245,6 +285,20 @@ export default function EvaluatorManuscriptCard({
                 Refuser
               </Button>
             </Stack>
+          )}
+
+          {/* Actions disponibles uniquement pour les manuscrits acceptés */}
+          {manuscript.assignmentStatus === 'accepted' && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              fullWidth
+              startIcon={<PictureAsPdf />}
+              onClick={() => router.push(`/dashboard/evaluator/manuscripts/${manuscript.id}/evaluate`)}
+            >
+              Évaluer
+            </Button>
           )}
 
           {/* Afficher la date de réponse si déjà répondu */}
