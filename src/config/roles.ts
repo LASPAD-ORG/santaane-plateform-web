@@ -90,20 +90,20 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.SUPER_ADMIN],
   },
   {
-    label:'Gestion des roles',
+    label:'Roles',
     path:'/dashboard/super-admin/gestion-roles',
     icon:SettingsIcon,
     roles:[UserRole.SUPER_ADMIN]
   },
 
   {
-    label: 'Gestion des thèmes',
+    label: 'Thèmes',
     path: '/dashboard/super-admin/gestion-theme',
     icon: SettingsIcon,
     roles: [UserRole.SUPER_ADMIN],
   },
   {
-    label: 'Gestion des rubriques',
+    label: 'Rubriques',
     path: '/dashboard/super-admin/gestion-rubriques',
     icon: SettingsIcon,
     roles: [UserRole.SUPER_ADMIN],

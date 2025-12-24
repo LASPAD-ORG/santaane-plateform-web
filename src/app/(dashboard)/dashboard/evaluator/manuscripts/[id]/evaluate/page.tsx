@@ -24,11 +24,13 @@ import {
   Send,
   MenuOpen,
   Menu,
+  Assignment,
 } from '@mui/icons-material';
 import type { EvaluatorHighlight } from '@/types/evaluator';
 import { CommentsSidebar } from './components/CommentsSidebar';
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 import { PdfZoomControls } from './components/PdfZoomControls';
+import { EvaluationGridDialog } from './components/EvaluationGridDialog';
 import { useAnnotations } from './hooks/useAnnotations';
 
 // Chargement dynamique pour éviter les erreurs SSR avec pdfjs
@@ -69,6 +71,7 @@ export default function EvaluateManuscriptPage({
   const [highlightToDelete, setHighlightToDelete] = useState<string | null>(null);
   const [pdfScaleValue, setPdfScaleValue] = useState<number | string>('auto');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [evaluationGridOpen, setEvaluationGridOpen] = useState(false);
   const highlighterUtilsRef = React.useRef<any>(null);
 
   // Hook pour gérer la persistance des annotations
@@ -256,11 +259,10 @@ export default function EvaluateManuscriptPage({
             </Tooltip>
             <Button
               variant="contained"
-              startIcon={<Send />}
-              onClick={handleSubmitEvaluation}
-              disabled={isSubmitting || highlights.length === 0}
+              startIcon={<Assignment />}
+              onClick={() => setEvaluationGridOpen(true)}
             >
-              {isSubmitting ? 'Envoi...' : 'Soumettre l\'évaluation'}
+              Grille d&apos;évaluation
             </Button>
           </Stack>
         </Stack>
@@ -377,6 +379,15 @@ export default function EvaluateManuscriptPage({
         open={Boolean(highlightToDelete)}
         onConfirm={confirmDelete}
         onCancel={() => setHighlightToDelete(null)}
+      />
+
+      {/* Dialog de grille d'évaluation */}
+      <EvaluationGridDialog
+        open={evaluationGridOpen}
+        onClose={() => setEvaluationGridOpen(false)}
+        manuscriptTitle={manuscript?.title || ''}
+        evaluatorName={manuscript?.assignedTo?.name || 'Évaluateur'}
+        manuscriptId={parseInt(manuscriptId)}
       />
     </Box>
   );

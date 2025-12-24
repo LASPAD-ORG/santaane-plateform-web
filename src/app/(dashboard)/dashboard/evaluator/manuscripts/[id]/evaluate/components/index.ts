@@ -5,3 +5,4 @@ export { HighlightTooltip } from './HighlightTooltip';
 export { CommentsSidebar } from './CommentsSidebar';
 export { DeleteConfirmDialog } from './DeleteConfirmDialog';
 export { PdfZoomControls } from './PdfZoomControls';
+export { EvaluationGridDialog } from './EvaluationGridDialog';
