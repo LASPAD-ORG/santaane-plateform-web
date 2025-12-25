@@ -17,7 +17,6 @@ import {
 import { Visibility, VisibilityOff, PersonAdd as RegisterIcon } from '@mui/icons-material';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
-import { getDefaultRouteForRole } from '@/config/roles';
 import { AxiosError } from 'axios';
 
 export default function RegisterForm() {
@@ -46,25 +45,22 @@ export default function RegisterForm() {
     e.preventDefault();
     setError('');
 
-    // Validate passwords match
+    // --- Validations ---
     if (formData.password !== formData.confirmPassword) {
       setError('Les mots de passe ne correspondent pas.');
       return;
     }
 
-    // Validate password length
     if (formData.password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères.');
       return;
     }
 
-    // Validate ethical charter acceptance
     if (!acceptedEthicalCharter) {
       setError('Vous devez accepter la charte éthique et les règles de soumission.');
       return;
     }
 
-    // Validate APA style acceptance
     if (!acceptedAPAStyle) {
       setError('Vous devez accepter le formatage des références selon le style APA.');
       return;
@@ -73,21 +69,17 @@ export default function RegisterForm() {
     setIsLoading(true);
 
     try {
+      // 1. Appel du store pour l'inscription
       await register({
         email: formData.email,
         password: formData.password,
         fullName: formData.fullName,
       });
 
-      // Get user roles and redirect to appropriate dashboard
-      const currentUser = useAuthStore.getState().user;
-      if (currentUser && currentUser.roles.length > 0) {
-        // Redirect to the first role's default route (you can customize priority)
-        const defaultRoute = getDefaultRouteForRole(currentUser.roles[0]);
-        router.push(defaultRoute);
-      } else {
-        router.push('/dashboard');
-      }
+      // 2. Redirection vers la page OTP
+      // On passe l'email en paramètre pour que la page OTP sache à qui renvoyer le code si besoin
+      router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
+      
     } catch (err) {
       const axiosError = err as AxiosError<{ detail?: string; message?: string }>;
       const errorMessage =

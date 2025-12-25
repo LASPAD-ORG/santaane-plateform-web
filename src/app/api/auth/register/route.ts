@@ -3,61 +3,56 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+/**
+ * Route d'inscription proxy
+ * Sécurité : Cette route crée l'utilisateur mais ne génère pas de cookie de session
+ * car le compte doit d'abord être activé via OTP.
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Call backend API to register
-    await axios.post(`${API_URL}/api/v1/auth/register`, body);
+    console.log('Proxy Registration attempt for:', body.email);
 
-    // After registration, login the user
-    const formData = new URLSearchParams();
-    formData.append('username', body.email);
-    formData.append('password', body.password);
-    formData.append('grant_type', 'password');
+    // 1. Appel au backend Python pour créer l'utilisateur
+    // Le backend va générer l'OTP et envoyer l'email automatiquement
+    await axios.post(`${API_URL}/api/v1/auth/register`, {
+      email: body.email,
+      password: body.password,
+      fullName: body.fullName,
+      // On propage les champs optionnels s'ils existent
+      profilePhoto: body.profilePhoto || null,
+      orcidId: body.orcidId || null
+    });
 
-    const loginResponse = await axios.post(
-      `${API_URL}/api/v1/auth/login`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    );
+    console.log('Registration successful on backend, OTP sent.');
 
-    const { access_token } = loginResponse.data;
-
-    // Create response
-    const apiResponse = NextResponse.json(
-      { success: true },
+    // 2. On retourne un succès simple
+    // Le frontend (RegisterForm.tsx) interceptera ce 201 pour rediriger vers /verify-otp
+    return NextResponse.json(
+      { 
+        success: true, 
+        message: "Utilisateur créé. Vérification OTP requise.",
+        email: body.email 
+      },
       { status: 201 }
     );
 
-    // Set HTTP-Only cookie with the token
-    apiResponse.cookies.set('auth_token', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
-      path: '/',
-    });
-
-    return apiResponse;
   } catch (error) {
-    console.error('Register error:', error);
+    console.error('Register proxy error:', error);
 
     if (axios.isAxiosError(error)) {
+      const status = error.response?.status || 400;
+      const detail = error.response?.data?.detail || "Erreur lors de l'inscription";
+      
       return NextResponse.json(
-        {
-          error: error.response?.data?.detail || 'Erreur lors de l\'inscription',
-        },
-        { status: error.response?.status || 400 }
+        { error: detail },
+        { status: status }
       );
     }
 
     return NextResponse.json(
-      { error: 'Erreur serveur' },
+      { error: 'Erreur serveur interne' },
       { status: 500 }
     );
   }
