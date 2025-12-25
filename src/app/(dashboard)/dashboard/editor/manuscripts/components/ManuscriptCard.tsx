@@ -14,21 +14,22 @@ import {
   Badge,
   Stack,
 } from '@mui/material';
-import { 
-  Visibility, 
-  PictureAsPdf, 
-  CalendarToday, 
-  MoreVert, 
-  Edit, 
-  CheckCircle, 
-  Cancel, 
-  RateReview, 
+import {
+  Visibility,
+  PictureAsPdf,
+  CalendarToday,
+  MoreVert,
+  Edit,
+  CheckCircle,
+  Cancel,
+  RateReview,
   PersonAdd,
   HourglassEmpty,
   ThumbUp,
   ThumbDown,
   CheckCircleOutline,
   History,
+  Block,
 } from '@mui/icons-material';
 import { Manuscript, MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import { useState } from 'react';
@@ -70,6 +71,11 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/dashboard/editor/manuscripts/${manuscript.id}/edit`);
+  };
+
+  const handleAnonymize = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/dashboard/editor/manuscripts/${manuscript.id}/anonymize`);
   };
 
   const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
@@ -210,6 +216,16 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
             <Tooltip title="Modifier">
               <IconButton size="small" onClick={handleEdit} disabled={updating}>
                 <Edit fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={manuscript.isAnonymized ? "Manuscrit anonymisé" : "Anonymiser le manuscrit"}>
+              <IconButton
+                size="small"
+                onClick={handleAnonymize}
+                disabled={updating}
+                color={manuscript.isAnonymized ? "success" : "default"}
+              >
+                <Block fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title="Assigner un évaluateur">

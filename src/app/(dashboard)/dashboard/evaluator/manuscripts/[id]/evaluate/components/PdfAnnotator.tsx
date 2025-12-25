@@ -30,6 +30,7 @@ interface PdfAnnotatorProps {
   authToken?: string;
   pdfScaleValue?: number | string;
   utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
+  showRedactions?: boolean; // CRITICAL: Must be false for evaluators to prevent seeing redactions
 }
 
 // Couleur unique pour tous les highlights (jaune)
@@ -148,6 +149,7 @@ export default function PdfAnnotator({
   authToken,
   pdfScaleValue,
   utilsRef,
+  showRedactions = false,
 }: PdfAnnotatorProps) {
   const [highlights, setHighlights] = useState<EvaluatorHighlight[]>(initialHighlights);
   const currentSelectionRef = useRef<PdfSelection | null>(null);
@@ -155,9 +157,13 @@ export default function PdfAnnotator({
   const highlighterUtilsRef = utilsRef || internalUtilsRef;
 
   // Synchroniser les highlights quand initialHighlights change (par ex. après suppression)
+  // CRITICAL SECURITY: Filter out redactions if showRedactions is false (defense-in-depth)
   useEffect(() => {
-    setHighlights(initialHighlights);
-  }, [initialHighlights]);
+    const filtered = showRedactions
+      ? initialHighlights
+      : initialHighlights.filter(h => h.type !== 'redaction');
+    setHighlights(filtered);
+  }, [initialHighlights, showRedactions]);
 
   const updateHighlights = useCallback(
     (newHighlights: EvaluatorHighlight[]) => {

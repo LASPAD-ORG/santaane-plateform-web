@@ -329,6 +329,7 @@ export default function EvaluateManuscriptPage({
               authToken={authToken}
               pdfScaleValue={pdfScaleValue}
               utilsRef={highlighterUtilsRef}
+              showRedactions={false} // CRITICAL: Evaluators must NEVER see redactions
             />
           </Box>
         </Box>
