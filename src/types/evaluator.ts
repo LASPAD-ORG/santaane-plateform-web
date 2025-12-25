@@ -39,6 +39,7 @@ export interface CreateEvaluatorRequest {
 
 // Evaluator Manuscript Assignment Types
 export type AssignmentStatus = 'pending' | 'accepted' | 'declined';
+export type EvaluationStatus = 'not_started' | 'in_progress' | 'completed';
 
 export interface EvaluatorManuscript {
   id: number;
@@ -51,6 +52,7 @@ export interface EvaluatorManuscript {
   status: string;
   pdfFilename: string;
   assignmentStatus: AssignmentStatus;
+  evaluationStatus?: EvaluationStatus; // Nouvel état pour l'évaluation
   assignedAt: string;
   evaluationDeadline: string | null;
   responseAt: string | null;

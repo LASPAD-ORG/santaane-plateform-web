@@ -34,8 +34,12 @@ export async function POST(
     return NextResponse.json(response.data, { status: 201 });
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
+      // Preserve the original error message structure
+      const backendError = error.response?.data;
+      const errorResponse = backendError || { message: 'Erreur lors de l\'assignation de l\'évaluateur' };
+      
       return NextResponse.json(
-        { message: error.response?.data?.detail || 'Erreur lors de l\'assignation de l\'évaluateur' },
+        errorResponse,
         { status: error.response?.status || 500 }
       );
     }

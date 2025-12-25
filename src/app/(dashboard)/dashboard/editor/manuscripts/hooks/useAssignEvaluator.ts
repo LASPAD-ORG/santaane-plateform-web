@@ -21,19 +21,33 @@ export function useAssignEvaluator() {
       showSuccess('Évaluateur assigné avec succès. Un email de notification a été envoyé.');
       return true;
     } catch (error) {
-      console.error('Erreur lors de l\'assignation de l\'évaluateur:', error);
+      // Suppress console logging for handled errors
       if (axios.isAxiosError(error)) {
-        // Extract error message from backend response (can be in 'detail' or 'message' field)
+        // Extract error message from backend response
         const errorData = error.response?.data;
-        const message = errorData?.detail || errorData?.message || 'Erreur lors de l\'assignation de l\'évaluateur';
+        let message = 'Erreur lors de l\'assignation de l\'évaluateur';
+        
+        if (errorData) {
+          // Try different possible fields where the error message might be
+          message = errorData.detail || 
+                   errorData.message || 
+                   errorData.error || 
+                   errorData.errorCode ||  // Backend uses this field!
+                   (typeof errorData === 'string' ? errorData : message);
+        }
 
         // Check if it's the anonymization error and provide a helpful message
-        if (typeof message === 'string' && message.includes('must be anonymized')) {
-          showError('⚠️ Le manuscrit doit d\'abord être anonymisé avant d\'assigner un évaluateur. Utilisez le bouton "Anonymiser" pour masquer les informations sensibles.');
+        if (typeof message === 'string' && (
+            message.toLowerCase().includes('must be anonymized') ||
+            message.toLowerCase().includes('anonymized first') ||
+            message.includes('Cannot assign evaluator: manuscript must be anonymized first')
+          )) {
+          showError('Le manuscrit doit d\'abord être anonymisé avant d\'assigner un évaluateur.\n\nUtilisez le bouton "Anonymiser" pour masquer les informations sensibles.');
         } else {
-          showError(message);
+          showError(typeof message === 'string' ? message : 'Erreur lors de l\'assignation de l\'évaluateur');
         }
       } else {
+        console.error('Erreur lors de l\'assignation de l\'évaluateur:', error);
         showError('Erreur lors de l\'assignation de l\'évaluateur');
       }
       return false;

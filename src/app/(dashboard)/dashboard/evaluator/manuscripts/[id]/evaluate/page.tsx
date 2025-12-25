@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { exportPdf } from 'react-pdf-highlighter-plus';
 import {
   Box,
   Paper,
@@ -73,6 +74,8 @@ export default function EvaluateManuscriptPage({
   const [pdfScaleValue, setPdfScaleValue] = useState<number | string>('auto');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [evaluationGridOpen, setEvaluationGridOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState({ current: 0, total: 0 });
   const highlighterUtilsRef = React.useRef<any>(null);
 
   // Hook pour gérer la persistance des annotations
@@ -122,16 +125,77 @@ export default function EvaluateManuscriptPage({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!manuscript?.pdfFilename) return;
 
-    const downloadUrl = `${API_URL}/api/v1/files/download/${manuscript.pdfFilename}`;
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = manuscript.pdfFilename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    setIsExporting(true);
+    setExportProgress({ current: 0, total: 0 });
+
+    try {
+      // Utiliser notre route API Next.js qui gère l'authentification automatiquement
+      const pdfUrl = `/api/manuscripts/${manuscriptId}/download`;
+      
+      // Combiner les annotations de l'évaluateur avec les masques de rédaction
+      const allHighlights = [
+        // Annotations de l'évaluateur (en jaune)
+        ...highlights.map(h => ({
+          id: h.id,
+          type: h.type,
+          content: h.content,
+          position: h.position,
+          highlightColor: 'rgba(255, 235, 59, 0.4)', // Couleur jaune pour les annotations
+        })),
+        // Masques de rédaction (en noir opaque)
+        ...redactionMasks.map(mask => {
+          try {
+            const position = JSON.parse(mask.positionData);
+            return {
+              id: mask.id,
+              type: 'area' as const,
+              position: position,
+              highlightColor: '#000000', // Couleur noire opaque pour les masques
+              content: { text: '' },
+            };
+          } catch (error) {
+            console.error('Failed to parse redaction mask position:', error);
+            return null;
+          }
+        }).filter(Boolean), // Supprimer les masques invalides
+      ];
+
+      // Utiliser notre route API Next.js qui gère l'authentification automatiquement
+      const exportPdfUrl = `/api/manuscripts/${manuscriptId}/download`;
+
+      // Exporter le PDF avec toutes les annotations et masques
+      const pdfBytes = await exportPdf(
+        exportPdfUrl, // URL simple - les cookies sont gérés automatiquement
+        allHighlights,
+        {
+          textHighlightColor: 'rgba(255, 235, 59, 0.4)', // Jaune pour les annotations de texte
+          areaHighlightColor: 'rgba(255, 235, 59, 0.4)', // Jaune pour les annotations de zone  
+          onProgress: (current, total) => {
+            setExportProgress({ current, total });
+          },
+        }
+      );
+
+      // Télécharger le fichier PDF annoté
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${manuscript.title || 'manuscript'}_annotated.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Export failed:', error);
+      setError('Échec de l\'export du PDF annoté');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleSubmitEvaluation = async () => {
@@ -259,11 +323,20 @@ export default function EvaluateManuscriptPage({
                 </Typography>
               </Stack>
             )}
-            <Tooltip title="Télécharger le PDF">
-              <IconButton onClick={handleDownload} color="primary">
-                <Download />
+            <Tooltip title={isExporting ? "Export en cours..." : "Télécharger le PDF annoté"}>
+              <IconButton 
+                onClick={handleDownload} 
+                color="primary" 
+                disabled={isExporting}
+              >
+                {isExporting ? <CircularProgress size={20} /> : <Download />}
               </IconButton>
             </Tooltip>
+            {isExporting && exportProgress.total > 0 && (
+              <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+                {exportProgress.current}/{exportProgress.total}
+              </Typography>
+            )}
             <Button
               variant="contained"
               startIcon={<Assignment />}

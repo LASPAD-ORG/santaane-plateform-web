@@ -19,6 +19,9 @@ import {
   PictureAsPdf,
   Visibility,
   Download,
+  PlayCircle,
+  PauseCircle,
+  TaskAlt,
 } from '@mui/icons-material';
 import { EvaluatorManuscript } from '@/types/evaluator';
 import { useState } from 'react';
@@ -91,6 +94,47 @@ export default function EvaluatorManuscriptCard({
     }
   };
 
+  const getEvaluationStatusLabel = () => {
+    if (manuscript.assignmentStatus !== 'accepted') return null;
+    
+    switch (manuscript.evaluationStatus) {
+      case 'not_started':
+        return 'Non démarré';
+      case 'in_progress':
+        return 'En cours';
+      case 'completed':
+        return 'Terminé';
+      default:
+        return 'Non démarré';
+    }
+  };
+
+  const getEvaluationStatusColor = () => {
+    switch (manuscript.evaluationStatus) {
+      case 'not_started':
+        return 'default';
+      case 'in_progress':
+        return 'warning';
+      case 'completed':
+        return 'success';
+      default:
+        return 'default';
+    }
+  };
+
+  const getEvaluationStatusIcon = () => {
+    switch (manuscript.evaluationStatus) {
+      case 'not_started':
+        return <PlayCircle fontSize="small" />;
+      case 'in_progress':
+        return <PauseCircle fontSize="small" />;
+      case 'completed':
+        return <TaskAlt fontSize="small" />;
+      default:
+        return <PlayCircle fontSize="small" />;
+    }
+  };
+
   const handleResponse = async (accept: boolean) => {
     setResponding(true);
     try {
@@ -146,12 +190,23 @@ export default function EvaluatorManuscriptCard({
       <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-          <Chip
-            label={getStatusLabel()}
-            color={getStatusColor() as any}
-            size="small"
-            icon={getStatusIcon() || undefined}
-          />
+          <Stack direction="row" spacing={1}>
+            <Chip
+              label={getStatusLabel()}
+              color={getStatusColor() as any}
+              size="small"
+              icon={getStatusIcon() || undefined}
+            />
+            {manuscript.assignmentStatus === 'accepted' && getEvaluationStatusLabel() && (
+              <Chip
+                label={getEvaluationStatusLabel()}
+                color={getEvaluationStatusColor() as any}
+                size="small"
+                icon={getEvaluationStatusIcon() || undefined}
+                variant="outlined"
+              />
+            )}
+          </Stack>
           {manuscript.evaluationDeadline && (
             <Chip
               label={`Échéance: ${formatDate(manuscript.evaluationDeadline)}`}

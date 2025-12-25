@@ -31,8 +31,43 @@ export async function GET() {
 
     console.log('[Evaluator Manuscripts] Success, got', response.data?.length || 0, 'manuscripts');
 
-    // Le backend retourne directement un tableau
-    return NextResponse.json(response.data);
+    // Enrichir chaque manuscrit avec l'état d'évaluation
+    const manuscriptsWithEvaluationStatus = await Promise.all(
+      response.data.map(async (manuscript: any) => {
+        try {
+          // Récupérer le statut d'évaluation depuis l'API backend pour l'évaluateur connecté
+          const evaluationStatusResponse = await axios.get(
+            `${API_URL}/api/v1/manuscripts/${manuscript.id}/evaluation-status`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          
+          const statusData = evaluationStatusResponse.data;
+          let evaluationStatus = 'not_started';
+          
+          if (statusData && statusData.evaluationStatus) {
+            evaluationStatus = statusData.evaluationStatus;
+          }
+          
+          return {
+            ...manuscript,
+            evaluationStatus
+          };
+        } catch (error) {
+          // En cas d'erreur, considérer comme non démarrée
+          console.warn(`Impossible de récupérer le statut d'évaluation pour le manuscrit ${manuscript.id}`);
+          return {
+            ...manuscript,
+            evaluationStatus: 'not_started'
+          };
+        }
+      })
+    );
+
+    return NextResponse.json(manuscriptsWithEvaluationStatus);
   } catch (error: any) {
     console.error('[Evaluator Manuscripts] Error:', error.response?.status, error.response?.data);
     
