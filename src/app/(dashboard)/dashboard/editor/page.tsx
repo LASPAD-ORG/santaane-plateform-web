@@ -1,120 +1,136 @@
 'use client';
 
-import { Box, Typography, Card, CardContent, Paper, Grid } from '@mui/material';
-import {
-  Groups as GroupsIcon,
-  Article as ArticleIcon,
-  SupervisorAccount as SupervisorIcon,
-  CheckCircle as ApprovedIcon,
-} from '@mui/icons-material';
+import { Box, Typography, Grid, CircularProgress, Alert, Container } from '@mui/material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
+import { useFetchEditorDashboard } from './fetchers/useFetchEditorDashboard';
+import StatsGrid from './components/StatsGrid';
+import DashboardBarChart from './components/DashboardBarChart';
+import DashboardLineChart from './components/DashboardLineChart';
 
 export default function EditorDashboard() {
   const { user } = useAuthStore();
+  const { data, loading, error } = useFetchEditorDashboard();
+
+  if (loading) {
+    return (
+      <RoleGuard allowedRoles={[UserRole.EDITOR]}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '60vh',
+          }}
+        >
+          <CircularProgress size={60} />
+        </Box>
+      </RoleGuard>
+    );
+  }
+
+  if (error) {
+    return (
+      <RoleGuard allowedRoles={[UserRole.EDITOR]}>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Alert severity="error">
+            Erreur lors du chargement du dashboard: {error.message}
+          </Alert>
+        </Container>
+      </RoleGuard>
+    );
+  }
+
+  if (!data) {
+    return (
+      <RoleGuard allowedRoles={[UserRole.EDITOR]}>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Alert severity="info">Aucune donnée disponible</Alert>
+        </Container>
+      </RoleGuard>
+    );
+  }
 
   return (
     <RoleGuard allowedRoles={[UserRole.EDITOR]}>
-      <Box>
-        <Typography variant="h4" gutterBottom>
-          Dashboard Laboratoire
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        {/* Page Title */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+            Tableau de Bord Éditeur
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Bienvenue, {user?.fullName}
+          </Typography>
+        </Box>
+
+        {/* Statistics Grid */}
+        <Box sx={{ mb: 6 }}>
+          <StatsGrid stats={data.stats} />
+        </Box>
+
+        {/* Bar Charts Section */}
+        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
+          Répartition des Soumissions
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Bienvenue, {user?.fullName} - Gestion de votre laboratoire
+
+        <Grid container spacing={3} sx={{ mb: 6 }}>
+          {/* Status Distribution */}
+          <Grid item xs={12} lg={6}>
+            <DashboardBarChart data={data.status_bar_chart} />
+          </Grid>
+
+          {/* Theme Distribution */}
+          <Grid item xs={12} lg={6}>
+            <DashboardBarChart data={data.theme_bar_chart} />
+          </Grid>
+
+          {/* Section Distribution */}
+          <Grid item xs={12} lg={6}>
+            <DashboardBarChart data={data.section_bar_chart} />
+          </Grid>
+
+          {/* Language Distribution */}
+          <Grid item xs={12} lg={6}>
+            <DashboardBarChart data={data.language_bar_chart} />
+          </Grid>
+        </Grid>
+
+        {/* Time Series - Submissions Section */}
+        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
+          Évolution des Soumissions
+        </Typography>
+
+        <Grid container spacing={3} sx={{ mb: 6 }}>
+          <Grid item xs={12} lg={4}>
+            <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
+          </Grid>
+          <Grid item xs={12} lg={4}>
+            <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
+          </Grid>
+          <Grid item xs={12} lg={4}>
+            <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
+          </Grid>
+        </Grid>
+
+        {/* Time Series - Authors Section */}
+        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
+          Évolution des Auteurs
         </Typography>
 
         <Grid container spacing={3}>
-          {/* Statistics Cards */}
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <GroupsIcon sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
-                  <Box>
-                    <Typography variant="h4">42</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Chercheurs
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
+          <Grid item xs={12} lg={4}>
+            <DashboardLineChart data={data.weekly_authors} color="#10B981" />
           </Grid>
-
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <ArticleIcon sx={{ fontSize: 40, color: 'success.main', mr: 2 }} />
-                  <Box>
-                    <Typography variant="h4">184</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Manuscrits du labo
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
+          <Grid item xs={12} lg={4}>
+            <DashboardLineChart data={data.monthly_authors} color="#22C55E" />
           </Grid>
-
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <SupervisorIcon sx={{ fontSize: 40, color: 'info.main', mr: 2 }} />
-                  <Box>
-                    <Typography variant="h4">12</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Rôles attribués ce mois
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <ApprovedIcon sx={{ fontSize: 40, color: 'warning.main', mr: 2 }} />
-                  <Box>
-                    <Typography variant="h4">8</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      En attente de publication
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Lab Overview */}
-          <Grid size={{ xs: 12, md: 8 }}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
-                Aperçu du laboratoire
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Les statistiques détaillées de votre laboratoire, graphiques et activités des chercheurs apparaîtront ici.
-              </Typography>
-            </Paper>
-          </Grid>
-
-          {/* Recent Activity */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
-                Activité récente
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Les dernières soumissions, attributions de rôles et publications apparaîtront ici.
-              </Typography>
-            </Paper>
+          <Grid item xs={12} lg={4}>
+            <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
           </Grid>
         </Grid>
-      </Box>
+      </Container>
     </RoleGuard>
   );
 }
