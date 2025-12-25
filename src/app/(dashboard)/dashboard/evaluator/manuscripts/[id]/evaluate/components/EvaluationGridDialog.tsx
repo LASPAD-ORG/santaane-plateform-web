@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { evaluationGridService } from '@/services/evaluationGridService';
 import {
   Dialog,
   DialogTitle,
@@ -158,11 +159,12 @@ export function EvaluationGridDialog({
       };
       await saveGrid(data);
 
-      // 2. TODO: Appeler API pour soumettre l'évaluation complète
-      // Simuler l'envoi pour le moment
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // 2. Soumettre l'évaluation complète (marque la grille comme soumise)
+      const response = await evaluationGridService.submitEvaluation(manuscriptId);
 
-      useAlertStore.getState().showSuccess('Évaluation soumise avec succès !');
+      useAlertStore.getState().showSuccess(
+        `Évaluation soumise avec succès ! (${response.annotationCount} annotation(s))`
+      );
       onClose();
       router.push('/dashboard/evaluator/manuscripts');
     } catch (error) {

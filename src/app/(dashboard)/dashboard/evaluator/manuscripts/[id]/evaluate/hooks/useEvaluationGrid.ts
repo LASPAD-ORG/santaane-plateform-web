@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { mockEvaluationGridService } from '@/services/mockEvaluationGridService';
+import { evaluationGridService } from '@/services/evaluationGridService';
 import type { EvaluationGrid, SaveEvaluationGridRequest } from '@/types/evaluationGrid';
 import { useAlertStore } from '@/stores/alertStore';
 
@@ -24,7 +24,7 @@ export function useEvaluationGrid({
   const loadGrid = useCallback(async () => {
     setLoading(true);
     try {
-      const existingGrid = await mockEvaluationGridService.getEvaluationGrid(manuscriptId);
+      const existingGrid = await evaluationGridService.getEvaluationGrid(manuscriptId);
       setGrid(existingGrid);
     } catch (error: any) {
       console.error('Erreur chargement grille d\'évaluation:', error);
@@ -43,11 +43,9 @@ export function useEvaluationGrid({
   const saveGrid = useCallback(async (data: SaveEvaluationGridRequest) => {
     setSaving(true);
     try {
-      const savedGrid = await mockEvaluationGridService.saveEvaluationGrid(
+      const savedGrid = await evaluationGridService.saveEvaluationGrid(
         manuscriptId,
-        data,
-        articleTitle,
-        evaluatorName
+        data
       );
       setGrid(savedGrid);
       useAlertStore.getState().showSuccess('Grille d\'évaluation enregistrée');
@@ -59,7 +57,7 @@ export function useEvaluationGrid({
     } finally {
       setSaving(false);
     }
-  }, [manuscriptId, articleTitle, evaluatorName]);
+  }, [manuscriptId]);
 
   return {
     grid,
