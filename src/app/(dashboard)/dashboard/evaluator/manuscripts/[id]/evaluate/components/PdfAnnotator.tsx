@@ -62,26 +62,35 @@ function HighlightContainer({
   const isRedactionMask = 'isRedactionMask' in highlight && highlight.isRedactionMask;
 
   if (isRedactionMask) {
+    // Créer un highlight modifié avec la couleur noire pour l'export
+    const blackRedactionHighlight = {
+      ...highlight,
+      highlightColor: REDACTION_MASK_COLOR,
+    };
+    
     return (
-      <MonitoredHighlightContainer>
-        <AreaHighlight
-          highlight={highlight}
-          isScrolledTo={false}
-          style={{
-            backgroundColor: REDACTION_MASK_COLOR,
-            border: 'none',
-            opacity: 1,
-            cursor: 'not-allowed',
-            pointerEvents: 'none',
-          }}
-          onChange={() => {}}
-          bounds={undefined}
-        />
-      </MonitoredHighlightContainer>
+      <div data-redaction="true" className="redaction-mask-area">
+        <MonitoredHighlightContainer>
+          <AreaHighlight
+            highlight={blackRedactionHighlight}
+            isScrolledTo={false}
+            style={{
+              backgroundColor: `${REDACTION_MASK_COLOR} !important`,
+              background: `${REDACTION_MASK_COLOR} !important`,
+              border: 'none',
+              opacity: 1,
+              cursor: 'not-allowed',
+              pointerEvents: 'none',
+            }}
+            onChange={() => {}}
+            bounds={undefined}
+          />
+        </MonitoredHighlightContainer>
+      </div>
     );
   }
 
-  const evaluatorHighlight = highlight as EvaluatorHighlight;
+  const evaluatorHighlight = highlight as ViewportHighlight<EvaluatorHighlight>;
 
   // Créer le tooltip avec le commentaire (seulement pour les annotations normales)
   const highlightTip = {
@@ -104,7 +113,7 @@ function HighlightContainer({
               animation: 'pulse 1s ease-in-out',
             }),
           }}
-          onContextMenu={onContextMenu ? (e) => onContextMenu(e, evaluatorHighlight) : undefined}
+          onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
         />
       </MonitoredHighlightContainer>
     );
@@ -136,7 +145,7 @@ function HighlightContainer({
           }}
           bounds={highlightBindings.textLayer}
           onEditStart={() => toggleEditInProgress(true)}
-          onContextMenu={onContextMenu ? (e) => onContextMenu(e, evaluatorHighlight) : undefined}
+          onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
         />
       </MonitoredHighlightContainer>
     );
@@ -164,7 +173,7 @@ function HighlightContainer({
           onEditEnd={() => toggleEditInProgress(false)}
           color="#333333"
           backgroundColor={HIGHLIGHT_COLOR}
-          onContextMenu={onContextMenu ? (e) => onContextMenu(e, evaluatorHighlight) : undefined}
+          onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
         />
       </MonitoredHighlightContainer>
     );
@@ -238,6 +247,7 @@ export default function PdfAnnotator({
         ...ghostHighlight,
         id: getNextId(),
         comment,
+        type: ghostHighlight.type as 'text' | 'area' | 'freetext',
       };
 
       updateHighlights([newHighlight, ...highlights]);
@@ -279,7 +289,7 @@ export default function PdfAnnotator({
             utilsRef={(utils) => {
               highlighterUtilsRef.current = utils;
             }}
-            pdfScaleValue={pdfScaleValue}
+            pdfScaleValue={pdfScaleValue as any}
             selectionTip={<SelectionTip onAddComment={addHighlight} />}
             style={{
               height: '100%',

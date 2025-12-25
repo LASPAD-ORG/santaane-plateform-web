@@ -17,6 +17,7 @@ export interface RedactionMaskHighlight extends Highlight {
   isRedactionMask?: true; // Flag pour identifier un masque de redaction
   comment: string; // Requis par l'interface Highlight
   content: { text: string; image?: string }; // Requis par l'interface Highlight
+  highlightColor?: string; // NOUVEAU: Couleur spécifique pour les masques
   position: {
     boundingRect: {
       pageNumber: number;
@@ -67,7 +68,8 @@ export function redactionMaskToHighlight(mask: RedactionMask): RedactionMaskHigh
       position: position,
       content: { text: '' }, // Contenu vide requis par l'interface
       comment: '', // Commentaire vide requis par l'interface
-    };
+      highlightColor: '#000000', // NOUVEAU: Couleur noire spécifique pour les masques
+    } as RedactionMaskHighlight;
   } catch (error) {
     console.error('Failed to parse redaction mask position data:', error);
     // Fallback: créer un rectangle minimal
@@ -89,7 +91,8 @@ export function redactionMaskToHighlight(mask: RedactionMask): RedactionMaskHigh
       },
       content: { text: '' },
       comment: '',
-    };
+      highlightColor: '#000000', // NOUVEAU: Couleur noire spécifique pour les masques
+    } as RedactionMaskHighlight;
   }
 }
 
