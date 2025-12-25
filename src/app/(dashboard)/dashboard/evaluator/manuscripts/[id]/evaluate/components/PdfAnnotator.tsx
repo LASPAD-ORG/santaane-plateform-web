@@ -22,6 +22,12 @@ import { Box } from '@mui/material';
 import type { EvaluatorHighlight } from '@/types/evaluator';
 import { SelectionTip } from './SelectionTip';
 import { HighlightTooltip } from './HighlightTooltip';
+import { 
+  RedactionMaskContainer, 
+  RedactionMaskHighlight, 
+  redactionMaskToHighlight 
+} from './RedactionMask';
+import type { RedactionMask } from '@/services/redactionViewerService';
 
 interface PdfAnnotatorProps {
   pdfUrl: string;
@@ -30,37 +36,64 @@ interface PdfAnnotatorProps {
   authToken?: string;
   pdfScaleValue?: number | string;
   utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
-  showRedactions?: boolean; // CRITICAL: Must be false for evaluators to prevent seeing redactions
+  redactionMasks?: RedactionMask[]; // NOUVEAU: masques de redaction à afficher en noir
 }
 
 // Couleur unique pour tous les highlights (jaune)
 const HIGHLIGHT_COLOR = 'rgba(255, 235, 59, 0.4)';
+// Couleur pour les masques de redaction (noir opaque)
+const REDACTION_MASK_COLOR = '#000000';
 
 const getNextId = () => String(Math.random()).slice(2);
 
-// Composant pour rendre un highlight
+// Composant pour rendre un highlight (annotation) ou un masque de redaction
 function HighlightContainer({
   editHighlight,
   onContextMenu,
 }: {
   editHighlight: (id: string, edit: Partial<EvaluatorHighlight>) => void;
-  onContextMenu?: (event: MouseEvent<HTMLDivElement>, highlight: ViewportHighlight<EvaluatorHighlight>) => void;
+  onContextMenu?: (event: MouseEvent<HTMLDivElement>, highlight: ViewportHighlight<EvaluatorHighlight | RedactionMaskHighlight>) => void;
 }) {
   const { highlight, isScrolledTo, viewportToScaled, screenshot, highlightBindings } =
-    useHighlightContainerContext<EvaluatorHighlight>();
+    useHighlightContainerContext<EvaluatorHighlight | RedactionMaskHighlight>();
   const { toggleEditInProgress } = usePdfHighlighterContext();
 
-  // Créer le tooltip avec le commentaire
+  // Si c'est un masque de redaction, utiliser le style spécialisé
+  const isRedactionMask = 'isRedactionMask' in highlight && highlight.isRedactionMask;
+
+  if (isRedactionMask) {
+    return (
+      <MonitoredHighlightContainer>
+        <AreaHighlight
+          highlight={highlight}
+          isScrolledTo={false}
+          style={{
+            backgroundColor: REDACTION_MASK_COLOR,
+            border: 'none',
+            opacity: 1,
+            cursor: 'not-allowed',
+            pointerEvents: 'none',
+          }}
+          onChange={() => {}}
+          bounds={undefined}
+        />
+      </MonitoredHighlightContainer>
+    );
+  }
+
+  const evaluatorHighlight = highlight as EvaluatorHighlight;
+
+  // Créer le tooltip avec le commentaire (seulement pour les annotations normales)
   const highlightTip = {
-    position: highlight.position,
-    content: <HighlightTooltip comment={highlight.comment} />,
+    position: evaluatorHighlight.position,
+    content: <HighlightTooltip comment={evaluatorHighlight.comment} />,
   };
 
-  if (highlight.type === 'text') {
+  if (evaluatorHighlight.type === 'text') {
     return (
       <MonitoredHighlightContainer highlightTip={highlightTip}>
         <TextHighlight
-          highlight={highlight}
+          highlight={evaluatorHighlight}
           isScrolledTo={isScrolledTo}
           style={{
             backgroundColor: HIGHLIGHT_COLOR,
@@ -71,15 +104,15 @@ function HighlightContainer({
               animation: 'pulse 1s ease-in-out',
             }),
           }}
-          onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
+          onContextMenu={onContextMenu ? (e) => onContextMenu(e, evaluatorHighlight) : undefined}
         />
       </MonitoredHighlightContainer>
     );
-  } else if (highlight.type === 'area') {
+  } else if (evaluatorHighlight.type === 'area') {
     return (
       <MonitoredHighlightContainer highlightTip={highlightTip}>
         <AreaHighlight
-          highlight={highlight}
+          highlight={evaluatorHighlight}
           isScrolledTo={isScrolledTo}
           style={{
             backgroundColor: HIGHLIGHT_COLOR,
@@ -92,7 +125,7 @@ function HighlightContainer({
             }),
           }}
           onChange={(boundingRect) => {
-            editHighlight(highlight.id, {
+            editHighlight(evaluatorHighlight.id, {
               position: {
                 boundingRect: viewportToScaled(boundingRect),
                 rects: [],
@@ -103,18 +136,18 @@ function HighlightContainer({
           }}
           bounds={highlightBindings.textLayer}
           onEditStart={() => toggleEditInProgress(true)}
-          onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
+          onContextMenu={onContextMenu ? (e) => onContextMenu(e, evaluatorHighlight) : undefined}
         />
       </MonitoredHighlightContainer>
     );
-  } else if (highlight.type === 'freetext') {
+  } else if (evaluatorHighlight.type === 'freetext') {
     return (
       <MonitoredHighlightContainer highlightTip={highlightTip}>
         <FreetextHighlight
-          highlight={highlight}
+          highlight={evaluatorHighlight}
           isScrolledTo={isScrolledTo}
           onChange={(boundingRect) => {
-            editHighlight(highlight.id, {
+            editHighlight(evaluatorHighlight.id, {
               position: {
                 boundingRect: viewportToScaled(boundingRect),
                 rects: [],
@@ -123,7 +156,7 @@ function HighlightContainer({
             toggleEditInProgress(false);
           }}
           onTextChange={(newText) => {
-            editHighlight(highlight.id, {
+            editHighlight(evaluatorHighlight.id, {
               content: { text: newText },
             });
           }}
@@ -131,12 +164,12 @@ function HighlightContainer({
           onEditEnd={() => toggleEditInProgress(false)}
           color="#333333"
           backgroundColor={HIGHLIGHT_COLOR}
-          onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
+          onContextMenu={onContextMenu ? (e) => onContextMenu(e, evaluatorHighlight) : undefined}
         />
       </MonitoredHighlightContainer>
     );
   } else {
-    console.warn('⚠️ Type de highlight inconnu:', highlight.type, highlight);
+    console.warn('⚠️ Type de highlight inconnu:', evaluatorHighlight.type, evaluatorHighlight);
     return null;
   }
 }
@@ -149,21 +182,27 @@ export default function PdfAnnotator({
   authToken,
   pdfScaleValue,
   utilsRef,
-  showRedactions = false,
+  redactionMasks = [], // NOUVEAU: masques de redaction
 }: PdfAnnotatorProps) {
   const [highlights, setHighlights] = useState<EvaluatorHighlight[]>(initialHighlights);
   const currentSelectionRef = useRef<PdfSelection | null>(null);
   const internalUtilsRef = useRef<PdfHighlighterUtils | null>(null);
   const highlighterUtilsRef = utilsRef || internalUtilsRef;
 
+  // Convertir les masques de redaction en highlights
+  const redactionMaskHighlights: RedactionMaskHighlight[] = redactionMasks.map(redactionMaskToHighlight);
+
+  // Combiner les annotations normales et les masques de redaction
+  // IMPORTANT: Mettre les masques EN DERNIER pour qu'ils soient au-dessus
+  const allHighlights: (EvaluatorHighlight | RedactionMaskHighlight)[] = [
+    ...highlights,
+    ...redactionMaskHighlights,
+  ];
+
   // Synchroniser les highlights quand initialHighlights change (par ex. après suppression)
-  // CRITICAL SECURITY: Filter out redactions if showRedactions is false (defense-in-depth)
   useEffect(() => {
-    const filtered = showRedactions
-      ? initialHighlights
-      : initialHighlights.filter(h => h.type !== 'redaction');
-    setHighlights(filtered);
-  }, [initialHighlights, showRedactions]);
+    setHighlights(initialHighlights);
+  }, [initialHighlights]);
 
   const updateHighlights = useCallback(
     (newHighlights: EvaluatorHighlight[]) => {
@@ -234,7 +273,7 @@ export default function PdfAnnotator({
         {(pdfDoc) => (
           <PdfHighlighter
             pdfDocument={pdfDoc}
-            highlights={highlights}
+            highlights={allHighlights} // Utiliser les highlights combinés (annotations + masques)
             onSelection={handleSelection}
             enableAreaSelection={(e) => e.altKey}
             utilsRef={(utils) => {

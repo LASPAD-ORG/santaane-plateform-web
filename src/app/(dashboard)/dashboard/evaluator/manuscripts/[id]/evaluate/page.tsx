@@ -32,6 +32,7 @@ import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 import { PdfZoomControls } from './components/PdfZoomControls';
 import { EvaluationGridDialog } from './components/EvaluationGridDialog';
 import { useAnnotations } from './hooks/useAnnotations';
+import { useRedactionMasks } from './hooks/useRedactionMasks';
 
 // Chargement dynamique pour éviter les erreurs SSR avec pdfjs
 const PdfAnnotator = dynamic(() => import('./components'), {
@@ -83,6 +84,12 @@ export default function EvaluateManuscriptPage({
     updateAnnotation,
     deleteAnnotation,
   } = useAnnotations({ manuscriptId: parseInt(manuscriptId) });
+
+  // Hook pour récupérer les masques de redaction (zones anonymisées)
+  const {
+    masks: redactionMasks,
+    loading: loadingRedactionMasks,
+  } = useRedactionMasks({ manuscriptId: parseInt(manuscriptId) });
 
   useEffect(() => {
     const token = getCookie('auth_token');
@@ -329,7 +336,7 @@ export default function EvaluateManuscriptPage({
               authToken={authToken}
               pdfScaleValue={pdfScaleValue}
               utilsRef={highlighterUtilsRef}
-              showRedactions={false} // CRITICAL: Evaluators must NEVER see redactions
+              redactionMasks={redactionMasks} // NOUVEAU: Passer les masques de redaction
             />
           </Box>
         </Box>
