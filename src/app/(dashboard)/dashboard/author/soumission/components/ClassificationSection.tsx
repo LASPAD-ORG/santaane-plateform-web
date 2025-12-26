@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Box, TextField, Typography, MenuItem, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { Category, Language } from '@mui/icons-material';
+import { Box, TextField, Typography, MenuItem, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Chip } from '@mui/material';
+import { Category, Language, Schedule } from '@mui/icons-material';
 
 interface Theme {
   id: number;
   title: string;
   description: string;
+  date_limite: string | null;
 }
 
 interface Section {
@@ -101,6 +102,7 @@ export default function ClassificationSection({
                 label="Choisir un thème"
                 value={formData.themeId}
                 onChange={onChange('themeId')}
+                helperText="Seuls les thèmes avec des dates limites non expirées sont affichés"
                 InputProps={{
                   startAdornment: <Category sx={{ mr: 1, color: 'text.secondary' }} />,
                 }}
@@ -108,11 +110,42 @@ export default function ClassificationSection({
                 <MenuItem value="">
                   <em>Sélectionnez un thème</em>
                 </MenuItem>
-                {themes.map((theme) => (
-                  <MenuItem key={theme.id} value={theme.id}>
-                    {theme.title}
-                  </MenuItem>
-                ))}
+                {themes.map((theme) => {
+                  const formatDateLimit = (dateLimit: string | null) => {
+                    if (!dateLimit) return 'Pas de limite';
+                    try {
+                      const date = new Date(dateLimit);
+                      const now = new Date();
+                      const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                      
+                      const dateStr = date.toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      });
+                      
+                      if (diffDays > 0) {
+                        return `${dateStr} (${diffDays}j restants)`;
+                      } else {
+                        return `${dateStr} (expiré)`;
+                      }
+                    } catch {
+                      return 'Date invalide';
+                    }
+                  };
+                  
+                  return (
+                    <MenuItem key={theme.id} value={theme.id}>
+                      <Box sx={{ width: '100%' }}>
+                        <Typography variant="body1">{theme.title}</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Schedule fontSize="small" />
+                          {formatDateLimit(theme.date_limite)}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                  );
+                })}
               </TextField>
             </Box>
           )}

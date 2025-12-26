@@ -18,10 +18,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('Fetching available themes from backend:', `${API_URL}/api/v1/themes/`);
+    console.log('Fetching available themes from backend:', `${API_URL}/api/v1/themes/active`);
 
-    // Call backend API - Backend usually expects trailing slash for DRF
-    const response = await axios.get(`${API_URL}/api/v1/themes/`, {
+    // Call backend API - Get only active themes for manuscript submission
+    const response = await axios.get(`${API_URL}/api/v1/themes/active`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

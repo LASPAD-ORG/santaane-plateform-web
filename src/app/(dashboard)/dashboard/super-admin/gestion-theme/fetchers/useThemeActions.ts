@@ -8,11 +8,13 @@ import type { Theme } from './useFetchThemes';
 export interface CreateThemeData {
   title: string;
   description: string;
+  date_limite: string;
 }
 
 export interface UpdateThemeData {
   title?: string;
   description?: string;
+  date_limite?: string;
 }
 
 export const useThemeActions = () => {

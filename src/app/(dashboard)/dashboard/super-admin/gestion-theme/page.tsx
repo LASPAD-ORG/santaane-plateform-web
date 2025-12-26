@@ -19,18 +19,26 @@ import {
   Pagination,
   TextField,
   InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  Grid,
 } from '@mui/material';
-import { Add, Search, Edit, Delete } from '@mui/icons-material';
+import { Add, Search, Edit, Delete, FilterList } from '@mui/icons-material';
 import { useFetchThemes } from './fetchers/useFetchThemes';
 import { useThemeActions } from './fetchers/useThemeActions';
 import CreateThemeDialog from './components/CreateThemeDialog';
 import EditThemeDialog from './components/EditThemeDialog';
 import { useAlertStore } from '@/stores/alertStore';
+import { getThemeStatusText, formatDateForDisplay } from './utils/themeUtils';
 import type { Theme } from './fetchers/useFetchThemes';
 
 export default function GestionThemePage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'active' | 'expired'>('all');
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
@@ -64,7 +72,7 @@ export default function GestionThemePage() {
     if (confirmed) {
       try {
         await deleteTheme(theme.id);
-        fetch();
+        fetch(0, 100, filterType);
       } catch (error) {
         // Error handled by hook
       }
@@ -72,7 +80,13 @@ export default function GestionThemePage() {
   };
 
   const handleSuccess = () => {
-    fetch();
+    fetch(0, 100, filterType);
+  };
+
+  const handleFilterChange = (newFilter: 'all' | 'active' | 'expired') => {
+    setFilterType(newFilter);
+    setPage(1);
+    fetch(0, 100, newFilter);
   };
 
   if (loading && !themes.length) {
@@ -98,23 +112,42 @@ export default function GestionThemePage() {
 
       <Card>
         <CardContent>
-          <TextField
-            fullWidth
-            placeholder="Rechercher par titre ou description..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-            sx={{ mb: 3 }}
-          />
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid item xs={12} md={8}>
+              <TextField
+                fullWidth
+                placeholder="Rechercher par titre ou description..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel id="filter-label">Filtrer par statut</InputLabel>
+                <Select
+                  labelId="filter-label"
+                  value={filterType}
+                  label="Filtrer par statut"
+                  onChange={(e) => handleFilterChange(e.target.value as 'all' | 'active' | 'expired')}
+                  startAdornment={<FilterList sx={{ mr: 1 }} />}
+                >
+                  <MenuItem value="all">Tous les thèmes</MenuItem>
+                  <MenuItem value="active">Thèmes actifs</MenuItem>
+                  <MenuItem value="expired">Thèmes expirés</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
 
           <TableContainer>
             <Table>
@@ -122,20 +155,24 @@ export default function GestionThemePage() {
                 <TableRow>
                   <TableCell>Titre</TableCell>
                   <TableCell>Description</TableCell>
+                  <TableCell>Date limite</TableCell>
+                  <TableCell>Statut</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paginatedThemes.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center">
+                    <TableCell colSpan={5} align="center">
                       <Typography variant="body2" color="text.secondary">
                         Aucun thème trouvé
                       </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedThemes.map((theme) => (
+                  paginatedThemes.map((theme) => {
+                    const statusInfo = getThemeStatusText(theme.date_limite);
+                    return (
                     <TableRow key={theme.id} hover>
                       <TableCell>
                         <Typography variant="body2" fontWeight={600}>
@@ -146,6 +183,23 @@ export default function GestionThemePage() {
                         <Typography variant="body2" color="text.secondary">
                           {theme.description}
                         </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDateForDisplay(theme.date_limite)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={statusInfo.text}
+                          size="small"
+                          sx={{ 
+                            color: statusInfo.color,
+                            bgcolor: 'transparent',
+                            border: `1px solid ${statusInfo.color}`,
+                            fontWeight: 500
+                          }}
+                        />
                       </TableCell>
                       <TableCell align="right">
                         <Tooltip title="Modifier">
@@ -169,7 +223,8 @@ export default function GestionThemePage() {
                         </Tooltip>
                       </TableCell>
                     </TableRow>
-                  ))
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

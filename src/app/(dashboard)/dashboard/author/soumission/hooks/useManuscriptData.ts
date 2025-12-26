@@ -6,6 +6,7 @@ interface Theme {
   id: number;
   title: string;
   description: string;
+  date_limite: string | null;
 }
 
 interface Section {
