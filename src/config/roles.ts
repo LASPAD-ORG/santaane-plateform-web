@@ -163,12 +163,7 @@ export const MENU_ITEMS: MenuItem[] = [
   },
 
   // Common Profile Menu Item
-  {
-    label: 'Profil',
-    path: '/dashboard/profil',
-    icon: AccountCircleIcon,
-    roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR],
-  },
+
 
     {
     label: 'Dashboard',
@@ -181,6 +176,13 @@ export const MENU_ITEMS: MenuItem[] = [
     path: '/dashboard/evaluator/manuscripts',
     icon: DashboardIcon,
     roles: [UserRole.EVALUATOR],
+  },
+
+    {
+    label: 'Profil',
+    path: '/dashboard/profil',
+    icon: AccountCircleIcon,
+    roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR],
   },
   
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Grid, CircularProgress, Alert, Container } from '@mui/material';
+import { Box, Typography, Grid, CircularProgress, Alert, Container, Stack } from '@mui/material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -54,46 +54,37 @@ export default function EvaluatorDashboard() {
 
   return (
     <RoleGuard allowedRoles={[UserRole.EVALUATOR]}>
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-        {/* Page Title */}
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-            Tableau de Bord Évaluateur
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            Tableau de Bord
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary">
             Bienvenue, {user?.fullName}
           </Typography>
         </Box>
 
-        {/* Statistics Grid */}
-        <Box sx={{ mb: 6 }}>
+        {/* Statistics */}
+        <Box sx={{ mb: 4 }}>
           <StatsGrid stats={data.stats} />
         </Box>
 
-        {/* Bar Chart Section */}
-        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-          Répartition des Évaluations
-        </Typography>
-
-        <Grid container spacing={3} sx={{ mb: 6 }}>
-          <Grid item xs={12}>
+        {/* Charts Grid */}
+        <Grid container spacing={3}>
+          {/* Bar Chart - Full width */}
+          <Grid size={12}>
             <DashboardBarChart data={data.status_bar_chart} />
           </Grid>
-        </Grid>
 
-        {/* Time Series - Evaluations Section */}
-        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-          Évolution de vos Évaluations
-        </Typography>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={4}>
+          {/* Time Series - 3 columns */}
+          <Grid size={{ xs: 12, md: 4 }}>
             <DashboardLineChart data={data.weekly_evaluations} color="#3B82F6" />
           </Grid>
-          <Grid item xs={12} lg={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <DashboardLineChart data={data.monthly_evaluations} color="#8B5CF6" />
           </Grid>
-          <Grid item xs={12} lg={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <DashboardLineChart data={data.yearly_evaluations} color="#06B6D4" />
           </Grid>
         </Grid>

@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent, Typography, Box } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Paper, Typography, Box, Stack } from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { BarChartResponse } from '../types/dashboard.types';
 
 interface DashboardBarChartProps {
@@ -9,43 +9,60 @@ interface DashboardBarChartProps {
 }
 
 export default function DashboardBarChart({ data }: DashboardBarChartProps) {
-  // Transform data to Recharts format
   const chartData = data.data.map((item) => ({
     name: item.label,
     value: item.value,
     color: item.color || '#3B82F6',
   }));
 
+  const total = chartData.reduce((acc, item) => acc + item.value, 0);
+
   return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Typography variant="h6" component="h3" gutterBottom>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2.5,
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+      }}
+    >
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+        <Typography variant="subtitle1" fontWeight={600}>
           {data.title}
         </Typography>
+        <Typography variant="h5" fontWeight="bold">
+          {total}
+        </Typography>
+      </Stack>
 
-        <Box sx={{ width: '100%', height: 300, mt: 2 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="name"
-                angle={-45}
-                textAnchor="end"
-                height={100}
-                interval={0}
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </Box>
-      </CardContent>
-    </Card>
+      <Box sx={{ width: '100%', height: 200 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 40 }}>
+            <XAxis
+              dataKey="name"
+              angle={-35}
+              textAnchor="end"
+              tick={{ fontSize: 11 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis hide />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 8,
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              }}
+            />
+            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </Box>
+    </Paper>
   );
 }

@@ -182,7 +182,12 @@ export default function EvaluationResultPage({
             </Box>
           </Stack>
 
-          <Stack direction="row" gap={1}>
+          <Stack direction="row" gap={2} alignItems="center">
+            <PdfZoomControls
+              currentZoom={pdfScaleValue}
+              onZoomChange={setPdfScaleValue}
+            />
+            
             <Button
               variant="contained"
               startIcon={<Assignment />}
@@ -205,23 +210,6 @@ export default function EvaluationResultPage({
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* PDF Viewer */}
         <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-          {/* Zoom controls */}
-          <Paper
-            elevation={0}
-            sx={{
-              position: 'absolute',
-              top: 16,
-              left: 16,
-              zIndex: 10,
-              p: 1,
-            }}
-          >
-            <PdfZoomControls
-              currentZoom={pdfScaleValue}
-              onZoomChange={setPdfScaleValue}
-            />
-          </Paper>
-
           {/* PDF Viewer */}
           <PdfAnnotator
             pdfUrl={pdfUrl}
