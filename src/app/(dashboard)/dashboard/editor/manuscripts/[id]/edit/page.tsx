@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import {
   Box,
   Card,
@@ -10,8 +11,13 @@ import {
   Button,
   IconButton,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
-import { ArrowBack, Save } from '@mui/icons-material';
+import { ArrowBack, Save, Warning } from '@mui/icons-material';
 import { useManuscriptStaffDetails } from '../hooks/useManuscriptStaffDetails';
 import { useManuscriptStaffEdit } from './hooks/useManuscriptStaffEdit';
 import GeneralInfoSection from './components/GeneralInfoSection';
@@ -33,6 +39,18 @@ export default function EditManuscriptStaffPage() {
     uploading,
     submitting,
   } = useManuscriptStaffEdit(id);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleOpenConfirm = (e: React.FormEvent) => {
+    e.preventDefault();
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setConfirmOpen(false);
+    await handleSubmit();
+  };
 
   if (loadingDetails) {
     return (
@@ -66,17 +84,11 @@ export default function EditManuscriptStaffPage() {
           <Typography variant="h4" fontWeight="bold">
             Modifier le Manuscrit
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            ID: {manuscript.id}
-          </Typography>
         </Box>
       </Box>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Vous pouvez modifier tous les champs sauf le statut. Pour changer le statut, utilisez le menu d&apos;actions sur la liste des manuscrits.
-      </Alert>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleOpenConfirm}>
         {/* Informations générales */}
         <GeneralInfoSection
           title={formData.title}
@@ -123,6 +135,34 @@ export default function EditManuscriptStaffPage() {
           </Button>
         </Box>
       </form>
+
+      {/* Modal de confirmation */}
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Warning color="warning" />
+          Confirmer les modifications
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Êtes-vous sûr de vouloir enregistrer les modifications apportées à ce manuscrit ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setConfirmOpen(false)} color="inherit">
+            Annuler
+          </Button>
+          <Button
+            onClick={handleConfirmSubmit}
+            variant="contained"
+            autoFocus
+          >
+            Confirmer
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

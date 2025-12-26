@@ -26,40 +26,8 @@ interface PdfRedactorProps {
   authToken?: string;
   pdfScaleValue?: number | string;
   utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
-  viewAnonymized?: boolean; // Toggle to preview anonymized version
+  viewAnonymized?: boolean;
 }
-
-/**
- * Redaction styles:
- * - Normal mode (viewAnonymized=false): Semi-transparent red to show where redactions are
- * - Anonymized mode (viewAnonymized=true): Solid black to simulate evaluator view
- */
-const getRedactionStyle = (viewAnonymized: boolean, isScrolledTo: boolean) => {
-  if (viewAnonymized) {
-    // Anonymized view: solid black (as evaluators will see)
-    return {
-      backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      border: '2px solid #000',
-      transition: 'all 0.3s ease-in-out',
-      ...(isScrolledTo && {
-        border: '3px solid #333',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.8)',
-      }),
-    };
-  } else {
-    // Editor view: semi-transparent red to show redaction zones
-    return {
-      backgroundColor: 'rgba(211, 47, 47, 0.3)',
-      border: '2px solid #d32f2f',
-      transition: 'all 0.3s ease-in-out',
-      ...(isScrolledTo && {
-        backgroundColor: 'rgba(211, 47, 47, 0.5)',
-        border: '3px solid #d32f2f',
-        boxShadow: '0 0 10px rgba(211, 47, 47, 0.5)',
-      }),
-    };
-  }
-};
 
 const getNextId = () => String(Math.random()).slice(2);
 
@@ -83,13 +51,49 @@ function RedactionContainer({
     content: <HighlightTooltip comment={highlight.comment} />,
   };
 
-  // Redactions are always 'area' type (rectangle zones)
+  // Mode anonymisé : afficher en noir opaque
+  if (viewAnonymized) {
+    return (
+      <div
+        data-redaction="true"
+        className="redaction-mask-area"
+        style={{ zIndex: 9999, position: 'relative' }}
+      >
+        <MonitoredHighlightContainer>
+          <AreaHighlight
+            highlight={highlight}
+            isScrolledTo={false}
+            style={{
+              backgroundColor: '#000000',
+              background: '#000000',
+              border: 'none',
+              opacity: 1,
+              cursor: 'default',
+            }}
+            onChange={() => {}}
+            bounds={undefined}
+          />
+        </MonitoredHighlightContainer>
+      </div>
+    );
+  }
+
+  // Mode édition : afficher en jaune semi-transparent
   return (
     <MonitoredHighlightContainer highlightTip={highlightTip}>
       <AreaHighlight
         highlight={highlight}
         isScrolledTo={isScrolledTo}
-        style={getRedactionStyle(viewAnonymized, isScrolledTo)}
+        style={{
+          backgroundColor: 'rgba(255, 235, 59, 0.5)',
+          border: '2px solid #FBC02D',
+          transition: 'all 0.3s ease-in-out',
+          ...(isScrolledTo && {
+            backgroundColor: 'rgba(255, 235, 59, 0.7)',
+            border: '3px solid #F9A825',
+            boxShadow: '0 0 10px rgba(255, 235, 59, 0.5)',
+          }),
+        }}
         onChange={(boundingRect) => {
           editRedaction(highlight.id, {
             position: {

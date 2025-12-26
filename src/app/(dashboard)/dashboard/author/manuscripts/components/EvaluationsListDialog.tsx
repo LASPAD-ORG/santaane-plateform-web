@@ -103,7 +103,7 @@ export function EvaluationsListDialog({
                       primary={
                         <Stack direction="row" alignItems="center" spacing={1}>
                           <Typography variant="subtitle1" fontWeight="medium">
-                            {evaluator.anonymizedName}
+                            Évaluateur SLSP{evaluator.evaluatorId}
                           </Typography>
                           <Chip
                             icon={<CheckCircle />}

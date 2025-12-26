@@ -205,34 +205,90 @@ export default function AnonymizeManuscriptPage({
           display: 'flex',
           alignItems: 'center',
           gap: 2,
+          flexWrap: 'wrap',
         }}
       >
         <IconButton onClick={() => router.back()}>
           <ArrowBack />
         </IconButton>
 
-        <Box sx={{ flex: 1 }}>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="h6" noWrap sx={{ flex: 1 }}>
-              Anonymisation: {manuscript.title}
-            </Typography>
-            {isAnonymized && (
-              <Chip
-                icon={<CheckCircle />}
-                label="Anonymisé"
-                color="success"
+        <Typography variant="h6" noWrap>
+          Anonymisation: {manuscript.title}
+        </Typography>
+
+        {isAnonymized && (
+          <Chip
+            icon={<CheckCircle />}
+            label="Anonymisé"
+            color="success"
+            size="small"
+          />
+        )}
+
+        {savingRedactions && (
+          <Chip
+            label="Sauvegarde..."
+            color="info"
+            size="small"
+          />
+        )}
+
+        <Box sx={{ flex: 1 }} />
+
+        {/* Contrôles */}
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <PdfZoomControls
+            currentZoom={pdfScaleValue}
+            onZoomChange={setPdfScaleValue}
+          />
+
+          <Divider orientation="vertical" flexItem />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={viewAnonymized}
+                onChange={(e) => setViewAnonymized(e.target.checked)}
+                color="error"
                 size="small"
               />
-            )}
-            {savingRedactions && (
-              <Chip
-                label="Sauvegarde..."
-                color="info"
-                size="small"
-              />
-            )}
-          </Stack>
-        </Box>
+            }
+            label={
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                {viewAnonymized ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                <Typography variant="body2">
+                  {viewAnonymized ? 'Vue anonymisée' : 'Vue normale'}
+                </Typography>
+              </Stack>
+            }
+            sx={{ mr: 0 }}
+          />
+
+          <Divider orientation="vertical" flexItem />
+
+          {!isAnonymized ? (
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<Block />}
+              onClick={handleMarkAsAnonymized}
+              disabled={redactions.length === 0 || savingRedactions}
+              size="small"
+            >
+              Marquer comme anonymisé
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              color="warning"
+              onClick={handleUnmarkAsAnonymized}
+              disabled={savingRedactions}
+              size="small"
+            >
+              Démarquer
+            </Button>
+          )}
+        </Stack>
 
         {/* Mobile sidebar toggle */}
         {isMobile && (
@@ -246,71 +302,6 @@ export default function AnonymizeManuscriptPage({
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* PDF Viewer */}
         <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-          {/* Controls bar */}
-          <Paper
-            elevation={0}
-            sx={{
-              position: 'absolute',
-              top: 16,
-              left: 16,
-              zIndex: 10,
-              p: 1,
-              display: 'flex',
-              gap: 1,
-              alignItems: 'center',
-            }}
-          >
-            <PdfZoomControls
-              currentZoom={pdfScaleValue}
-              onZoomChange={setPdfScaleValue}
-            />
-
-            <Divider orientation="vertical" flexItem />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={viewAnonymized}
-                  onChange={(e) => setViewAnonymized(e.target.checked)}
-                  color="error"
-                />
-              }
-              label={
-                <Stack direction="row" alignItems="center" spacing={0.5}>
-                  {viewAnonymized ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-                  <Typography variant="body2">
-                    {viewAnonymized ? 'Vue anonymisée' : 'Vue normale'}
-                  </Typography>
-                </Stack>
-              }
-            />
-
-            <Divider orientation="vertical" flexItem />
-
-            {!isAnonymized ? (
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<Block />}
-                onClick={handleMarkAsAnonymized}
-                disabled={redactions.length === 0 || savingRedactions}
-                size="small"
-              >
-                Marquer comme anonymisé
-              </Button>
-            ) : (
-              <Button
-                variant="outlined"
-                color="warning"
-                onClick={handleUnmarkAsAnonymized}
-                disabled={savingRedactions}
-                size="small"
-              >
-                Démarquer
-              </Button>
-            )}
-          </Paper>
-
           {/* PDF Redactor */}
           <PdfRedactor
             pdfUrl={pdfUrl}

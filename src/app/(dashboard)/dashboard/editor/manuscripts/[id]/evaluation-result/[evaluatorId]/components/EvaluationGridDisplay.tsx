@@ -67,187 +67,217 @@ export function EvaluationGridDisplay({ open, onClose, grid }: EvaluationGridDis
       fullScreen={fullScreen}
       scroll="paper"
     >
-      <DialogTitle>
+      <DialogTitle sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" fontWeight="600">
             Grille d'Évaluation
           </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            sx={{
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
+          <IconButton onClick={onClose}>
             <Close />
           </IconButton>
         </Stack>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent sx={{ py: 3 }}>
         <Stack spacing={3}>
-          {/* En-tête */}
-          <Paper elevation={0} sx={{ p: 3, bgcolor: 'background.default' }}>
+          {/* En-tête simple */}
+          <Paper elevation={0} sx={{ p: 3, bgcolor: 'background.default', borderRadius: 1, mt: 2 }}>
             <Stack spacing={2}>
               <Box>
                 <Typography variant="overline" color="text.secondary">
                   Article
                 </Typography>
-                <Typography variant="h6">{grid.articleTitle}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="overline" color="text.secondary">
-                  Évaluateur
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {grid.evaluatorName}
+                <Typography variant="h6" fontWeight="500">
+                  {grid.articleTitle}
                 </Typography>
               </Box>
-              {grid.submittedAt && (
+              
+              <Stack direction="row" spacing={4}>
                 <Box>
                   <Typography variant="overline" color="text.secondary">
-                    Soumis le
+                    Évaluateur
                   </Typography>
-                  <Typography variant="body2">
-                    {new Date(grid.submittedAt).toLocaleDateString('fr-FR', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                  <Typography variant="body1">
+                    SLSP{grid.evaluatorId}
                   </Typography>
                 </Box>
-              )}
+                
+                {grid.submittedAt && (
+                  <Box>
+                    <Typography variant="overline" color="text.secondary">
+                      Évaluation soumise le
+                    </Typography>
+                    <Typography variant="body1">
+                      {new Date(grid.submittedAt).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
+
+              <Box>
+                <Typography variant="overline" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                  Recommandation finale
+                </Typography>
+                <Chip
+                  icon={recommendationInfo.icon}
+                  label={recommendationInfo.label}
+                  color={recommendationInfo.color}
+                  variant="outlined"
+                  sx={{ fontWeight: 500 }}
+                />
+              </Box>
             </Stack>
           </Paper>
 
-          {/* Avis Final */}
+          {/* Critères d'évaluation simples */}
           <Box>
-            <Typography variant="overline" color="text.secondary" gutterBottom>
-              Avis Final
+            <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mb: 3 }}>
+              Critères d'Évaluation
             </Typography>
-            <Chip
-              icon={recommendationInfo.icon}
-              label={recommendationInfo.label}
-              color={recommendationInfo.color}
-              size="large"
-              sx={{ fontSize: '1rem', py: 3, px: 2 }}
-            />
+
+            <Stack spacing={2}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="500" color="primary.main" gutterBottom>
+                  Originalité et pertinence des idées
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                  {grid.originalityOfIdeas}
+                </Typography>
+              </Paper>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="500" color="primary.main" gutterBottom>
+                  Méthode et rigueur scientifique
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                  {grid.methodologyRigor}
+                </Typography>
+              </Paper>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="500" color="primary.main" gutterBottom>
+                  Approche théorique et empirique
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                  {grid.theoreticalApproach}
+                </Typography>
+              </Paper>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="500" color="primary.main" gutterBottom>
+                  Présentation et clarté
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                  {grid.presentationClarity}
+                </Typography>
+              </Paper>
+            </Stack>
           </Box>
 
-          <Divider />
-
-          {/* Critères d'évaluation */}
-          <Typography variant="h6" fontWeight="bold">
-            Critères d'Évaluation
-          </Typography>
-
-          <Paper variant="outlined" sx={{ p: 2.5 }}>
-            <Typography variant="subtitle2" color="primary" gutterBottom>
-              Originalité et pertinence des idées
+          {/* Synthèse simple et claire */}
+          <Box>
+            <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mb: 3 }}>
+              Synthèse de l'Évaluation
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-              {grid.originalityOfIdeas}
-            </Typography>
-          </Paper>
 
-          <Paper variant="outlined" sx={{ p: 2.5 }}>
-            <Typography variant="subtitle2" color="primary" gutterBottom>
-              Pertinence et rigueur de la méthode, de la démarche et des références
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-              {grid.methodologyRigor}
-            </Typography>
-          </Paper>
-
-          <Paper variant="outlined" sx={{ p: 2.5 }}>
-            <Typography variant="subtitle2" color="primary" gutterBottom>
-              Recours à des études empiriques et une approche théorique solide
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-              {grid.theoreticalApproach}
-            </Typography>
-          </Paper>
-
-          <Paper variant="outlined" sx={{ p: 2.5 }}>
-            <Typography variant="subtitle2" color="primary" gutterBottom>
-              Soin dans la présentation et la structure du texte, clarté de l'expression
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-              {grid.presentationClarity}
-            </Typography>
-          </Paper>
-
-          <Divider />
-
-          {/* Points forts et faibles */}
-          <Typography variant="h6" fontWeight="bold">
-            Synthèse
-          </Typography>
-
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2.5,
-              borderColor: 'success.light',
-              bgcolor: 'rgba(46, 125, 50, 0.08)',
-            }}
-          >
-            <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-              <ThumbUp color="success" fontSize="small" />
-              <Typography variant="subtitle2" color="success.dark" fontWeight="bold">
-                Points forts
-              </Typography>
-            </Stack>
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-              {grid.strengths}
-            </Typography>
-          </Paper>
-
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2.5,
-              borderColor: 'error.light',
-              bgcolor: 'rgba(211, 47, 47, 0.08)',
-            }}
-          >
-            <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-              <ThumbDown color="error" fontSize="small" />
-              <Typography variant="subtitle2" color="error.dark" fontWeight="bold">
-                Points faibles
-              </Typography>
-            </Stack>
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-              {grid.weaknesses}
-            </Typography>
-          </Paper>
-
-          {grid.suggestions && (
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 2.5,
-                borderColor: 'info.light',
-                bgcolor: 'rgba(2, 136, 209, 0.08)',
-              }}
-            >
-              <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-                <Lightbulb color="info" fontSize="small" />
-                <Typography variant="subtitle2" color="info.dark" fontWeight="bold">
-                  Suggestions pour améliorer le texte
+            <Stack spacing={2}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  border: '1px solid',
+                  borderColor: 'success.light',
+                  borderRadius: 1,
+                  bgcolor: 'success.50'
+                }}
+              >
+                <Typography variant="subtitle1" color="success.dark" fontWeight="600" gutterBottom>
+                  Points forts
                 </Typography>
-              </Stack>
-              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                {grid.suggestions}
-              </Typography>
-            </Paper>
-          )}
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                  {grid.strengths}
+                </Typography>
+              </Paper>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  border: '1px solid',
+                  borderColor: 'error.light',
+                  borderRadius: 1,
+                  bgcolor: 'error.50'
+                }}
+              >
+                <Typography variant="subtitle1" color="error.dark" fontWeight="600" gutterBottom>
+                  Points faibles
+                </Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                  {grid.weaknesses}
+                </Typography>
+              </Paper>
+
+              {grid.suggestions && (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    border: '1px solid',
+                    borderColor: 'info.light',
+                    borderRadius: 1,
+                    bgcolor: 'info.50'
+                  }}
+                >
+                  <Typography variant="subtitle1" color="info.dark" fontWeight="600" gutterBottom>
+                    Suggestions d'amélioration
+                  </Typography>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                    {grid.suggestions}
+                  </Typography>
+                </Paper>
+              )}
+            </Stack>
+          </Box>
         </Stack>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 2 }}>
+      <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
         <Button onClick={onClose} variant="contained">
           Fermer
         </Button>

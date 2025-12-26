@@ -98,9 +98,7 @@ export function useManuscriptStaffEdit(manuscriptId: string) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     // Validation
     if (!formData.title.trim()) {
       showError('Le titre est requis');
@@ -157,7 +155,7 @@ export function useManuscriptStaffEdit(manuscriptId: string) {
       await axios.put(`/api/manuscripts/detail/${manuscriptId}`, payload);
 
       showSuccess('Manuscrit mis à jour avec succès');
-      router.push(`/dashboard/editor/manuscripts/${manuscriptId}`);
+      router.push('/dashboard/editor/manuscripts');
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
       if (axios.isAxiosError(error) && error.response) {

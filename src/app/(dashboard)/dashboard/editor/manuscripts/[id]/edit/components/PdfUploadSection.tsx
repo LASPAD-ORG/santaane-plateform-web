@@ -34,11 +34,6 @@ export default function PdfUploadSection({
           Fichier PDF
         </Typography>
 
-        <Alert severity="info" sx={{ mb: 2 }}>
-          PDF actuel : <strong>{currentPdfName}</strong>
-          {selectedFile && ' → Sera remplacé par le nouveau fichier'}
-        </Alert>
-
         <Box display="flex" flexDirection="column" gap={2}>
           <input
             accept="application/pdf"

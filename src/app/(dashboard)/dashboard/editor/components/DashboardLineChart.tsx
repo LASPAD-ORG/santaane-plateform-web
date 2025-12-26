@@ -1,15 +1,13 @@
 'use client';
 
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts';
 import { TimeSeriesResponse } from '../types/dashboard.types';
 
@@ -19,46 +17,65 @@ interface DashboardLineChartProps {
 }
 
 export default function DashboardLineChart({ data, color = '#3B82F6' }: DashboardLineChartProps) {
-  // Transform data to Recharts format
   const chartData = data.data.map((item) => ({
     period: item.period,
     value: item.count,
   }));
 
-  return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Typography variant="h6" component="h3" gutterBottom>
-          {data.title}
-        </Typography>
+  const total = chartData.reduce((sum, item) => sum + item.value, 0);
 
-        <Box sx={{ width: '100%', height: 300, mt: 2 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="period"
-                angle={-45}
-                textAnchor="end"
-                height={80}
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke={color}
-                strokeWidth={2}
-                dot={{ fill: color, r: 4 }}
-                activeDot={{ r: 6 }}
-                name="Valeur"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </Box>
-      </CardContent>
-    </Card>
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
+        height: '100%',
+      }}
+    >
+      <Typography variant="subtitle1" fontWeight="600" gutterBottom>
+        {data.title}
+      </Typography>
+      
+      <Typography variant="h4" fontWeight="700" sx={{ mb: 2, color }}>
+        {total}
+      </Typography>
+
+      <Box sx={{ width: '100%', height: 150 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+            <defs>
+              <linearGradient id={`gradient-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={color} stopOpacity={0.3}/>
+                <stop offset="95%" stopColor={color} stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="period"
+              tick={{ fontSize: 10 }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis hide />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={color}
+              strokeWidth={2}
+              fill={`url(#gradient-${color.replace('#', '')})`}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </Box>
+    </Paper>
   );
 }

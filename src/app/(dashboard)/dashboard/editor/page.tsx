@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Grid, CircularProgress, Alert, Container } from '@mui/material';
+import { Box, Typography, Grid, CircularProgress, Alert, Container, Stack, Divider } from '@mui/material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -54,82 +54,70 @@ export default function EditorDashboard() {
 
   return (
     <RoleGuard allowedRoles={[UserRole.EDITOR]}>
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-        {/* Page Title */}
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-            Tableau de Bord Éditeur
+          <Typography variant="h4" fontWeight="700">
+            Tableau de Bord
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary">
             Bienvenue, {user?.fullName}
           </Typography>
         </Box>
 
-        {/* Statistics Grid */}
-        <Box sx={{ mb: 6 }}>
+        {/* Stats */}
+        <Box sx={{ mb: 4 }}>
           <StatsGrid stats={data.stats} />
         </Box>
 
-        {/* Bar Charts Section */}
-        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-          Répartition des Soumissions
+        {/* Charts - 2x2 Grid */}
+        <Typography variant="h6" fontWeight="600" sx={{ mb: 2 }}>
+          Répartition
+        </Typography>
+        
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+            gap: 2,
+            mb: 4,
+          }}
+        >
+          <DashboardBarChart data={data.status_bar_chart} />
+          <DashboardBarChart data={data.theme_bar_chart} />
+          <DashboardBarChart data={data.section_bar_chart} />
+          <DashboardBarChart data={data.language_bar_chart} />
+        </Box>
+
+        {/* Time Series */}
+        <Typography variant="h6" fontWeight="600" sx={{ mb: 2 }}>
+          Évolution
         </Typography>
 
-        <Grid container spacing={3} sx={{ mb: 6 }}>
-          {/* Status Distribution */}
-          <Grid item xs={12} lg={6}>
-            <DashboardBarChart data={data.status_bar_chart} />
-          </Grid>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+            gap: 2,
+            mb: 3,
+          }}
+        >
+          <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
+          <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
+          <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
+        </Box>
 
-          {/* Theme Distribution */}
-          <Grid item xs={12} lg={6}>
-            <DashboardBarChart data={data.theme_bar_chart} />
-          </Grid>
-
-          {/* Section Distribution */}
-          <Grid item xs={12} lg={6}>
-            <DashboardBarChart data={data.section_bar_chart} />
-          </Grid>
-
-          {/* Language Distribution */}
-          <Grid item xs={12} lg={6}>
-            <DashboardBarChart data={data.language_bar_chart} />
-          </Grid>
-        </Grid>
-
-        {/* Time Series - Submissions Section */}
-        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-          Évolution des Soumissions
-        </Typography>
-
-        <Grid container spacing={3} sx={{ mb: 6 }}>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
-          </Grid>
-        </Grid>
-
-        {/* Time Series - Authors Section */}
-        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-          Évolution des Auteurs
-        </Typography>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.weekly_authors} color="#10B981" />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.monthly_authors} color="#22C55E" />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
-          </Grid>
-        </Grid>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+            gap: 2,
+          }}
+        >
+          <DashboardLineChart data={data.weekly_authors} color="#10B981" />
+          <DashboardLineChart data={data.monthly_authors} color="#22C55E" />
+          <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
+        </Box>
       </Container>
     </RoleGuard>
   );

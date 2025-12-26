@@ -143,7 +143,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
     const completedEvaluations = acceptedEvals.filter(e => e.evaluationStatus === 'completed').length;
     
     if (completedEvaluations === acceptedEvals.length) {
-      return { status: 'completed', label: 'Toutes terminées', color: 'success' };
+      return { status: 'completed', label: 'Évaluations terminées', color: 'success' };
     } else {
       return { status: 'in_progress', label: `${completedEvaluations}/${acceptedEvals.length} terminées`, color: 'primary' };
     }
@@ -411,7 +411,6 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
         {totalEvaluators === 0 && (
           <Box mb={2}>
             <Chip
-              icon={<PersonAdd />}
               label="Aucun évaluateur assigné"
               color="default"
               size="small"
@@ -436,7 +435,6 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
             </Typography>
           </Box>
 
-          <PictureAsPdf sx={{ fontSize: 20, color: 'error.main' }} />
         </Box>
       </CardContent>
 
