@@ -152,7 +152,7 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     label: 'Soumission',
     path: '/dashboard/author/soumission',
-    icon: ArticleIcon,
+    icon: CreateIcon,
     roles: [UserRole.AUTHOR],
   },
   {
