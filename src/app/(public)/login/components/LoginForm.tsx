@@ -36,10 +36,9 @@ export default function LoginForm() {
     try {
       await login(email, password);
 
-      // Get user roles and redirect to appropriate dashboard
+      // Récupérer l'utilisateur et rediriger selon son rôle
       const currentUser = useAuthStore.getState().user;
       if (currentUser && currentUser.roles.length > 0) {
-        // Redirect based on role priority: SUPER_ADMIN > EDITOR > EVALUATOR > AUTHOR
         const defaultRoute = getDefaultRouteForRoles(currentUser.roles);
         router.push(defaultRoute);
       } else {
@@ -47,6 +46,13 @@ export default function LoginForm() {
       }
     } catch (err) {
       const axiosError = err as AxiosError<{ detail?: string; message?: string }>;
+      
+      // LOGIQUE OTP : Si le compte n'est pas activé (403 Forbidden)
+      if (axiosError.response?.status === 403) {
+        router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+        return;
+      }
+
       const errorMessage =
         axiosError.response?.data?.detail ||
         axiosError.response?.data?.message ||
@@ -106,6 +112,19 @@ export default function LoginForm() {
           ),
         }}
       />
+
+      {/* Lien Mot de passe oublié */}
+      <Box sx={{ textAlign: 'right', mt: 1 }}>
+        <MuiLink 
+          component={Link} 
+          href="/forgot-password" 
+          variant="body2" 
+          underline="hover"
+          sx={{ color: 'text.secondary' }}
+        >
+          Mot de passe oublié ?
+        </MuiLink>
+      </Box>
 
       <Button
         type="submit"
