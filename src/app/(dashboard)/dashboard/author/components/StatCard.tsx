@@ -15,13 +15,18 @@ export default function StatCard({ title, value, icon, color = 'primary.main', s
   return (
     <Card
       sx={{
-        height: 200,
+        height: 140,
         display: 'flex',
         flexDirection: 'column',
-        transition: 'transform 0.2s, box-shadow 0.2s',
+        transition: 'all 0.3s ease',
+        borderRadius: 3,
+        border: '1px solid',
+        borderColor: 'divider',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,1) 100%)',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: 4,
+          transform: 'translateY(-8px)',
+          boxShadow: '0 12px 24px rgba(0,0,0,0.1)',
+          borderColor: color,
         },
       }}
     >
@@ -30,11 +35,12 @@ export default function StatCard({ title, value, icon, color = 'primary.main', s
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
-          p: 2.5,
-          '&:last-child': { pb: 2.5 }
+          justifyContent: 'space-between',
+          p: 3,
+          '&:last-child': { pb: 3 }
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
           <Box
             sx={{
               display: 'flex',
@@ -43,29 +49,47 @@ export default function StatCard({ title, value, icon, color = 'primary.main', s
               width: 48,
               height: 48,
               borderRadius: 2,
-              bgcolor: color,
-              color: 'white',
+              bgcolor: `${color}15`,
+              color: color,
             }}
           >
             {icon}
           </Box>
-        </Box>
-
-        <Typography variant="h4" component="div" fontWeight="bold" sx={{ mb: 1 }}>
-          {value}
-        </Typography>
-
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          {title}
-        </Typography>
-
-        <Box sx={{ flexGrow: 1 }} />
-
-        {subtitle && (
-          <Typography variant="caption" color="text.secondary">
-            {subtitle}
+          <Typography 
+            variant="h4" 
+            component="div" 
+            sx={{ 
+              fontWeight: 'bold',
+              color: 'text.primary',
+              lineHeight: 1
+            }}
+          >
+            {value}
           </Typography>
-        )}
+        </Box>
+        
+        <Box>
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{ 
+              fontWeight: 500,
+              lineHeight: 1.2,
+              mb: subtitle ? 0.5 : 0
+            }}
+          >
+            {title}
+          </Typography>
+          {subtitle && (
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ opacity: 0.7 }}
+            >
+              {subtitle}
+            </Typography>
+          )}
+        </Box>
       </CardContent>
     </Card>
   );

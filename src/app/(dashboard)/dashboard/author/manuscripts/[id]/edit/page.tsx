@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   Box,
@@ -10,6 +11,11 @@ import {
   Button,
   IconButton,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import { ArrowBack, Save } from '@mui/icons-material';
 import { useManuscriptDetails } from '../hooks/useManuscriptDetails';
@@ -21,6 +27,7 @@ export default function EditManuscriptPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const { loading: loadingDetails, manuscript } = useManuscriptDetails(id);
   const {
     formData,
@@ -76,17 +83,21 @@ export default function EditManuscriptPage() {
           <Typography variant="h4" fontWeight="bold">
             Réviser le Manuscrit
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            ID: {manuscript.id}
-          </Typography>
         </Box>
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Vous pouvez modifier le titre, le résumé, les mots-clés et le fichier PDF. Le thème, la section et la langue ne peuvent pas être modifiés.
+        <Typography variant="body2">
+          <strong>Éléments modifiables :</strong> titre, résumé, mots-clés et fichier PDF.
+          <br />
+          <strong>Éléments non modifiables :</strong> thème, section et langue.
+        </Typography>
       </Alert>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        setConfirmDialogOpen(true);
+      }}>
         {/* Informations générales */}
         <GeneralInfoSection
           title={formData.title}
@@ -153,6 +164,43 @@ export default function EditManuscriptPage() {
           </Button>
         </Box>
       </form>
+
+      {/* Modal de confirmation */}
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+      >
+        <DialogTitle id="confirm-dialog-title">
+          Confirmer les modifications
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-dialog-description">
+            Êtes-vous sûr de vouloir enregistrer ces modifications ? Cette action va mettre à jour votre manuscrit.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setConfirmDialogOpen(false)} 
+            color="inherit"
+            disabled={submitting || uploading}
+          >
+            Annuler
+          </Button>
+          <Button 
+            onClick={(e) => {
+              setConfirmDialogOpen(false);
+              handleSubmit(e);
+            }}
+            variant="contained"
+            disabled={submitting || uploading}
+            autoFocus
+          >
+            Confirmer
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

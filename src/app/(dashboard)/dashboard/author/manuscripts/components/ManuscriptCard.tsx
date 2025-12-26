@@ -150,7 +150,7 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title={`Télécharger ${manuscript.pdfFilename.split('/').pop()}`}>
+          <Tooltip title={`Télécharger le PDF`}>
             <IconButton size="small" onClick={handleDownloadPdf}>
               <PictureAsPdf fontSize="small" />
             </IconButton>

@@ -92,9 +92,6 @@ export default function ManuscriptDetailsPage() {
           <Typography variant="h4" fontWeight="bold">
             Détails du Manuscrit
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            ID: {manuscript.id}
-          </Typography>
         </Box>
         <Chip
           label={MANUSCRIPT_STATUS_LABELS[manuscript.status]}
@@ -115,16 +112,13 @@ export default function ManuscriptDetailsPage() {
             Modifier le manuscrit
           </Button>
         )}
-        <Button variant="outlined" startIcon={<PictureAsPdf />} onClick={handleDownloadPdf}>
-          Télécharger le PDF
-        </Button>
       </Box>
 
       {/* Onglets */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
           <Tab label="Informations" />
-          <Tab label="Prévisualisation PDF" icon={<Visibility />} iconPosition="start" />
+          <Tab label="Prévisualisation PDF"  />
         </Tabs>
       </Box>
 
@@ -209,22 +203,16 @@ export default function ManuscriptDetailsPage() {
             {/* Fichier PDF */}
             <Box mb={3}>
               <Typography variant="h6" fontWeight="600" mb={2}>
-                Fichier PDF
+                Document
               </Typography>
-              <Box display="flex" alignItems="center" gap={2}>
-                <PictureAsPdf sx={{ color: 'error.main', fontSize: 40 }} />
-                <Box flex={1}>
-                  <Typography variant="body1" fontWeight="500">
-                    {manuscript.pdfFilename.split('/').pop()}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Chemin: {manuscript.pdfFilename}
-                  </Typography>
-                </Box>
-                <Button size="small" variant="contained" onClick={handleDownloadPdf}>
-                  Télécharger
-                </Button>
-              </Box>
+              <Button 
+                variant="contained" 
+                startIcon={<PictureAsPdf />} 
+                onClick={handleDownloadPdf}
+                sx={{ mt: 1 }}
+              >
+                Télécharger le PDF
+              </Button>
             </Box>
 
             <Divider sx={{ my: 3 }} />
@@ -261,9 +249,6 @@ export default function ManuscriptDetailsPage() {
         // Onglet Prévisualisation PDF
         <Card elevation={2}>
           <CardContent sx={{ p: 4 }}>
-            <Typography variant="h6" fontWeight="600" mb={3}>
-              Prévisualisation du PDF
-            </Typography>
             <PdfViewer pdfUrl={`${API_URL}/api/v1/files/view/${manuscript.pdfFilename}`} />
           </CardContent>
         </Card>

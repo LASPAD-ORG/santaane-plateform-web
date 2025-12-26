@@ -105,10 +105,29 @@ export default function EvaluateManuscriptPage({
   }, [rawHighlights]);
 
   // Hook pour récupérer les masques de redaction (zones anonymisées)
+  // Seulement après que le manuscrit soit chargé et l'authentification confirmée
+  const redactionEnabled = !!manuscript && !!authToken;
+  console.log('Redaction masks enabled:', {
+    manuscript: !!manuscript,
+    authToken: !!authToken,
+    enabled: redactionEnabled,
+    manuscriptId: parseInt(manuscriptId)
+  });
+  
   const {
     masks: redactionMasks,
     loading: loadingRedactionMasks,
-  } = useRedactionMasks({ manuscriptId: parseInt(manuscriptId) });
+  } = useRedactionMasks({ 
+    manuscriptId: parseInt(manuscriptId),
+    enabled: redactionEnabled
+  });
+
+  // Log des masques de redaction
+  console.log('Redaction masks loaded:', {
+    count: redactionMasks.length,
+    loading: loadingRedactionMasks,
+    masks: redactionMasks
+  });
 
   useEffect(() => {
     const token = getCookie('auth_token');

@@ -126,7 +126,7 @@ export function useManuscriptRevision(manuscriptId: string) {
       await axios.put(`/api/manuscripts/${manuscriptId}/revise`, payload);
 
       showSuccess('Manuscrit révisé avec succès', 'Il sera re-soumis pour révision.');
-      router.push(`/dashboard/author/manuscripts/${manuscriptId}`);
+      router.push('/dashboard/author/manuscripts');
     } catch (error) {
       console.error('Erreur lors de la révision:', error);
       if (axios.isAxiosError(error) && error.response) {

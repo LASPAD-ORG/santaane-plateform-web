@@ -5,21 +5,25 @@ import { redactionViewerService, RedactionMask } from '@/services/redactionViewe
 
 interface UseRedactionMasksOptions {
   manuscriptId: number;
+  enabled?: boolean; // Permet de contrôler quand charger les masques
 }
 
-export function useRedactionMasks({ manuscriptId }: UseRedactionMasksOptions) {
+export function useRedactionMasks({ manuscriptId, enabled = true }: UseRedactionMasksOptions) {
   const [masks, setMasks] = useState<RedactionMask[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Commence à false
 
   // Charger les masques de redaction au montage
   const loadRedactionMasks = useCallback(async () => {
+    console.log('Loading redaction masks for manuscript:', manuscriptId);
     setLoading(true);
     try {
       const redactionMasks = await redactionViewerService.getRedactionMasks(manuscriptId);
+      console.log('Loaded redaction masks:', redactionMasks.length, 'masks found');
       setMasks(redactionMasks);
     } catch (error: any) {
-      console.error('Erreur chargement masques redaction:', error);
-      // Ne pas bloquer l'évaluation si les masques ne se chargent pas
+      console.error('Failed to load redaction masks:', error);
+      // Ne pas afficher d'erreur pour les manuscrits sans redaction
+      // C'est un comportement normal
       setMasks([]);
     } finally {
       setLoading(false);
@@ -27,8 +31,11 @@ export function useRedactionMasks({ manuscriptId }: UseRedactionMasksOptions) {
   }, [manuscriptId]);
 
   useEffect(() => {
-    loadRedactionMasks();
-  }, [loadRedactionMasks]);
+    // Seulement charger si enabled est true
+    if (enabled) {
+      loadRedactionMasks();
+    }
+  }, [loadRedactionMasks, enabled]);
 
   return {
     masks,

@@ -156,7 +156,7 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.AUTHOR],
   },
   {
-    label: 'Manuscripts',
+    label: 'Manuscrits',
     path: '/dashboard/author/manuscripts',
     icon: ArticleIcon,
     roles: [UserRole.AUTHOR],

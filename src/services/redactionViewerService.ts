@@ -19,13 +19,20 @@ export const redactionViewerService = {
    */
   async getRedactionMasks(manuscriptId: number): Promise<RedactionMask[]> {
     try {
-      // Call backend to get redaction masks for this manuscript
+      // Call backend via Next.js API route to get redaction masks for this manuscript
       // This endpoint returns only position data for masking
-      const { data } = await apiClient.get(`/manuscripts/${manuscriptId}/redaction-masks`);
+      const { data } = await apiClient.get(`/v1/manuscripts/${manuscriptId}/redaction-masks`);
       return data;
-    } catch (error) {
-      console.error('Error fetching redaction masks:', error);
-      // Return empty array if fails - don't block evaluation
+    } catch (error: any) {
+      // Log more details about the error to help debug
+      console.error('Error fetching redaction masks:', {
+        manuscriptId,
+        status: error?.response?.status,
+        message: error?.response?.data?.detail || error.message
+      });
+      
+      // Return empty array if endpoint doesn't exist or access denied
+      // This is expected behavior - not all manuscripts have redactions
       return [];
     }
   },

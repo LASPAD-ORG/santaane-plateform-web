@@ -1,13 +1,34 @@
 'use client';
 
-import { Box, Typography, Grid, CircularProgress, Alert, Container } from '@mui/material';
+import { 
+  Box, 
+  Typography, 
+  Grid, 
+  CircularProgress, 
+  Alert, 
+  Container,
+  Card,
+  CardContent,
+  Button,
+  Avatar,
+  IconButton,
+  Paper,
+  Stack
+} from '@mui/material';
+import { 
+  Add as AddIcon,
+  ArticleOutlined as ManuscriptIcon,
+  Notifications as NotificationIcon,
+  Settings as SettingsIcon,
+  Help as HelpIcon,
+  Dashboard as DashboardIcon
+} from '@mui/icons-material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
+import Link from 'next/link';
 import { useFetchAuthorDashboard } from './fetchers/useFetchAuthorDashboard';
 import StatsGrid from './components/StatsGrid';
-import DashboardBarChart from './components/DashboardBarChart';
-import DashboardLineChart from './components/DashboardLineChart';
 
 export default function AuthorDashboard() {
   const { user } = useAuthStore();
@@ -54,49 +75,93 @@ export default function AuthorDashboard() {
 
   return (
     <RoleGuard allowedRoles={[UserRole.AUTHOR]}>
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-        {/* Page Title */}
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Header Section */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-            Tableau de Bord
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Bienvenue, {user?.fullName}
-          </Typography>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={8}>
+              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                <Box>
+                  <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 0.5 }}>
+                    Bienvenue, {user?.fullName}
+                  </Typography>
+                  <Typography variant="subtitle1" color="text.secondary">
+                    Tableau de bord Auteur
+                  </Typography>
+                </Box>
+              </Stack>
+            </Grid>
+          </Grid>
         </Box>
 
-        {/* Statistics Grid */}
-        <Box sx={{ mb: 6 }}>
-          <StatsGrid stats={data.stats} />
-        </Box>
+        {/* Quick Actions Section */}
+        <Paper elevation={0} sx={{ p: 3, mb: 4, bgcolor: 'background.paper', borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+          <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+            <DashboardIcon sx={{ mr: 1 }} />
+            Actions Rapides
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={6}>
+              <Link href="/dashboard/author/soumission" style={{ textDecoration: 'none' }}>
+                <Card 
+                  sx={{ 
+                    p: 2, 
+                    textAlign: 'center', 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    '&:hover': { 
+                      transform: 'translateY(-4px)', 
+                      boxShadow: 3,
+                      bgcolor: 'primary.50'
+                    }
+                  }}
+                >
+                  <AddIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+                  <Typography variant="h6" fontWeight="bold">
+                    Nouveau Manuscrit
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Soumettre un article
+                  </Typography>
+                </Card>
+              </Link>
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
+              <Link href="/dashboard/author/manuscripts" style={{ textDecoration: 'none' }}>
+                <Card 
+                  sx={{ 
+                    p: 2, 
+                    textAlign: 'center', 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    '&:hover': { 
+                      transform: 'translateY(-4px)', 
+                      boxShadow: 3,
+                      bgcolor: 'success.50'
+                    }
+                  }}
+                >
+                  <ManuscriptIcon sx={{ fontSize: 40, color: 'success.main', mb: 1 }} />
+                  <Typography variant="h6" fontWeight="bold">
+                    Mes Manuscrits
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Voir tous les manuscrits
+                  </Typography>
+                </Card>
+              </Link>
+            </Grid>
+          </Grid>
+        </Paper>
 
-        {/* Bar Chart Section */}
-        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-          Répartition de vos Manuscrits
-        </Typography>
-
-        <Grid container spacing={3} sx={{ mb: 6 }}>
+        {/* Statistics Section */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12}>
-            <DashboardBarChart data={data.bar_chart} />
+            <StatsGrid stats={data.stats} />
           </Grid>
         </Grid>
 
-        {/* Time Series - Submissions Section */}
-        <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-          Évolution de vos Soumissions
-        </Typography>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
-          </Grid>
-          <Grid item xs={12} lg={4}>
-            <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
-          </Grid>
-        </Grid>
       </Container>
     </RoleGuard>
   );
