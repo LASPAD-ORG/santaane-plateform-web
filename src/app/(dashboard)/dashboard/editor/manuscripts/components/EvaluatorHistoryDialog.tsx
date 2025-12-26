@@ -340,7 +340,7 @@ export default function EvaluatorHistoryDialog({
                             size="small"
                             startIcon={<Visibility />}
                             onClick={() => {
-                              router.push(`/dashboard/editor/manuscripts/${manuscriptId}/evaluations/${evaluator.evaluatorId}/view`);
+                              router.push(`/dashboard/editor/manuscripts/${manuscriptId}/evaluation-result/${evaluator.evaluatorId}`);
                             }}
                             sx={{
                               textTransform: 'none',

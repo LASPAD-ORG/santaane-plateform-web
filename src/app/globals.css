@@ -41,56 +41,12 @@ a {
   }
 }
 
-/* Styles pour les masques de rédaction - Force la couleur noire */
-.redaction-mask-black,
-.redaction-mask-black .AreaHighlight,
-.redaction-mask-black .AreaHighlight__part,
-.redaction-mask-black div[style*="background"],
-.AreaHighlight.redaction-mask-black,
-.AreaHighlight.redaction-mask-black .AreaHighlight__part {
-  background-color: #000000 !important;
-  background: #000000 !important;
-  color: #000000 !important;
-  fill: #000000 !important;
-}
-
-/* Override pour tous les éléments enfants des masques de rédaction */
-.redaction-mask-black * {
-  background-color: #000000 !important;
-  background: #000000 !important;
-  color: #000000 !important;
-}
-
-/* Override spécifique pour react-pdf-highlighter-plus */
-.PdfHighlighter .redaction-mask-black,
-.PdfHighlighter .redaction-mask-black > div,
-.PdfHighlighter .redaction-mask-black .AreaHighlight__part {
-  background-color: #000000 !important;
-  background: #000000 !important;
-}
-
-/* Override ultra spécifique pour surcharger la couleur par défaut */
-.AreaHighlight.redaction-mask-black .AreaHighlight__part,
-.redaction-mask-black .AreaHighlight .AreaHighlight__part {
-  background: #000000 !important;
-  background-color: #000000 !important;
-}
-
-/* Style CSS pour les masques de rédaction - NOUVEAU STYLE GLOBAL */
-.PdfHighlighter .AreaHighlight__part {
-  background: rgba(255, 226, 143, 1);
-}
-
-/* Override ULTRA spécifique pour les masques de rédaction */
-.PdfHighlighter div[data-redaction="true"] .AreaHighlight__part,
-.PdfHighlighter .AreaHighlight[data-redaction="true"] .AreaHighlight__part,
+/* Styles pour les masques de rédaction uniquement */
+/* Utilise data-redaction="true" pour cibler uniquement les masques */
 div[data-redaction="true"] .AreaHighlight__part,
 .redaction-mask-area .AreaHighlight__part {
   background: #000000 !important;
   background-color: #000000 !important;
-}
-
-/* Style spécifique basé sur la position dans le DOM */
-.PdfHighlighter > div > div:has([data-redaction="true"]) .AreaHighlight__part {
-  background: #000000 !important;
+  opacity: 1 !important;
+  border: none !important;
 }

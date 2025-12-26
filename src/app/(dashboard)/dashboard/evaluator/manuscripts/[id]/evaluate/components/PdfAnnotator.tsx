@@ -66,21 +66,31 @@ function HighlightContainer({
   const isRedactionMask = 'isRedactionMask' in highlight && highlight.isRedactionMask;
 
   if (isRedactionMask) {
+    console.log('🎭 [HighlightContainer] Rendering redaction mask:', {
+      id: highlight.id,
+      position: highlight.position,
+      isRedactionMask,
+    });
+
     // Créer un highlight modifié avec la couleur noire pour l'export
     const blackRedactionHighlight = {
       ...highlight,
       highlightColor: REDACTION_MASK_COLOR,
     };
-    
+
     return (
-      <div data-redaction="true" className="redaction-mask-area">
+      <div
+        data-redaction="true"
+        className="redaction-mask-area redaction-mask-black"
+        style={{ zIndex: 9999, position: 'relative' }}
+      >
         <MonitoredHighlightContainer>
           <AreaHighlight
             highlight={blackRedactionHighlight}
             isScrolledTo={false}
             style={{
-              backgroundColor: `${REDACTION_MASK_COLOR} !important`,
-              background: `${REDACTION_MASK_COLOR} !important`,
+              backgroundColor: REDACTION_MASK_COLOR,
+              background: REDACTION_MASK_COLOR,
               border: 'none',
               opacity: 1,
               cursor: 'not-allowed',
@@ -207,12 +217,28 @@ export default function PdfAnnotator({
   // Convertir les masques de redaction en highlights
   const redactionMaskHighlights: RedactionMaskHighlight[] = redactionMasks.map(redactionMaskToHighlight);
 
+  // Log détaillé des masques de redaction
+  useEffect(() => {
+    console.log('🔍 [PdfAnnotator] Redaction masks received:', {
+      count: redactionMasks.length,
+      rawMasks: redactionMasks,
+      convertedHighlights: redactionMaskHighlights,
+    });
+  }, [redactionMasks, redactionMaskHighlights]);
+
   // Combiner les annotations normales et les masques de redaction
   // IMPORTANT: Mettre les masques EN DERNIER pour qu'ils soient au-dessus
   const allHighlights: (EvaluatorHighlight | RedactionMaskHighlight)[] = [
     ...highlights,
     ...redactionMaskHighlights,
   ];
+
+  console.log('📊 [PdfAnnotator] All highlights:', {
+    totalCount: allHighlights.length,
+    annotationsCount: highlights.length,
+    masksCount: redactionMaskHighlights.length,
+    allHighlights,
+  });
 
   // Synchroniser les highlights quand initialHighlights change (par ex. après suppression)
   useEffect(() => {
