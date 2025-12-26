@@ -37,6 +37,7 @@ interface PdfAnnotatorProps {
   pdfScaleValue?: number | string;
   utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
   redactionMasks?: RedactionMask[]; // NOUVEAU: masques de redaction à afficher en noir
+  annotationEnabled?: boolean; // NOUVEAU: contrôle si l'annotation est autorisée
 }
 
 // Couleur unique pour tous les highlights (jaune)
@@ -192,6 +193,7 @@ export default function PdfAnnotator({
   pdfScaleValue,
   utilsRef,
   redactionMasks = [], // NOUVEAU: masques de redaction
+  annotationEnabled = true, // NOUVEAU: contrôle si l'annotation est autorisée
 }: PdfAnnotatorProps) {
   const [highlights, setHighlights] = useState<EvaluatorHighlight[]>(initialHighlights);
   const currentSelectionRef = useRef<PdfSelection | null>(null);
@@ -231,6 +233,11 @@ export default function PdfAnnotator({
 
   const addHighlight = useCallback(
     (comment: string) => {
+      if (!annotationEnabled) {
+        console.warn('L\'annotation n\'est pas autorisée');
+        return;
+      }
+
       if (!currentSelectionRef.current) {
         console.error('Aucune sélection active');
         return;
@@ -258,7 +265,7 @@ export default function PdfAnnotator({
         highlighterUtilsRef.current.setTip(null);
       }
     },
-    [highlights, updateHighlights]
+    [highlights, updateHighlights, annotationEnabled]
   );
 
   const handleSelection = useCallback(
@@ -290,7 +297,7 @@ export default function PdfAnnotator({
               highlighterUtilsRef.current = utils;
             }}
             pdfScaleValue={pdfScaleValue as any}
-            selectionTip={<SelectionTip onAddComment={addHighlight} />}
+            selectionTip={annotationEnabled ? <SelectionTip onAddComment={addHighlight} /> : null}
             style={{
               height: '100%',
               width: '100%',

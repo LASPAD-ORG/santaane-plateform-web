@@ -76,8 +76,8 @@ export function EvaluationGridDialog({
   const [weaknesses, setWeaknesses] = useState('');
   const [suggestions, setSuggestions] = useState('');
   const [recommendation, setRecommendation] = useState<
-    'accepted_with_validation' | 'resubmission_required' | 'rejected'
-  >('accepted_with_validation');
+    'accepted_with_validation' | 'resubmission_required' | 'rejected' | ''
+  >('');
 
   // Confirmation dialog state
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -133,7 +133,11 @@ export function EvaluationGridDialog({
   // Handle submit evaluation
   const handleSubmit = () => {
     if (!isFormValid) {
-      useAlertStore.getState().showError('Veuillez remplir tous les champs requis');
+      if (recommendation === '') {
+        useAlertStore.getState().showError('Veuillez choisir un avis avant de soumettre l\'évaluation');
+      } else {
+        useAlertStore.getState().showError('Veuillez remplir tous les champs requis');
+      }
       return;
     }
     // Open confirmation dialog
@@ -162,9 +166,6 @@ export function EvaluationGridDialog({
       // 2. Soumettre l'évaluation complète (marque la grille comme soumise)
       const response = await evaluationGridService.submitEvaluation(manuscriptId);
 
-      useAlertStore.getState().showSuccess(
-        `Évaluation soumise avec succès ! (${response.annotationCount} annotation(s))`
-      );
       onClose();
       router.push('/dashboard/evaluator/manuscripts');
     } catch (error) {
@@ -206,17 +207,10 @@ export function EvaluationGridDialog({
           </Box>
         ) : (
           <Stack spacing={3}>
-            {/* Champs lecture seule */}
+            {/* Champ lecture seule */}
             <TextField
               label="Titre article"
               value={manuscriptTitle}
-              disabled
-              fullWidth
-              variant="filled"
-            />
-            <TextField
-              label="Lecteur"
-              value={evaluatorName}
               disabled
               fullWidth
               variant="filled"
@@ -320,9 +314,13 @@ export function EvaluationGridDialog({
                       | 'accepted_with_validation'
                       | 'resubmission_required'
                       | 'rejected'
+                      | ''
                   )
                 }
               >
+                <MenuItem value="" disabled>
+                  <em>Choisir un avis</em>
+                </MenuItem>
                 {recommendationOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}

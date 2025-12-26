@@ -17,8 +17,6 @@ import {
   HourglassEmpty,
   Schedule,
   PictureAsPdf,
-  Visibility,
-  Download,
   PlayCircle,
   PauseCircle,
   TaskAlt,
@@ -98,27 +96,23 @@ export default function EvaluatorManuscriptCard({
     if (manuscript.assignmentStatus !== 'accepted') return null;
     
     switch (manuscript.evaluationStatus) {
-      case 'not_started':
-        return 'Non démarré';
-      case 'in_progress':
-        return 'En cours';
       case 'completed':
         return 'Terminé';
+      case 'in_progress':
+      case 'not_started':
       default:
-        return 'Non démarré';
+        return 'En cours';
     }
   };
 
   const getEvaluationStatusColor = () => {
     switch (manuscript.evaluationStatus) {
-      case 'not_started':
-        return 'default';
-      case 'in_progress':
-        return 'warning';
       case 'completed':
         return 'success';
+      case 'in_progress':
+      case 'not_started':
       default:
-        return 'default';
+        return 'warning';
     }
   };
 
@@ -159,19 +153,6 @@ export default function EvaluatorManuscriptCard({
   const isDeadlinePassed = () => {
     if (!manuscript.evaluationDeadline) return false;
     return new Date(manuscript.evaluationDeadline) < new Date();
-  };
-
-  const handleDownloadPdf = () => {
-    // Télécharger le PDF
-    const link = document.createElement('a');
-    link.href = `/api/manuscripts/pdf/${manuscript.pdfFilename}`;
-    link.download = manuscript.pdfFilename;
-    link.click();
-  };
-
-  const handlePreviewPdf = () => {
-    // Ouvrir la prévisualisation du PDF dans un nouvel onglet
-    window.open(`/api/manuscripts/pdf/${manuscript.pdfFilename}`, '_blank');
   };
 
   return (
@@ -283,28 +264,6 @@ export default function EvaluatorManuscriptCard({
 
         <Divider sx={{ my: 2 }} />
 
-        {/* Actions PDF - Disponibles pour tous */}
-        <Stack direction="row" spacing={1} mb={2}>
-          <Button
-            variant="outlined"
-            size="small"
-            fullWidth
-            startIcon={<Visibility />}
-            onClick={handlePreviewPdf}
-          >
-            Prévisualiser
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            fullWidth
-            startIcon={<Download />}
-            onClick={handleDownloadPdf}
-          >
-            Télécharger
-          </Button>
-        </Stack>
-
         {/* Footer avec dates et actions */}
         <Box>
           <Box display="flex" alignItems="center" gap={0.5} mb={2}>
@@ -314,53 +273,80 @@ export default function EvaluatorManuscriptCard({
             </Typography>
           </Box>
 
+          {/* Afficher la date de réponse si déjà répondu */}
+          {manuscript.responseAt && (
+            <Box display="flex" alignItems="center" gap={0.5} mb={2}>
+              <CalendarToday sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <Typography variant="caption" color="text.secondary">
+                Répondu le {formatDate(manuscript.responseAt)}
+              </Typography>
+            </Box>
+          )}
+
+          {/* Afficher la date de soumission de l'évaluation si terminée */}
+          {manuscript.evaluationStatus === 'completed' && manuscript.evaluationSubmittedAt && (
+            <Box display="flex" alignItems="center" gap={0.5} mb={2}>
+              <CalendarToday sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <Typography variant="caption" color="text.secondary">
+                Évaluation soumise le {formatDate(manuscript.evaluationSubmittedAt)}
+              </Typography>
+            </Box>
+          )}
+
           {/* Boutons d'action pour les manuscrits en attente */}
           {manuscript.assignmentStatus === 'pending' && (
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="contained"
-                color="success"
-                size="small"
-                fullWidth
-                startIcon={<CheckCircle />}
-                onClick={() => handleResponse(true)}
-                disabled={responding}
-              >
-                Accepter
-              </Button>
+            <Stack direction="column" spacing={1}>
+              {/* Bouton pour consulter le manuscrit (lecture seule) */}
               <Button
                 variant="outlined"
-                color="error"
+                color="primary"
                 size="small"
                 fullWidth
-                startIcon={<Cancel />}
-                onClick={() => handleResponse(false)}
-                disabled={responding}
+                startIcon={<PictureAsPdf />}
+                onClick={() => router.push(`/dashboard/evaluator/manuscripts/${manuscript.id}/view`)}
               >
-                Refuser
+                Consulter le manuscrit
               </Button>
+              
+              {/* Boutons Accepter/Refuser */}
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="contained"
+                  color="success"
+                  size="small"
+                  fullWidth
+                  startIcon={<CheckCircle />}
+                  onClick={() => handleResponse(true)}
+                  disabled={responding}
+                >
+                  Accepter
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  fullWidth
+                  startIcon={<Cancel />}
+                  onClick={() => handleResponse(false)}
+                  disabled={responding}
+                >
+                  Refuser
+                </Button>
+              </Stack>
             </Stack>
           )}
 
-          {/* Actions disponibles uniquement pour les manuscrits acceptés */}
-          {manuscript.assignmentStatus === 'accepted' && (
+          {/* Actions disponibles uniquement pour les manuscrits acceptés et non terminés */}
+          {manuscript.assignmentStatus === 'accepted' && manuscript.evaluationStatus !== 'completed' && (
             <Button
               variant="contained"
               color="primary"
               size="small"
               fullWidth
-              startIcon={<PictureAsPdf />}
               onClick={() => router.push(`/dashboard/evaluator/manuscripts/${manuscript.id}/evaluate`)}
             >
               Évaluer
             </Button>
-          )}
-
-          {/* Afficher la date de réponse si déjà répondu */}
-          {manuscript.responseAt && (
-            <Typography variant="caption" color="text.secondary" display="block">
-              Répondu le {formatDate(manuscript.responseAt)}
-            </Typography>
           )}
         </Box>
       </CardContent>

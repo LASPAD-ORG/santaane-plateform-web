@@ -52,7 +52,13 @@ export function useEvaluationGrid({
       return savedGrid;
     } catch (error: any) {
       console.error('Erreur sauvegarde grille:', error);
-      useAlertStore.getState().showError('Erreur lors de la sauvegarde de la grille');
+      
+      // Afficher le message d'erreur spécifique ou un message générique
+      const errorMessage = error.message && error.message.includes('accepter l\'assignation') 
+        ? error.message
+        : 'Erreur lors de la sauvegarde de la grille';
+        
+      useAlertStore.getState().showError(errorMessage);
       throw error;
     } finally {
       setSaving(false);

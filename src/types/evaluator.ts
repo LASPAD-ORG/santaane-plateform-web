@@ -53,6 +53,7 @@ export interface EvaluatorManuscript {
   pdfFilename: string;
   assignmentStatus: AssignmentStatus;
   evaluationStatus?: EvaluationStatus; // Nouvel état pour l'évaluation
+  evaluationSubmittedAt?: string; // Date de soumission de l'évaluation
   assignedAt: string;
   evaluationDeadline: string | null;
   responseAt: string | null;

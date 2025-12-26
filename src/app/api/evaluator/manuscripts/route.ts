@@ -31,37 +31,104 @@ export async function GET() {
 
     console.log('[Evaluator Manuscripts] Success, got', response.data?.length || 0, 'manuscripts');
 
-    // Enrichir chaque manuscrit avec l'état d'évaluation
+    // Enrichir chaque manuscrit avec l'état d'évaluation basé sur l'API backend
     const manuscriptsWithEvaluationStatus = await Promise.all(
       response.data.map(async (manuscript: any) => {
         try {
-          // Récupérer le statut d'évaluation depuis l'API backend pour l'évaluateur connecté
-          const evaluationStatusResponse = await axios.get(
-            `${API_URL}/api/v1/manuscripts/${manuscript.id}/evaluation-status`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+          let evaluationStatus = 'in_progress'; // Par défaut, considérer comme en cours
+          
+          // Utiliser l'API d'évaluation status du backend qui fonctionne
+          try {
+            const statusResponse = await axios.get(
+              `${API_URL}/api/v1/manuscripts/${manuscript.id}/evaluation-status`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            
+            const statusData = statusResponse.data;
+            console.log(`[Manuscripts] Manuscrit ${manuscript.id} status API:`, statusData);
+            
+            if (statusData && statusData.evaluationStatus) {
+              // Mapper les statuts du backend vers nos statuts frontend simplifiés
+              switch (statusData.evaluationStatus) {
+                case 'completed':
+                  evaluationStatus = 'completed';
+                  // Essayer de récupérer la date de soumission depuis la grille
+                  try {
+                    const gridResponse = await axios.get(
+                      `${API_URL}/api/v1/manuscripts/${manuscript.id}/evaluation-grid`,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    );
+                    
+                    const grid = gridResponse.data;
+                    console.log(`[Manuscripts] Manuscrit ${manuscript.id} grille complète:`, grid);
+                    if (grid && grid.submittedAt) {
+                      manuscript.evaluationSubmittedAt = grid.submittedAt;
+                      console.log(`[Manuscripts] Manuscrit ${manuscript.id} soumis le:`, grid.submittedAt);
+                    } else if (grid && grid.updatedAt) {
+                      // Fallback: utiliser updatedAt si submittedAt n'existe pas
+                      manuscript.evaluationSubmittedAt = grid.updatedAt;
+                      console.log(`[Manuscripts] Manuscrit ${manuscript.id} fallback updatedAt:`, grid.updatedAt);
+                    } else {
+                      console.log(`[Manuscripts] Manuscrit ${manuscript.id} pas de date de soumission trouvée`);
+                    }
+                  } catch (gridError) {
+                    console.log(`[Manuscripts] Impossible de récupérer la date de soumission pour manuscrit ${manuscript.id}`);
+                  }
+                  break;
+                case 'in_progress':
+                case 'not_started':
+                default:
+                  evaluationStatus = 'in_progress';
+                  break;
+              }
             }
-          );
-          
-          const statusData = evaluationStatusResponse.data;
-          let evaluationStatus = 'not_started';
-          
-          if (statusData && statusData.evaluationStatus) {
-            evaluationStatus = statusData.evaluationStatus;
+            
+          } catch (statusError: any) {
+            console.log(`[Manuscripts] Erreur status API pour manuscrit ${manuscript.id}:`, statusError.response?.status, statusError.message);
+            
+            // Fallback : vérifier les annotations comme indicateur
+            try {
+              const annotationsResponse = await axios.get(
+                `${API_URL}/api/v1/manuscripts/${manuscript.id}/annotations`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              
+              const annotations = annotationsResponse.data || [];
+              console.log(`[Manuscripts] Manuscrit ${manuscript.id} a ${annotations.length} annotations (fallback)`);
+              
+              if (annotations.length > 0) {
+                evaluationStatus = 'in_progress';
+              }
+              
+            } catch (annotationError) {
+              console.log(`[Manuscripts] Erreur annotations pour manuscrit ${manuscript.id}:`, annotationError);
+              // Garder in_progress par défaut
+            }
           }
+          
+          console.log(`[Manuscripts] Manuscrit ${manuscript.id} statut final: ${evaluationStatus}`);
           
           return {
             ...manuscript,
             evaluationStatus
           };
         } catch (error) {
-          // En cas d'erreur, considérer comme non démarrée
-          console.warn(`Impossible de récupérer le statut d'évaluation pour le manuscrit ${manuscript.id}`);
+          console.warn(`Erreur lors du calcul du statut pour le manuscrit ${manuscript.id}:`, error);
           return {
             ...manuscript,
-            evaluationStatus: 'not_started'
+            evaluationStatus: 'in_progress'
           };
         }
       })

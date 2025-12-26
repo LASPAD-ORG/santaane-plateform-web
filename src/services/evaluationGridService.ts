@@ -14,7 +14,7 @@ import type { EvaluationGrid, SaveEvaluationGridRequest } from '@/types/evaluati
 export const evaluationGridService = {
   /**
    * Get evaluation grid for a manuscript
-   * Returns null if no grid exists yet (404)
+   * Returns null if no grid exists yet (404) or no access (403)
    */
   async getEvaluationGrid(manuscriptId: number): Promise<EvaluationGrid | null> {
     try {
@@ -25,6 +25,10 @@ export const evaluationGridService = {
     } catch (error: any) {
       // 404 means no grid exists yet - this is normal
       if (error.response?.status === 404) {
+        return null;
+      }
+      // 403 means evaluator hasn't accepted assignment yet - this is normal
+      if (error.response?.status === 403) {
         return null;
       }
       // Other errors should be thrown
@@ -40,11 +44,20 @@ export const evaluationGridService = {
     manuscriptId: number,
     data: SaveEvaluationGridRequest
   ): Promise<EvaluationGrid> {
-    const { data: savedGrid } = await apiClient.put<EvaluationGrid>(
-      `/manuscripts/${manuscriptId}/evaluation-grid`,
-      data
-    );
-    return savedGrid;
+    try {
+      const { data: savedGrid } = await apiClient.put<EvaluationGrid>(
+        `/manuscripts/${manuscriptId}/evaluation-grid`,
+        data
+      );
+      return savedGrid;
+    } catch (error: any) {
+      // Gérer les erreurs 403 (assignation non acceptée)
+      if (error.response?.status === 403) {
+        console.warn('Accès refusé pour sauvegarder la grille - assignation peut-être non acceptée');
+        throw new Error('Vous devez d\'abord accepter l\'assignation de ce manuscrit pour pouvoir sauvegarder la grille d\'évaluation.');
+      }
+      throw error;
+    }
   },
 
   /**

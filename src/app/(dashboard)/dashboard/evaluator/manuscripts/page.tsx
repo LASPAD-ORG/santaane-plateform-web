@@ -11,7 +11,7 @@ import {
   Alert,
   Stack,
 } from '@mui/material';
-import { FilterList, Assignment } from '@mui/icons-material';
+import { FilterList } from '@mui/icons-material';
 import { useEvaluatorManuscripts } from './hooks/useEvaluatorManuscripts';
 import EvaluatorManuscriptCard from './components/EvaluatorManuscriptCard';
 
@@ -57,61 +57,11 @@ export default function EvaluatorManuscriptsPage() {
             <MenuItem value="all">Tous les manuscrits</MenuItem>
             <MenuItem value="pending">En attente de réponse</MenuItem>
             <MenuItem value="accepted">Acceptés</MenuItem>
-            <MenuItem value="declined">Refusés</MenuItem>
+            <MenuItem value="in_progress">En cours d'évaluation</MenuItem>
+            <MenuItem value="completed">Terminés</MenuItem>
           </TextField>
         </CardContent>
       </Card>
-
-      {/* Statistiques */}
-      <Stack direction="row" spacing={2} mb={3}>
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Assignment color="primary" />
-              <Box>
-                <Typography variant="h4" fontWeight="bold">
-                  {manuscripts.filter((m) => m.assignmentStatus === 'pending').length}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  En attente
-                </Typography>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Assignment color="success" />
-              <Box>
-                <Typography variant="h4" fontWeight="bold">
-                  {manuscripts.filter((m) => m.assignmentStatus === 'accepted').length}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Acceptés
-                </Typography>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Assignment color="error" />
-              <Box>
-                <Typography variant="h4" fontWeight="bold">
-                  {manuscripts.filter((m) => m.assignmentStatus === 'declined').length}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Refusés
-                </Typography>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      </Stack>
 
       {/* Résultats */}
       <Box mb={2}>
@@ -127,13 +77,7 @@ export default function EvaluatorManuscriptsPage() {
         </Box>
       ) : manuscripts.length === 0 && total === 0 ? (
         <Alert severity="info" sx={{ mt: 2 }}>
-          <Typography variant="body1" gutterBottom fontWeight="600">
-            Aucun manuscrit assigné pour le moment.
-          </Typography>
-          <Typography variant="body2">
-            Les manuscrits qui vous seront assignés pour évaluation apparaîtront ici.
-            Assurez-vous d'avoir le rôle <strong>EVALUATOR</strong> pour recevoir des assignations.
-          </Typography>
+          Aucun résultat trouvé.
         </Alert>
       ) : manuscripts.length === 0 ? (
         <Alert severity="info">

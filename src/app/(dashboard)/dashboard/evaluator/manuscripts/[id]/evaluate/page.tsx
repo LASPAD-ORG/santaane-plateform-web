@@ -26,12 +26,14 @@ import {
   MenuOpen,
   Menu,
   Assignment,
+  InfoOutlined,
 } from '@mui/icons-material';
 import type { EvaluatorHighlight } from '@/types/evaluator';
 import { CommentsSidebar } from './components/CommentsSidebar';
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 import { PdfZoomControls } from './components/PdfZoomControls';
 import { EvaluationGridDialog } from './components/EvaluationGridDialog';
+import { ManuscriptDetailsDialog } from './components/ManuscriptDetailsDialog';
 import { useAnnotations } from './hooks/useAnnotations';
 import { useRedactionMasks } from './hooks/useRedactionMasks';
 
@@ -74,6 +76,7 @@ export default function EvaluateManuscriptPage({
   const [pdfScaleValue, setPdfScaleValue] = useState<number | string>('auto');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [evaluationGridOpen, setEvaluationGridOpen] = useState(false);
+  const [manuscriptDetailsOpen, setManuscriptDetailsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState({ current: 0, total: 0 });
   const highlighterUtilsRef = React.useRef<any>(null);
@@ -337,19 +340,36 @@ export default function EvaluateManuscriptPage({
                 {exportProgress.current}/{exportProgress.total}
               </Typography>
             )}
-            <Button
-              variant="contained"
-              startIcon={<Assignment />}
-              onClick={() => setEvaluationGridOpen(true)}
-            >
-              Grille d&apos;évaluation
-            </Button>
+            <Tooltip title="Détails du manuscrit">
+              <IconButton 
+                onClick={() => setManuscriptDetailsOpen(true)} 
+                color="primary"
+              >
+                <InfoOutlined />
+              </IconButton>
+            </Tooltip>
+            {manuscript?.assignmentStatus === 'accepted' && (
+              <Button
+                variant="contained"
+                startIcon={<Assignment />}
+                onClick={() => setEvaluationGridOpen(true)}
+              >
+                Grille d&apos;évaluation
+              </Button>
+            )}
           </Stack>
         </Stack>
 
         {error && (
           <Alert severity="error" sx={{ mt: 2 }} onClose={() => setError(null)}>
             {error}
+          </Alert>
+        )}
+
+        {/* Message informatif si l'annotation n'est pas autorisée */}
+        {manuscript?.assignmentStatus !== 'accepted' && (
+          <Alert severity="info" sx={{ mt: 2 }}>
+            Vous devez accepter la demande d'évaluation pour pouvoir annoter ce manuscrit et accéder à la grille d'évaluation.
           </Alert>
         )}
       </Paper>
@@ -410,6 +430,7 @@ export default function EvaluateManuscriptPage({
               pdfScaleValue={pdfScaleValue}
               utilsRef={highlighterUtilsRef}
               redactionMasks={redactionMasks} // NOUVEAU: Passer les masques de redaction
+              annotationEnabled={manuscript?.assignmentStatus === 'accepted'} // NOUVEAU: Autoriser l'annotation seulement si accepté
             />
           </Box>
         </Box>
@@ -469,6 +490,13 @@ export default function EvaluateManuscriptPage({
         manuscriptTitle={manuscript?.title || ''}
         evaluatorName={manuscript?.assignedTo?.name || 'Évaluateur'}
         manuscriptId={parseInt(manuscriptId)}
+      />
+
+      {/* Dialog des détails du manuscrit */}
+      <ManuscriptDetailsDialog
+        open={manuscriptDetailsOpen}
+        onClose={() => setManuscriptDetailsOpen(false)}
+        manuscript={manuscript}
       />
     </Box>
   );
