@@ -68,7 +68,7 @@ const App = () => {
   const [scrolledToHighlightId, setScrolledToHighlightId] = useState<string | null>(null);
 
   // Refs for PdfHighlighter utilities
-  const highlighterUtilsRef = useRef<PdfHighlighterUtils>();
+  const highlighterUtilsRef = useRef<PdfHighlighterUtils>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const toggleDocument = () => {

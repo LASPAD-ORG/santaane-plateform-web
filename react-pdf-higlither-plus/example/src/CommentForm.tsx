@@ -25,7 +25,7 @@ const CommentForm = ({ onSubmit, placeHolder }: CommentFormProps) => {
           setInput(event.target.value);
         }}
       />
-      <Button type="submit" size="sm" className="w-full">
+      <Button type="submit" className="w-full">
         Save
       </Button>
     </form>

@@ -30,8 +30,9 @@ import { groupHighlightsByPage } from '@/types/evaluator';
 interface CommentsSidebarProps {
   highlights: EvaluatorHighlight[];
   onHighlightClick: (highlightId: string) => void;
-  onDelete: (highlightId: string) => void;
+  onDelete?: (highlightId: string) => void;
   totalPages?: number;
+  readOnly?: boolean;
 }
 
 export function CommentsSidebar({
@@ -39,6 +40,7 @@ export function CommentsSidebar({
   onHighlightClick,
   onDelete,
   totalPages = 10,
+  readOnly = false,
 }: CommentsSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedPages, setExpandedPages] = useState<Set<number>>(new Set([1]));
@@ -218,23 +220,25 @@ export function CommentsSidebar({
                               )}
                             </Box>
 
-                            {/* Bouton supprimer */}
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDelete(highlight.id);
-                              }}
-                              sx={{
-                                opacity: 0.5,
-                                '&:hover': {
-                                  opacity: 1,
-                                  color: 'error.main',
-                                },
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
+                            {/* Bouton supprimer - masqué en mode lecture seule */}
+                            {!readOnly && onDelete && (
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onDelete(highlight.id);
+                                }}
+                                sx={{
+                                  opacity: 0.5,
+                                  '&:hover': {
+                                    opacity: 1,
+                                    color: 'error.main',
+                                  },
+                                }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            )}
                           </Stack>
                         </ListItem>
                         {index < pageHighlights.length - 1 && <Divider />}

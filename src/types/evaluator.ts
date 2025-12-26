@@ -163,6 +163,11 @@ export function backendAnnotationToHighlight(
       ? JSON.parse(annotation.contentData)
       : { text: '' };
 
+    // Verify position has required structure
+    if (!position || !position.boundingRect || typeof position.boundingRect.pageNumber !== 'number') {
+      throw new Error('Invalid position data structure');
+    }
+
     return {
       id: String(annotation.id),
       type: annotation.annotationType as 'text' | 'area' | 'freetext',
@@ -172,9 +177,9 @@ export function backendAnnotationToHighlight(
       author: annotation.evaluatorName,
     };
   } catch (error) {
-    console.error('Failed to parse annotation data:', error);
+    console.error('Failed to parse annotation data:', error, annotation);
 
-    // Fallback basique
+    // Fallback basique avec position valide
     return {
       id: String(annotation.id),
       type: 'text',

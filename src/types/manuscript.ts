@@ -18,6 +18,14 @@ export interface Evaluator {
   assignedAt: string;
   responseAt: string | null;
   evaluationDeadline: string | null;
+  evaluationStatus: string; // 'not_started', 'in_progress', 'completed'
+}
+
+export interface EvaluationStatus {
+  assignedEvaluators: number;
+  submittedEvaluations: number;
+  isFullyEvaluated: boolean;
+  evaluationProgress: number;
 }
 
 export interface Manuscript {
@@ -36,6 +44,7 @@ export interface Manuscript {
   status: ManuscriptStatus;
   pdfFilename: string;
   evaluators?: Evaluator[];
+  evaluationStatus?: EvaluationStatus;
   createdAt: string;
   updatedAt: string;
 }

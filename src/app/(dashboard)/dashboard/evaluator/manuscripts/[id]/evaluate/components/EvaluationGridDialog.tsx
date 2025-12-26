@@ -30,9 +30,11 @@ import type { SaveEvaluationGridRequest } from '@/types/evaluationGrid';
 interface EvaluationGridDialogProps {
   open: boolean;
   onClose: () => void;
-  manuscriptTitle: string;
-  evaluatorName: string;
+  manuscriptTitle?: string;
+  evaluatorName?: string;
   manuscriptId: number;
+  readOnly?: boolean;
+  initialData?: any;
 }
 
 const recommendationOptions = [
@@ -56,16 +58,26 @@ export function EvaluationGridDialog({
   manuscriptTitle,
   evaluatorName,
   manuscriptId,
+  readOnly = false,
+  initialData,
 }: EvaluationGridDialogProps) {
   const router = useRouter();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { grid, loading, saving, saveGrid } = useEvaluationGrid({
+  // Only use the hook if NOT in readOnly mode
+  const hookResult = useEvaluationGrid({
     manuscriptId,
-    articleTitle: manuscriptTitle,
-    evaluatorName,
+    articleTitle: manuscriptTitle || '',
+    evaluatorName: evaluatorName || '',
+    enabled: !readOnly, // Ne charge pas si en mode lecture seule
   });
+
+  // Use hook data or default values for readOnly mode
+  const grid = readOnly ? null : hookResult.grid;
+  const loading = readOnly ? false : hookResult.loading;
+  const saving = readOnly ? false : hookResult.saving;
+  const saveGrid = readOnly ? async () => {} : hookResult.saveGrid;
 
   // Form state
   const [originalityOfIdeas, setOriginalityOfIdeas] = useState('');
@@ -85,17 +97,18 @@ export function EvaluationGridDialog({
 
   // Load existing grid data into form
   useEffect(() => {
-    if (grid) {
-      setOriginalityOfIdeas(grid.originalityOfIdeas);
-      setMethodologyRigor(grid.methodologyRigor);
-      setTheoreticalApproach(grid.theoreticalApproach);
-      setPresentationClarity(grid.presentationClarity);
-      setStrengths(grid.strengths);
-      setWeaknesses(grid.weaknesses);
-      setSuggestions(grid.suggestions);
-      setRecommendation(grid.recommendation);
+    const dataToLoad = readOnly ? initialData : grid;
+    if (dataToLoad) {
+      setOriginalityOfIdeas(dataToLoad.originalityOfIdeas || '');
+      setMethodologyRigor(dataToLoad.methodologyRigor || '');
+      setTheoreticalApproach(dataToLoad.theoreticalApproach || '');
+      setPresentationClarity(dataToLoad.presentationClarity || '');
+      setStrengths(dataToLoad.strengths || '');
+      setWeaknesses(dataToLoad.weaknesses || '');
+      setSuggestions(dataToLoad.suggestions || '');
+      setRecommendation(dataToLoad.recommendation || '');
     }
-  }, [grid]);
+  }, [grid, initialData, readOnly]);
 
   // Form validation
   const isFormValid =
@@ -218,12 +231,13 @@ export function EvaluationGridDialog({
 
             {/* Champs éditables */}
             <TextField
-              label="Originalité des idées et des conclusions"
+              label="Originalité et pertinence des idées"
               multiline
               minRows={3}
               maxRows={8}
               fullWidth
               required
+              disabled={readOnly}
               value={originalityOfIdeas}
               onChange={(e) => setOriginalityOfIdeas(e.target.value)}
               helperText="Évaluez l'originalité et la pertinence des idées présentées"
@@ -236,6 +250,7 @@ export function EvaluationGridDialog({
               maxRows={8}
               fullWidth
               required
+              disabled={readOnly}
               value={methodologyRigor}
               onChange={(e) => setMethodologyRigor(e.target.value)}
               helperText="Commentez la rigueur méthodologique et la qualité des références"
@@ -248,6 +263,7 @@ export function EvaluationGridDialog({
               maxRows={8}
               fullWidth
               required
+              disabled={readOnly}
               value={theoreticalApproach}
               onChange={(e) => setTheoreticalApproach(e.target.value)}
               helperText="Évaluez la solidité de l'approche théorique et empirique"
@@ -260,6 +276,7 @@ export function EvaluationGridDialog({
               maxRows={8}
               fullWidth
               required
+              disabled={readOnly}
               value={presentationClarity}
               onChange={(e) => setPresentationClarity(e.target.value)}
               helperText="Commentez la qualité de la rédaction et de la présentation"
@@ -272,6 +289,7 @@ export function EvaluationGridDialog({
               maxRows={8}
               fullWidth
               required
+              disabled={readOnly}
               value={strengths}
               onChange={(e) => setStrengths(e.target.value)}
               helperText="Listez les principaux points forts de l'article"
@@ -284,6 +302,7 @@ export function EvaluationGridDialog({
               maxRows={8}
               fullWidth
               required
+              disabled={readOnly}
               value={weaknesses}
               onChange={(e) => setWeaknesses(e.target.value)}
               helperText="Listez les principaux points faibles à améliorer"
@@ -295,6 +314,7 @@ export function EvaluationGridDialog({
               minRows={3}
               maxRows={8}
               fullWidth
+              disabled={readOnly}
               value={suggestions}
               onChange={(e) => setSuggestions(e.target.value)}
               helperText="Proposez des pistes d'amélioration concrètes (optionnel)"
@@ -308,6 +328,7 @@ export function EvaluationGridDialog({
                 id="recommendation"
                 value={recommendation}
                 label="Avis"
+                disabled={readOnly}
                 onChange={(e) =>
                   setRecommendation(
                     e.target.value as
@@ -334,25 +355,27 @@ export function EvaluationGridDialog({
 
       <DialogActions sx={{ justifyContent: 'space-between', px: 3, py: 2 }}>
         <Button onClick={onClose} disabled={saving || isSubmitting}>
-          Annuler
+          {readOnly ? 'Fermer' : 'Annuler'}
         </Button>
-        <Stack direction="row" spacing={2}>
-          <Button
-            onClick={handleSave}
-            variant="outlined"
-            disabled={saving || !isFormValid || loading || isSubmitting}
-          >
-            {saving ? 'Enregistrement...' : 'Enregistrer'}
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            startIcon={<Send />}
-            disabled={saving || !isFormValid || loading || isSubmitting}
-          >
-            {isSubmitting ? 'Soumission...' : 'Soumettre l\'évaluation'}
-          </Button>
-        </Stack>
+        {!readOnly && (
+          <Stack direction="row" spacing={2}>
+            <Button
+              onClick={handleSave}
+              variant="outlined"
+              disabled={saving || !isFormValid || loading || isSubmitting}
+            >
+              {saving ? 'Enregistrement...' : 'Enregistrer'}
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
+              startIcon={<Send />}
+              disabled={saving || !isFormValid || loading || isSubmitting}
+            >
+              {isSubmitting ? 'Soumission...' : 'Soumettre l\'évaluation'}
+            </Button>
+          </Stack>
+        )}
       </DialogActions>
 
       {/* Confirmation Dialog */}

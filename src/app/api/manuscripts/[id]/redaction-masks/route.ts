@@ -22,9 +22,10 @@ export async function GET(
       );
     }
 
-    // Call backend API to get redaction masks
+    // Call backend API to get redactions (which serve as redaction masks)
+    // Backend endpoint is /redactions, not /redaction-masks
     const response = await fetch(
-      `${API_BASE_URL}/api/v1/manuscripts/${manuscriptId}/redaction-masks`,
+      `${API_BASE_URL}/api/v1/manuscripts/${manuscriptId}/redactions`,
       {
         method: 'GET',
         headers: {

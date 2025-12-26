@@ -9,15 +9,17 @@ interface UseEvaluationGridOptions {
   manuscriptId: number;
   articleTitle?: string;
   evaluatorName?: string;
+  enabled?: boolean;
 }
 
 export function useEvaluationGrid({
   manuscriptId,
   articleTitle = '',
-  evaluatorName = ''
+  evaluatorName = '',
+  enabled = true
 }: UseEvaluationGridOptions) {
   const [grid, setGrid] = useState<EvaluationGrid | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled); // Only load if enabled
   const [saving, setSaving] = useState(false);
 
   // Charger la grille au montage
@@ -36,8 +38,10 @@ export function useEvaluationGrid({
   }, [manuscriptId]);
 
   useEffect(() => {
-    loadGrid();
-  }, [loadGrid]);
+    if (enabled) {
+      loadGrid();
+    }
+  }, [loadGrid, enabled]);
 
   // Sauvegarder la grille
   const saveGrid = useCallback(async (data: SaveEvaluationGridRequest) => {

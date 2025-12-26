@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -12,9 +15,11 @@ import {
   Edit,
   PictureAsPdf,
   CalendarToday,
+  Assignment,
 } from '@mui/icons-material';
 import type { Manuscript } from '@/types/manuscript';
 import { MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
+import { EvaluationsListDialog } from './EvaluationsListDialog';
 
 interface ManuscriptCardProps {
   manuscript: Manuscript;
@@ -23,6 +28,14 @@ interface ManuscriptCardProps {
 }
 
 export default function ManuscriptCard({ manuscript, onView, onEdit }: ManuscriptCardProps) {
+  const [evaluationsDialogOpen, setEvaluationsDialogOpen] = useState(false);
+
+  // Calculer le nombre d'évaluations terminées
+  const completedEvaluations = manuscript.evaluators?.filter(
+    (e) => e.evaluationStatus === 'completed'
+  ) || [];
+  const hasEvaluations = completedEvaluations.length > 0;
+
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -126,6 +139,17 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
               </IconButton>
             </Tooltip>
           )}
+          {hasEvaluations && (
+            <Tooltip title={`Voir les évaluations (${completedEvaluations.length})`}>
+              <IconButton
+                size="small"
+                color="success"
+                onClick={() => setEvaluationsDialogOpen(true)}
+              >
+                <Assignment fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
           <Tooltip title={`Télécharger ${manuscript.pdfFilename.split('/').pop()}`}>
             <IconButton size="small" onClick={handleDownloadPdf}>
               <PictureAsPdf fontSize="small" />
@@ -133,6 +157,13 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
           </Tooltip>
         </Box>
       </CardContent>
+
+      {/* Dialog pour lister les évaluations */}
+      <EvaluationsListDialog
+        open={evaluationsDialogOpen}
+        onClose={() => setEvaluationsDialogOpen(false)}
+        manuscript={manuscript}
+      />
     </Card>
   );
 }

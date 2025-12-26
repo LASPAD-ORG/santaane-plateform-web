@@ -83,13 +83,26 @@ export default function EvaluateManuscriptPage({
 
   // Hook pour gérer la persistance des annotations
   const {
-    highlights,
+    highlights: rawHighlights,
     loading: loadingAnnotations,
     saving: savingAnnotations,
     createAnnotation,
     updateAnnotation,
     deleteAnnotation,
   } = useAnnotations({ manuscriptId: parseInt(manuscriptId) });
+
+  // Filter highlights to only include those with valid position data
+  const highlights = React.useMemo(() => {
+    return rawHighlights.filter(highlight => {
+      const hasValidPosition = highlight.position &&
+                               highlight.position.boundingRect &&
+                               typeof highlight.position.boundingRect.pageNumber === 'number';
+      if (!hasValidPosition) {
+        console.warn('Skipping highlight with invalid position:', highlight.id);
+      }
+      return hasValidPosition;
+    });
+  }, [rawHighlights]);
 
   // Hook pour récupérer les masques de redaction (zones anonymisées)
   const {
@@ -247,6 +260,7 @@ export default function EvaluateManuscriptPage({
   const handleHighlightClick = (highlightId: string) => {
     const highlight = highlights.find((h) => h.id === highlightId);
     if (highlight && highlighterUtilsRef.current) {
+      // All highlights are pre-filtered to have valid positions
       // Fermer la sidebar sur mobile après clic
       if (isMobile) {
         setSidebarOpen(false);

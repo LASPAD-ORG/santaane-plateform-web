@@ -13,6 +13,7 @@ import {
   ListItemText,
   Badge,
   Stack,
+  LinearProgress,
 } from '@mui/material';
 import {
   Visibility,
@@ -126,13 +127,29 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
     setOpenHistoryDialog(false);
   };
 
-  // Statistiques des évaluateurs
+  // Statistiques des évaluateurs (logique originale restaurée)
   const evaluators = manuscript.evaluators || [];
   const totalEvaluators = evaluators.length;
   const pendingEvaluators = evaluators.filter(e => e.status === 'pending').length;
   const acceptedEvaluators = evaluators.filter(e => e.status === 'accepted').length;
   const rejectedEvaluators = evaluators.filter(e => e.status === 'rejected').length;
   const completedEvaluators = evaluators.filter(e => e.status === 'completed').length;
+
+  // Calcul du statut d'évaluation global basé sur les données individuelles
+  const calculateGlobalEvaluationStatus = () => {
+    const acceptedEvals = evaluators.filter(e => e.status === 'accepted');
+    if (acceptedEvals.length === 0) return null;
+    
+    const completedEvaluations = acceptedEvals.filter(e => e.evaluationStatus === 'completed').length;
+    
+    if (completedEvaluations === acceptedEvals.length) {
+      return { status: 'completed', label: 'Toutes terminées', color: 'success' };
+    } else {
+      return { status: 'in_progress', label: `${completedEvaluations}/${acceptedEvals.length} terminées`, color: 'primary' };
+    }
+  };
+
+  const globalEvaluationStatus = calculateGlobalEvaluationStatus();
 
   const getEvaluatorStatusColor = (status: string) => {
     switch (status) {
@@ -338,7 +355,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
           </Box>
         </Box>
 
-        {/* Évaluateurs - Nouveaux badges */}
+        {/* Évaluateurs avec statut d'évaluation */}
         {totalEvaluators > 0 && (
           <Box mb={2}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
@@ -355,6 +372,19 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
                 </IconButton>
               </Tooltip>
             </Box>
+            
+            {/* Badge de statut d'évaluation global */}
+            {globalEvaluationStatus && (
+              <Box mb={1}>
+                <Chip
+                  label={globalEvaluationStatus.label}
+                  color={globalEvaluationStatus.color as any}
+                  size="small"
+                  variant="outlined"
+                />
+              </Box>
+            )}
+            
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               {evaluators.map((evaluator) => (
                 <Tooltip 
@@ -424,6 +454,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
         open={openHistoryDialog}
         onClose={handleCloseHistoryDialog}
         manuscriptTitle={manuscript.title}
+        manuscriptId={manuscript.id}
         evaluators={evaluators}
       />
     </Card>

@@ -14,6 +14,7 @@ import {
   List,
   ListItem,
   Avatar,
+  Button,
 } from '@mui/material';
 import {
   Close,
@@ -24,13 +25,18 @@ import {
   CheckCircleOutline,
   AccessTime,
   Event,
+  Visibility,
 } from '@mui/icons-material';
 import { Evaluator } from '@/types/manuscript';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 interface EvaluatorHistoryDialogProps {
   open: boolean;
   onClose: () => void;
   manuscriptTitle: string;
+  manuscriptId: number;
   evaluators: Evaluator[];
 }
 
@@ -38,8 +44,91 @@ export default function EvaluatorHistoryDialog({
   open,
   onClose,
   manuscriptTitle,
+  manuscriptId,
   evaluators,
 }: EvaluatorHistoryDialogProps) {
+  const router = useRouter();
+  
+  // Calculer le statut global d'évaluation basé sur les évaluateurs individuels
+  const calculateGlobalEvaluationStatus = () => {
+    if (!evaluators || evaluators.length === 0) {
+      return 'not_started';
+    }
+    
+    const acceptedEvaluators = evaluators.filter(e => e.status === 'accepted');
+    if (acceptedEvaluators.length === 0) {
+      return 'not_started';
+    }
+    
+    const completedEvaluations = acceptedEvaluators.filter(e => e.evaluationStatus === 'completed');
+    
+    if (completedEvaluations.length === acceptedEvaluators.length) {
+      return 'completed';
+    } else {
+      return 'in_progress'; // Toutes les autres situations = en cours
+    }
+  };
+
+  const globalEvaluationStatus = calculateGlobalEvaluationStatus();
+
+  const getGlobalEvaluationStatusBadge = () => {
+    switch (globalEvaluationStatus) {
+      case 'completed':
+        return (
+          <Chip
+            label="Toutes les Évaluations Terminées"
+            color="success"
+            size="small"
+            icon={<CheckCircleOutline />}
+          />
+        );
+      case 'in_progress':
+        return (
+          <Chip
+            label="Évaluations en Cours"
+            color="primary"
+            size="small"
+            icon={<HourglassEmpty />}
+          />
+        );
+      case 'not_started':
+        return (
+          <Chip
+            label="Aucune Évaluation Commencée"
+            color="default"
+            size="small"
+            icon={<PersonAdd />}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getIndividualEvaluationStatusBadge = (evaluationStatus: string) => {
+    switch (evaluationStatus) {
+      case 'completed':
+        return (
+          <Chip
+            label="Terminée"
+            color="success"
+            size="small"
+            variant="outlined"
+          />
+        );
+      case 'in_progress':
+      case 'not_started':
+      default:
+        return (
+          <Chip
+            label="En Cours"
+            color="primary"
+            size="small"
+            variant="outlined"
+          />
+        );
+    }
+  };
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -123,6 +212,10 @@ export default function EvaluatorHistoryDialog({
             <Typography variant="body2" color="text.secondary" mt={0.5}>
               {manuscriptTitle}
             </Typography>
+            {/* Badge de statut global d'évaluation */}
+            <Box mt={1}>
+              {getGlobalEvaluationStatusBadge()}
+            </Box>
           </Box>
           <IconButton onClick={onClose} size="small">
             <Close />
@@ -188,12 +281,18 @@ export default function EvaluatorHistoryDialog({
                             {evaluator.evaluatorEmail}
                           </Typography>
                         </Box>
-                        <Chip
-                          label={getStatusLabel(evaluator.status)}
-                          color={getStatusColor(evaluator.status) as any}
-                          size="small"
-                          icon={getStatusIcon(evaluator.status)}
-                        />
+                        <Box display="flex" flexDirection="column" gap={1} alignItems="end">
+                          <Chip
+                            label={getStatusLabel(evaluator.status)}
+                            color={getStatusColor(evaluator.status) as any}
+                            size="small"
+                            icon={getStatusIcon(evaluator.status)}
+                          />
+                          {/* Badge de statut d'évaluation individuel */}
+                          {evaluator.status === 'accepted' && evaluator.evaluationStatus && 
+                            getIndividualEvaluationStatusBadge(evaluator.evaluationStatus)
+                          }
+                        </Box>
                       </Box>
 
                       {/* Détails de l'affectation */}
@@ -232,6 +331,31 @@ export default function EvaluatorHistoryDialog({
                           </Box>
                         )}
                       </Stack>
+
+                      {/* Bouton de consultation pour les évaluations terminées */}
+                      {evaluator.status === 'accepted' && evaluator.evaluationStatus === 'completed' && (
+                        <Box mt={2} display="flex" justifyContent="flex-end">
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={<Visibility />}
+                            onClick={() => {
+                              router.push(`/dashboard/editor/manuscripts/${manuscriptId}/evaluation-result/${evaluator.evaluatorId}`);
+                            }}
+                            sx={{
+                              textTransform: 'none',
+                              borderColor: 'primary.main',
+                              color: 'primary.main',
+                              '&:hover': {
+                                backgroundColor: 'primary.50',
+                                borderColor: 'primary.dark',
+                              }
+                            }}
+                          >
+                            Consulter le résultat
+                          </Button>
+                        </Box>
+                      )}
                     </Paper>
                   </Box>
                 </ListItem>

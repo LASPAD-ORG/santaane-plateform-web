@@ -38,6 +38,7 @@ interface PdfAnnotatorProps {
   utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
   redactionMasks?: RedactionMask[]; // NOUVEAU: masques de redaction à afficher en noir
   annotationEnabled?: boolean; // NOUVEAU: contrôle si l'annotation est autorisée
+  readOnly?: boolean; // NOUVEAU: mode lecture seule (désactive toute interaction)
 }
 
 // Couleur unique pour tous les highlights (jaune)
@@ -51,9 +52,11 @@ const getNextId = () => String(Math.random()).slice(2);
 function HighlightContainer({
   editHighlight,
   onContextMenu,
+  readOnly = false,
 }: {
   editHighlight: (id: string, edit: Partial<EvaluatorHighlight>) => void;
   onContextMenu?: (event: MouseEvent<HTMLDivElement>, highlight: ViewportHighlight<EvaluatorHighlight | RedactionMaskHighlight>) => void;
+  readOnly?: boolean;
 }) {
   const { highlight, isScrolledTo, viewportToScaled, screenshot, highlightBindings } =
     useHighlightContainerContext<EvaluatorHighlight | RedactionMaskHighlight>();
@@ -134,7 +137,7 @@ function HighlightContainer({
               boxShadow: '0 0 10px rgba(251, 192, 45, 0.5)',
             }),
           }}
-          onChange={(boundingRect) => {
+          onChange={readOnly ? undefined : (boundingRect) => {
             editHighlight(evaluatorHighlight.id, {
               position: {
                 boundingRect: viewportToScaled(boundingRect),
@@ -144,8 +147,8 @@ function HighlightContainer({
             });
             toggleEditInProgress(false);
           }}
-          bounds={highlightBindings.textLayer}
-          onEditStart={() => toggleEditInProgress(true)}
+          bounds={readOnly ? undefined : highlightBindings.textLayer}
+          onEditStart={readOnly ? undefined : () => toggleEditInProgress(true)}
           onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
         />
       </MonitoredHighlightContainer>
@@ -156,7 +159,7 @@ function HighlightContainer({
         <FreetextHighlight
           highlight={evaluatorHighlight}
           isScrolledTo={isScrolledTo}
-          onChange={(boundingRect) => {
+          onChange={readOnly ? undefined : (boundingRect) => {
             editHighlight(evaluatorHighlight.id, {
               position: {
                 boundingRect: viewportToScaled(boundingRect),
@@ -165,13 +168,13 @@ function HighlightContainer({
             });
             toggleEditInProgress(false);
           }}
-          onTextChange={(newText) => {
+          onTextChange={readOnly ? undefined : (newText) => {
             editHighlight(evaluatorHighlight.id, {
               content: { text: newText },
             });
           }}
-          onEditStart={() => toggleEditInProgress(true)}
-          onEditEnd={() => toggleEditInProgress(false)}
+          onEditStart={readOnly ? undefined : () => toggleEditInProgress(true)}
+          onEditEnd={readOnly ? undefined : () => toggleEditInProgress(false)}
           color="#333333"
           backgroundColor={HIGHLIGHT_COLOR}
           onContextMenu={onContextMenu ? (e) => onContextMenu(e, highlight) : undefined}
@@ -194,6 +197,7 @@ export default function PdfAnnotator({
   utilsRef,
   redactionMasks = [], // NOUVEAU: masques de redaction
   annotationEnabled = true, // NOUVEAU: contrôle si l'annotation est autorisée
+  readOnly = false, // NOUVEAU: mode lecture seule
 }: PdfAnnotatorProps) {
   const [highlights, setHighlights] = useState<EvaluatorHighlight[]>(initialHighlights);
   const currentSelectionRef = useRef<PdfSelection | null>(null);
@@ -291,19 +295,19 @@ export default function PdfAnnotator({
           <PdfHighlighter
             pdfDocument={pdfDoc}
             highlights={allHighlights} // Utiliser les highlights combinés (annotations + masques)
-            onSelection={handleSelection}
-            enableAreaSelection={(e) => e.altKey}
+            onSelection={readOnly ? undefined : handleSelection}
+            enableAreaSelection={readOnly ? () => false : (e) => e.altKey}
             utilsRef={(utils) => {
               highlighterUtilsRef.current = utils;
             }}
             pdfScaleValue={pdfScaleValue as any}
-            selectionTip={annotationEnabled ? <SelectionTip onAddComment={addHighlight} /> : null}
+            selectionTip={readOnly ? null : (annotationEnabled ? <SelectionTip onAddComment={addHighlight} /> : null)}
             style={{
               height: '100%',
               width: '100%',
             }}
           >
-            <HighlightContainer editHighlight={editHighlight} />
+            <HighlightContainer editHighlight={editHighlight} readOnly={readOnly} />
           </PdfHighlighter>
         )}
       </PdfLoader>

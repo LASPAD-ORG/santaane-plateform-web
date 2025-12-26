@@ -7,6 +7,7 @@ interface Filters {
   sectionId: number | null;
   languageId: number | null;
   evaluatorStatus: EvaluatorStatus | 'all' | 'none';
+  evaluationStatus: 'all' | 'completed' | 'in_progress';
 }
 
 export function useAllManuscripts() {
@@ -20,6 +21,7 @@ export function useAllManuscripts() {
     sectionId: null,
     languageId: null,
     evaluatorStatus: 'all',
+    evaluationStatus: 'all',
   });
 
   // Fetch manuscripts
@@ -36,6 +38,7 @@ export function useAllManuscripts() {
       if (filters.languageId) params.append('language_id', filters.languageId.toString());
 
       const response = await axios.get(`/api/manuscripts/all?${params.toString()}`);
+      
       setManuscripts(response.data.manuscripts);
       setFilteredManuscripts(response.data.manuscripts);
       setTotal(response.data.total);
@@ -54,8 +57,24 @@ export function useAllManuscripts() {
     fetchManuscripts();
   }, [filters.themeId, filters.sectionId, filters.languageId]);
 
-  // Client-side search filter
+  // Helper function to calculate evaluation status
+  const calculateEvaluationStatus = (manuscript: Manuscript) => {
+    const acceptedEvals = manuscript.evaluators?.filter(e => e.status === 'accepted') || [];
+    if (acceptedEvals.length === 0) return 'in_progress';
+    
+    const completedEvaluations = acceptedEvals.filter(e => e.evaluationStatus === 'completed').length;
+    const result = completedEvaluations === acceptedEvals.length ? 'completed' : 'in_progress';
+    
+    return result;
+  };
+
+  // Client-side search and evaluation status filter
   useEffect(() => {
+    console.log(`[Filter] Manuscrits: ${manuscripts.length}, Filtres:`, { 
+      evaluatorStatus: filters.evaluatorStatus, 
+      evaluationStatus: filters.evaluationStatus 
+    });
+    
     let filtered = manuscripts;
 
     // Filter by search query
@@ -86,9 +105,25 @@ export function useAllManuscripts() {
       }
     }
 
+    // Filter by evaluation status
+    if (filters.evaluationStatus !== 'all') {
+      console.log(`[Filter] Filtrage évaluation: ${filters.evaluationStatus}`);
+      const beforeFilter = filtered.length;
+      
+      filtered = filtered.filter((manuscript) => {
+        const evaluationStatus = calculateEvaluationStatus(manuscript);
+        const matches = evaluationStatus === filters.evaluationStatus;
+        if (!matches) console.log(`[Filter] Manuscrit ${manuscript.id}: ${evaluationStatus} ≠ ${filters.evaluationStatus}`);
+        return matches;
+      });
+      
+      console.log(`[Filter] Résultat: ${filtered.length}/${beforeFilter} manuscrits`);
+    }
+
+    console.log(`[Filter] Manuscrits finaux: ${filtered.length}`);
     setFilteredManuscripts(filtered);
     setTotal(filtered.length);
-  }, [searchQuery, manuscripts, filters.evaluatorStatus]);
+  }, [searchQuery, manuscripts, filters.evaluatorStatus, filters.evaluationStatus]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
