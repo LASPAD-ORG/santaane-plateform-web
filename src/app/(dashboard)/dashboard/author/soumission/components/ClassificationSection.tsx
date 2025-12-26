@@ -1,4 +1,5 @@
-import { Box, TextField, Typography, MenuItem } from '@mui/material';
+import { useState } from 'react';
+import { Box, TextField, Typography, MenuItem, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import { Category, Language } from '@mui/icons-material';
 
 interface Theme {
@@ -39,6 +40,26 @@ export default function ClassificationSection({
   languages,
   onChange,
 }: ClassificationSectionProps) {
+  // État local pour gérer le type de publication (varia ou theme)
+  const [publicationType, setPublicationType] = useState<'varia' | 'theme'>(
+    formData.themeId === '' ? 'varia' : 'theme'
+  );
+  
+  const handleThemeTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newType = event.target.value as 'varia' | 'theme';
+    setPublicationType(newType);
+    
+    if (newType === 'varia') {
+      // Si Varia sélectionné, vider le themeId
+      onChange('themeId')({ target: { value: '' } } as any);
+    } else {
+      // Si thème sélectionné, s'assurer qu'on a une valeur vide pour forcer la sélection
+      if (formData.themeId === '') {
+        onChange('themeId')({ target: { value: '' } } as any);
+      }
+    }
+  };
+
   return (
     <>
       <Typography variant="h6" gutterBottom fontWeight="600" mb={2}>
@@ -46,28 +67,55 @@ export default function ClassificationSection({
       </Typography>
 
       <Box display="flex" flexDirection="column" gap={3}>
+        {/* Choix Varia ou Thème */}
+        <FormControl component="fieldset">
+          <FormLabel component="legend" sx={{ mb: 1, fontWeight: 500 }}>
+            Publication
+          </FormLabel>
+          <RadioGroup
+            row
+            value={publicationType}
+            onChange={handleThemeTypeChange}
+          >
+            <FormControlLabel 
+              value="varia" 
+              control={<Radio />} 
+              label="Varia" 
+            />
+            <FormControlLabel 
+              value="theme" 
+              control={<Radio />} 
+              label="Thème spécifique" 
+            />
+          </RadioGroup>
+        </FormControl>
+
         <Box display="flex" gap={2} flexWrap="wrap">
-          <Box flex={1} minWidth={{ xs: '100%', md: 'calc(50% - 8px)' }}>
-            <TextField
-              select
-              fullWidth
-              label="Thème (optionnel)"
-              value={formData.themeId}
-              onChange={onChange('themeId')}
-              InputProps={{
-                startAdornment: <Category sx={{ mr: 1, color: 'text.secondary' }} />,
-              }}
-            >
-              <MenuItem value="">
-                <em>Aucun thème</em>
-              </MenuItem>
-              {themes.map((theme) => (
-                <MenuItem key={theme.id} value={theme.id}>
-                  {theme.title}
+          {/* Select des thèmes - affiché seulement si "Thème spécifique" est sélectionné */}
+          {publicationType === 'theme' && (
+            <Box flex={1} minWidth={{ xs: '100%', md: 'calc(50% - 8px)' }}>
+              <TextField
+                select
+                fullWidth
+                required
+                label="Choisir un thème"
+                value={formData.themeId}
+                onChange={onChange('themeId')}
+                InputProps={{
+                  startAdornment: <Category sx={{ mr: 1, color: 'text.secondary' }} />,
+                }}
+              >
+                <MenuItem value="">
+                  <em>Sélectionnez un thème</em>
                 </MenuItem>
-              ))}
-            </TextField>
-          </Box>
+                {themes.map((theme) => (
+                  <MenuItem key={theme.id} value={theme.id}>
+                    {theme.title}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+          )}
 
           <Box flex={1} minWidth={{ xs: '100%', md: 'calc(50% - 8px)' }}>
             <TextField

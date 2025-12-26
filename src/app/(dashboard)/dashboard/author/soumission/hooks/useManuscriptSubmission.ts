@@ -86,7 +86,7 @@ export function useManuscriptSubmission() {
 
       // Rediriger vers la liste des manuscrits
       setTimeout(() => {
-        router.push('/dashboard/author');
+        router.push('/dashboard/author/manuscripts');
       }, 1500);
     } catch (error: any) {
       console.error('Error submitting manuscript:', error);

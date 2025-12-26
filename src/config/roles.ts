@@ -47,6 +47,14 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
     defaultRoute: '/dashboard/super-admin',
     color: '#d32f2f', // Red
   },
+
+   [UserRole.DEVELOPER]: {
+    role: UserRole.DEVELOPER,
+    label: 'Developer',
+    defaultRoute: '/dashboard/developer',
+    color: '#74156bff', // Red
+  },
+  
   [UserRole.EDITOR]: {
     role: UserRole.EDITOR,
     label: 'Éditeur',
@@ -91,9 +99,9 @@ export const MENU_ITEMS: MenuItem[] = [
   },
   {
     label:'Roles',
-    path:'/dashboard/super-admin/gestion-roles',
+    path:'/dashboard/developer/gestion-roles',
     icon:SettingsIcon,
-    roles:[UserRole.SUPER_ADMIN]
+    roles:[UserRole.DEVELOPER]
   },
 
   {

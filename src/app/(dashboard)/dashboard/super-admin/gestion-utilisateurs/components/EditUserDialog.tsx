@@ -18,7 +18,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useCreateGestionUtilisateurs } from '../fetchers/useCreateGestionUtilisateurs';
-import { useFetchRoles } from '../../gestion-roles/fetchers/useFetchRoles';
+import { useFetchRoles } from '../../../developer/gestion-roles/fetchers/useFetchRoles';
 import apiClient from '@/lib/api/client';
 
 interface EditUserDialogProps {
