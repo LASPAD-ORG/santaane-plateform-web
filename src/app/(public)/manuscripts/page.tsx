@@ -232,8 +232,8 @@ function ManuscriptsPageContent() {
 
         {/* Filters */}
         <Collapse in={showFilters}>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 4 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(33.333% - 11px)' } }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Thème</InputLabel>
                 <Select
@@ -252,8 +252,8 @@ function ManuscriptsPageContent() {
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(33.333% - 11px)' } }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Section</InputLabel>
                 <Select
@@ -272,8 +272,8 @@ function ManuscriptsPageContent() {
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(33.333% - 11px)' } }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Langue</InputLabel>
                 <Select
@@ -292,8 +292,8 @@ function ManuscriptsPageContent() {
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Collapse>
       </Paper>
 
@@ -304,13 +304,13 @@ function ManuscriptsPageContent() {
 
       {/* Manuscripts Grid */}
       {loading ? (
-        <Grid container spacing={3}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={i}>
+            <Box key={i} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
               <Skeleton variant="rectangular" height={220} sx={{ borderRadius: 2 }} />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : manuscripts.length === 0 ? (
         <Paper
           elevation={0}
@@ -332,9 +332,9 @@ function ManuscriptsPageContent() {
         </Paper>
       ) : (
         <>
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {manuscripts.map((manuscript) => (
-              <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={manuscript.id}>
+              <Box key={manuscript.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
                 <Card
                   elevation={0}
                   sx={{
@@ -440,9 +440,9 @@ function ManuscriptsPageContent() {
                     </CardContent>
                   </CardActionArea>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
 
           {/* Pagination */}
           {totalPages > 1 && (

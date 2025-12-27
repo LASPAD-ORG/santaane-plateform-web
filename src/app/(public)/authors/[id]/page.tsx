@@ -6,7 +6,6 @@ import {
   Container,
   Typography,
   Paper,
-  Grid,
   Chip,
   Stack,
   Skeleton,
@@ -77,14 +76,14 @@ export default function AuthorProfilePage({ params }: PageProps) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Skeleton variant="rectangular" height={60} sx={{ mb: 4, borderRadius: 2 }} />
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 4 }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 21px)' } }}>
             <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 8 }}>
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 11px)' } }}>
             <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
     );
   }
@@ -114,9 +113,9 @@ export default function AuthorProfilePage({ params }: PageProps) {
         Retour
       </Button>
 
-      <Grid container spacing={4}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {/* Author Profile Card */}
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 21px)' } }}>
           <Paper
             elevation={0}
             sx={{
@@ -207,10 +206,10 @@ export default function AuthorProfilePage({ params }: PageProps) {
               </Box>
             )}
           </Paper>
-        </Grid>
+        </Box>
 
         {/* Publications */}
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 11px)' } }}>
           <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
             Publications
           </Typography>
@@ -310,8 +309,8 @@ export default function AuthorProfilePage({ params }: PageProps) {
               ))}
             </Stack>
           )}
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Container>
   );
 }

@@ -5,7 +5,6 @@ import {
   Box,
   Container,
   Typography,
-  Grid,
   Card,
   CardContent,
   Chip,
@@ -203,13 +202,13 @@ export default function ThemesPage() {
 
         {/* Themes Grid */}
         {loading ? (
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={i}>
+              <Box key={i} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
                 <Skeleton variant="rectangular" height={280} sx={{ borderRadius: 3 }} />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         ) : themes.length === 0 ? (
           <Paper
             elevation={0}
@@ -232,13 +231,13 @@ export default function ThemesPage() {
             </Typography>
           </Paper>
         ) : (
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {themes.map((theme) => (
-              <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={theme.id}>
+              <Box key={theme.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
                 <ThemeCard theme={theme} />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         )}
       </Container>
     </Box>

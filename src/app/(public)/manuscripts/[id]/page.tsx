@@ -6,7 +6,6 @@ import {
   Container,
   Typography,
   Paper,
-  Grid,
   Chip,
   Stack,
   Skeleton,
@@ -71,14 +70,14 @@ export default function ManuscriptDetailPage({ params }: PageProps) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Skeleton variant="rectangular" height={60} sx={{ mb: 4, borderRadius: 2 }} />
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 8 }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 21px)' } }}>
             <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 11px)' } }}>
             <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
     );
   }
@@ -108,9 +107,9 @@ export default function ManuscriptDetailPage({ params }: PageProps) {
         Retour aux publications
       </Button>
 
-      <Grid container spacing={4}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
         {/* Main Content */}
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 21px)' } }}>
           <Paper
             elevation={0}
             sx={{
@@ -191,10 +190,10 @@ export default function ManuscriptDetailPage({ params }: PageProps) {
               </>
             )}
           </Paper>
-        </Grid>
+        </Box>
 
         {/* Sidebar */}
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 11px)' } }}>
 
 
           {/* Author Info */}
@@ -275,8 +274,8 @@ export default function ManuscriptDetailPage({ params }: PageProps) {
               Voir le profil
             </Button>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* PDF Viewer Section */}
       {manuscript.pdfFilename && (
