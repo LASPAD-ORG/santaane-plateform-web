@@ -1,0 +1,71 @@
+# .dockerignore
+# =============================================================================
+# Docker Build Context Exclusions - Reduce build time and image size
+# =============================================================================
+
+# Git files
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab-ci.yml
+
+# Dependencies (installed during build)
+node_modules
+.pnpm-store
+.next
+.turbo
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Development files
+*.log
+logs/
+*.md
+!README.md
+docs/
+
+# Testing
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+coverage/
+.jest/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Docker files (not needed in image)
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Build artifacts
+.next/cache
+.next/server/app
+.next/static/chunks
+.next/build-manifest.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+._*
+
+# Scripts (not needed in container)
+scripts/create-page.mjs
+scripts/templates/

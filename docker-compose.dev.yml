@@ -1,0 +1,60 @@
+# =============================================================================
+# Santaane Platform Web - Development Environment
+# =============================================================================
+# Usage:
+#   docker-compose -f docker-compose.dev.yml build
+#   docker-compose -f docker-compose.dev.yml up
+#
+# Prerequisites:
+#   - Backend must be running (./santaane dev in santaane-plateform-api/)
+#   - Backend creates the network: santaane-plateform-api_default
+# =============================================================================
+
+services:
+  web:
+    build:
+      context: .
+      target: development
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
+        - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+
+    container_name: santaane_web_dev
+    restart: unless-stopped
+
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
+      # Enable polling for Docker volume watching (hot reload)
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      # Hot reload source code (read-only for security)
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - ./middleware.ts:/app/middleware.ts:ro
+      - ./next.config.ts:/app/next.config.ts:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+
+      # Exclude from volume mounts (use container's versions)
+      - /app/node_modules
+      - /app/.next
+
+    # Connect to backend network
+    networks:
+      - santaane_network
+
+    labels:
+      - dev.environment=development
+      - dev.hot-reload=enabled
+
+# External network created by backend
+networks:
+  santaane_network:
+    external: true
+    name: santaane-plateform-api_default

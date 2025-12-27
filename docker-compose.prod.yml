@@ -1,0 +1,64 @@
+# =============================================================================
+# Santaane Platform Web - Production Environment
+# =============================================================================
+# Usage:
+#   docker-compose -f docker-compose.prod.yml build
+#   docker-compose -f docker-compose.prod.yml up -d
+#
+# Prerequisites:
+#   - Set environment variables in .env.production or export them
+#   - NEXT_PUBLIC_API_URL (required)
+#   - NEXT_PUBLIC_BACKEND_URL (required)
+# =============================================================================
+
+services:
+  web:
+    build:
+      context: .
+      target: production
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+
+    image: santaane-web:latest
+    container_name: santaane_web_prod
+    restart: unless-stopped
+
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+      # Performance tuning
+      - NODE_OPTIONS=--max-old-space-size=2048
+
+    ports:
+      - "3000:3000"
+
+    networks:
+      - santaane_network
+
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits (adjust based on server capacity)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+    labels:
+      - production.service=santaane-web
+
+# Production network
+networks:
+  santaane_network:
+    driver: bridge
