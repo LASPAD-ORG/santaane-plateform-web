@@ -62,9 +62,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             },
             minHeight: '100vh',
             bgcolor: 'background.default',
-            // Add top padding on mobile for AppBar
-            pt: { xs: '64px', md: 0 },
-            p: { xs: 2, sm: 3 },
+            // Add top padding on mobile for AppBar, plus extra spacing
+            pt: { xs: '80px', sm: '88px', md: '24px' },
+            px: { xs: 2, md: 2.5, lg: 3 },
+            pb: { xs: 3, sm: 4 },
           }}
         >
           {children}

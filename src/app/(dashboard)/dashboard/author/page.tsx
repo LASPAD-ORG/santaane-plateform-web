@@ -5,7 +5,6 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Container,
   Card,
   CardContent,
   Button,
@@ -28,6 +27,7 @@ import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import { useFetchAuthorDashboard } from './fetchers/useFetchAuthorDashboard';
 import StatsGrid from './components/StatsGrid';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function AuthorDashboard() {
   const { user } = useAuthStore();
@@ -53,11 +53,11 @@ export default function AuthorDashboard() {
   if (error) {
     return (
       <RoleGuard allowedRoles={[UserRole.AUTHOR]}>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Box>
           <Alert severity="error">
             Erreur lors du chargement du dashboard: {error.message}
           </Alert>
-        </Container>
+        </Box>
       </RoleGuard>
     );
   }
@@ -65,25 +65,20 @@ export default function AuthorDashboard() {
   if (!data) {
     return (
       <RoleGuard allowedRoles={[UserRole.AUTHOR]}>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Box>
           <Alert severity="info">Aucune donnée disponible</Alert>
-        </Container>
+        </Box>
       </RoleGuard>
     );
   }
 
   return (
     <RoleGuard allowedRoles={[UserRole.AUTHOR]}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        {/* Header Section */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 0.5 }}>
-            Bienvenue, {user?.fullName}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Tableau de bord Auteur
-          </Typography>
-        </Box>
+      <Box>
+        <PageHeader
+          title={`Bienvenue, ${user?.fullName}`}
+          subtitle="Tableau de bord Auteur"
+        />
 
         {/* Quick Actions Section */}
         <Paper elevation={0} sx={{ p: 3, mb: 4, bgcolor: 'background.paper', borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
@@ -151,7 +146,7 @@ export default function AuthorDashboard() {
         </Box>
 
 
-      </Container>
+      </Box>
     </RoleGuard>
   );
 }

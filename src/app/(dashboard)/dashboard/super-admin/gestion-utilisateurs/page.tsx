@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -28,6 +27,7 @@ import CreateUserDialog from './components/CreateUserDialog';
 import EditUserDialog from './components/EditUserDialog';
 import ResetPasswordDialog from './components/ResetPasswordDialog';
 import { useAlertStore } from '@/stores/alertStore';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function GestionUtilisateursPage() {
   const [page, setPage] = useState(1);
@@ -104,16 +104,14 @@ export default function GestionUtilisateursPage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Gestion des Utilisateurs</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenCreateDialog(true)}
-        >
-          Nouvel utilisateur
-        </Button>
-      </Box>
+      <PageHeader
+        title="Gestion des Utilisateurs"
+        action={{
+          label: 'Nouvel utilisateur',
+          icon: <Add />,
+          onClick: () => setOpenCreateDialog(true),
+        }}
+      />
 
       <Card>
         <CardContent>

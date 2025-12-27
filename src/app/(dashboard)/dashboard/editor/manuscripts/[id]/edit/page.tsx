@@ -74,7 +74,7 @@ export default function EditManuscriptStaffPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto', p: 3 }}>
+    <Box>
       {/* Header */}
       <Box display="flex" alignItems="center" gap={2} mb={3}>
         <IconButton onClick={() => router.back()}>

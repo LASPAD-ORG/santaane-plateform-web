@@ -1,15 +1,17 @@
 'use client';
 
-import { Box, Typography, CircularProgress, Alert, Container } from '@mui/material';
+import { Box } from '@mui/material';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function DevloperDashboard() {
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold" sx={{ mb: 4 }}>
-        Tableau de Bord Super Admin
-      </Typography>
-    </Container>
+    <Box>
+      <PageHeader
+        title="Tableau de Bord Developer"
+        subtitle="Console de développement"
+      />
+    </Box>
   )
 
 }

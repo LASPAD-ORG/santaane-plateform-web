@@ -28,6 +28,7 @@ import CreateLanguageDialog from './components/CreateLanguageDialog';
 import EditLanguageDialog from './components/EditLanguageDialog';
 import { useAlertStore } from '@/stores/alertStore';
 import type { Language } from './fetchers/useFetchLanguages';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function GestionLanguePage() {
   const [page, setPage] = useState(1);
@@ -86,16 +87,15 @@ export default function GestionLanguePage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Gestion des Langues</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenCreateDialog(true)}
-        >
-          Nouvelle langue
-        </Button>
-      </Box>
+
+          <PageHeader
+              title="Gestion des Langues"
+              action={{
+                      label: 'Nouvelle langue',
+                      icon: <Add />,
+                      onClick: () => setOpenCreateDialog(true),
+                    }}
+                  />
 
       <Card>
         <CardContent>

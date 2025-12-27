@@ -23,6 +23,7 @@ import {
 import { Add, Email, CheckCircle, Cancel } from '@mui/icons-material';
 import { useEvaluators } from './hooks/useEvaluators';
 import CreateEvaluatorDialog from './components/CreateEvaluatorDialog';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function EvaluatorsPage() {
   const [page, setPage] = useState(1);
@@ -60,24 +61,18 @@ export default function EvaluatorsPage() {
   return (
     <Box>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Box>
-          <Typography variant="h4" fontWeight="bold">
-            Gestion des Évaluateurs
-          </Typography>
-          <Typography variant="body2" color="text.secondary" mt={0.5}>
-            {total} évaluateur{total > 1 ? 's' : ''} au total
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={handleOpenDialog}
-          size="large"
-        >
-          Ajouter un Évaluateur
-        </Button>
-      </Box>
+
+           <PageHeader
+                       title={`Gestion des évaluateurs`}
+                       subtitle={`${total} évaluateur${total > 1 ? 's' : ''} au total`}
+                      action={{
+                                       label: 'Ajouter un Évaluateur',
+                                       icon: <Add />,
+                                       onClick: () => handleOpenDialog(),
+                                     }}
+
+                     />
+                     
 
       {/* Table */}
       <Card>

@@ -50,7 +50,9 @@ export default function ForgotPasswordPage() {
           <EmailIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
           <Typography variant="h4" gutterBottom>Mot de passe oublié ?</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Entrez votre email. Nous vous enverrons un lien de réinitialisation **valable 5 minutes**.
+            Entrez votre email. <br></br>
+            Nous vous enverrons un lien de réinitialisation 
+            valable 5 minutes
           </Typography>
 
           {/* Affichage du succès */}

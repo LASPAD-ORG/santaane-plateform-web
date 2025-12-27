@@ -27,6 +27,7 @@ import CreateSectionDialog from './components/CreateSectionDialog';
 import EditSectionDialog from './components/EditSectionDialog';
 import { useAlertStore } from '@/stores/alertStore';
 import type { Section } from './fetchers/useFetchSections';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function GestionRubriquesPage() {
   const [page, setPage] = useState(1);
@@ -84,16 +85,15 @@ export default function GestionRubriquesPage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Gestion des Rubriques</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenCreateDialog(true)}
-        >
-          Nouvelle rubrique
-        </Button>
-      </Box>
+    
+    <PageHeader
+        title="Gestion des Rubriques"
+        action={{
+                label: 'Nouvelle rubrique',
+                icon: <Add />,
+                onClick: () => setOpenCreateDialog(true),
+              }}
+            />
 
       <Card>
         <CardContent>

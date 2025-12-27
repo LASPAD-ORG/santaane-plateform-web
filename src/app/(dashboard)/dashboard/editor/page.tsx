@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, CircularProgress, Alert, Container, Stack, Divider } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, Stack, Divider } from '@mui/material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -8,6 +8,7 @@ import { useFetchEditorDashboard } from './fetchers/useFetchEditorDashboard';
 import StatsGrid from './components/StatsGrid';
 import DashboardBarChart from './components/DashboardBarChart';
 import DashboardLineChart from './components/DashboardLineChart';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function EditorDashboard() {
   const { user } = useAuthStore();
@@ -33,11 +34,11 @@ export default function EditorDashboard() {
   if (error) {
     return (
       <RoleGuard allowedRoles={[UserRole.EDITOR]}>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Box>
           <Alert severity="error">
             Erreur lors du chargement du dashboard: {error.message}
           </Alert>
-        </Container>
+        </Box>
       </RoleGuard>
     );
   }
@@ -45,25 +46,20 @@ export default function EditorDashboard() {
   if (!data) {
     return (
       <RoleGuard allowedRoles={[UserRole.EDITOR]}>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Box>
           <Alert severity="info">Aucune donnée disponible</Alert>
-        </Container>
+        </Box>
       </RoleGuard>
     );
   }
 
   return (
     <RoleGuard allowedRoles={[UserRole.EDITOR]}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight="700">
-            Tableau de Bord
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Bienvenue, {user?.fullName}
-          </Typography>
-        </Box>
+      <Box>
+        <PageHeader
+          title={`Bienvenue, ${user?.fullName}`}
+          subtitle="Tableau de bord Éditeur"
+        />
 
         {/* Stats */}
         <Box sx={{ mb: 4 }}>
@@ -118,7 +114,7 @@ export default function EditorDashboard() {
             <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
           </Box>
         </Box>
-      </Container>
+      </Box>
     </RoleGuard>
   );
 }

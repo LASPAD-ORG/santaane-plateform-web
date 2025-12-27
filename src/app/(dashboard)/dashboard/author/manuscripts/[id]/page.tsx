@@ -82,7 +82,7 @@ export default function ManuscriptDetailsPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 1000, mx: 'auto', p: 3 }}>
+    <Box>
       {/* Header */}
       <Box display="flex" alignItems="center" gap={2} mb={3}>
         <IconButton onClick={() => router.back()}>

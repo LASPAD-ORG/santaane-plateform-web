@@ -1,10 +1,11 @@
 'use client';
 
-import { Box, Typography, CircularProgress, Alert, Container } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { useFetchSuperAdminDashboard } from './fetchers/useFetchSuperAdminDashboard';
 import StatsGrid from './components/StatsGrid';
 import DashboardBarChart from './components/DashboardBarChart';
 import DashboardLineChart from './components/DashboardLineChart';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function SuperAdminDashboard() {
   const { data, loading, error } = useFetchSuperAdminDashboard();
@@ -26,28 +27,27 @@ export default function SuperAdminDashboard() {
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Box>
         <Alert severity="error">
           Erreur lors du chargement du dashboard: {error.message}
         </Alert>
-      </Container>
+      </Box>
     );
   }
 
   if (!data) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Box>
         <Alert severity="info">Aucune donnée disponible</Alert>
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      {/* Page Title */}
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold" sx={{ mb: 4 }}>
-        Tableau de Bord Super Admin
-      </Typography>
+    <Box sx={{ p: 3 }}>
+      <PageHeader
+        title="Tableau de Bord Super Admin"
+      />
 
       {/* Statistics Grid */}
       <Box sx={{ mb: 4 }}>
@@ -114,6 +114,6 @@ export default function SuperAdminDashboard() {
           <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
         </Box>
       </Box>
-    </Container>
+    </Box>
   );
 }

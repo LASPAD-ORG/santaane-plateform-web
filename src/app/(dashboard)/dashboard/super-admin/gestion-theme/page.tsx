@@ -33,6 +33,7 @@ import EditThemeDialog from './components/EditThemeDialog';
 import { useAlertStore } from '@/stores/alertStore';
 import { getThemeStatusText, formatDateForDisplay } from './utils/themeUtils';
 import type { Theme } from './fetchers/useFetchThemes';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function GestionThemePage() {
   const [page, setPage] = useState(1);
@@ -98,16 +99,14 @@ export default function GestionThemePage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Gestion des Thèmes</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenCreateDialog(true)}
-        >
-          Nouveau thème
-        </Button>
-      </Box>
+      <PageHeader
+        title="Gestion des Thèmes"
+        action={{
+          label: 'Nouveau thème',
+          icon: <Add />,
+          onClick: () => setOpenCreateDialog(true),
+        }}
+      />
 
       <Card>
         <CardContent>

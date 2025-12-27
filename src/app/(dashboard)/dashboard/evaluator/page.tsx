@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, CircularProgress, Alert, Container, Stack } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, Stack } from '@mui/material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -8,6 +8,7 @@ import { useFetchEvaluatorDashboard } from './fetchers/useFetchEvaluatorDashboar
 import StatsGrid from './components/StatsGrid';
 import DashboardBarChart from './components/DashboardBarChart';
 import DashboardLineChart from './components/DashboardLineChart';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function EvaluatorDashboard() {
   const { user } = useAuthStore();
@@ -33,11 +34,11 @@ export default function EvaluatorDashboard() {
   if (error) {
     return (
       <RoleGuard allowedRoles={[UserRole.EVALUATOR]}>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Box>
           <Alert severity="error">
             Erreur lors du chargement du dashboard: {error.message}
           </Alert>
-        </Container>
+        </Box>
       </RoleGuard>
     );
   }
@@ -45,25 +46,20 @@ export default function EvaluatorDashboard() {
   if (!data) {
     return (
       <RoleGuard allowedRoles={[UserRole.EVALUATOR]}>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Box>
           <Alert severity="info">Aucune donnée disponible</Alert>
-        </Container>
+        </Box>
       </RoleGuard>
     );
   }
 
   return (
     <RoleGuard allowedRoles={[UserRole.EVALUATOR]}>
-      <Container maxWidth="xl" sx={{ py: 3 }}>
-        {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            Tableau de Bord
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Bienvenue, {user?.fullName}
-          </Typography>
-        </Box>
+      <Box>
+        <PageHeader
+          title={`Bienvenue, ${user?.fullName}`}
+          subtitle="Tableau de bord Évaluateur"
+        />
 
         {/* Statistics */}
         <Box sx={{ mb: 4 }}>
@@ -90,7 +86,7 @@ export default function EvaluatorDashboard() {
             </Box>
           </Box>
         </Box>
-      </Container>
+      </Box>
     </RoleGuard>
   );
 }

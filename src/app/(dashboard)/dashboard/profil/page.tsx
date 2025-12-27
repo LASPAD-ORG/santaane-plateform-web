@@ -28,6 +28,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { useAlertStore } from '@/stores/alertStore';
 import axios from 'axios';
+import PageHeader from '@/components/ui/PageHeader';
 
 interface ProfileData {
   fullName: string;
@@ -211,13 +212,15 @@ export default function ProfilPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto', p: 3 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Mon Profil
-      </Typography>
-      <Typography variant="body2" color="text.secondary" mb={3}>
-        Gérez vos informations personnelles et professionnelles
-      </Typography>
+    <Box>
+     
+
+            <PageHeader
+                             title={`Mon Profil`}
+                             subtitle="Gérez vos informations personnelles et professionnelles"
+                        
+      
+                           />
 
       <form onSubmit={handleSubmit}>
         <Card elevation={2}>

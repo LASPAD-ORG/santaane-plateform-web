@@ -214,7 +214,7 @@ export default function AuthorSoumission() {
   }
 
   return (
-    <Box sx={{ maxWidth: 1000, mx: 'auto', p: 3 }}>
+    <Box>
       <Typography variant="h4" gutterBottom fontWeight="bold">
         Soumettre un Manuscrit
       </Typography>

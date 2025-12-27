@@ -25,6 +25,7 @@ import {
 import { useAllManuscripts } from './hooks/useAllManuscripts';
 import { useManuscriptData } from '../../author/soumission/hooks/useManuscriptData';
 import ManuscriptCard from './components/ManuscriptCard';
+import PageHeader from '@/components/ui/PageHeader';
 
 export default function EditorManuscriptsPage() {
   const {
@@ -41,16 +42,15 @@ export default function EditorManuscriptsPage() {
   const { themes, sections, languages } = useManuscriptData();
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       {/* Header */}
-      <Box mb={3}>
-        <Typography variant="h4" fontWeight="bold" mb={1}>
-          Tous les Manuscrits
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Gérer et réviser les manuscrits soumis
-        </Typography>
-      </Box>
+     
+       <PageHeader
+               title={`Gestion des manuscrits`}
+             />
+
+
+      
 
       {/* Filtres */}
       <Card elevation={2} sx={{ mb: 3 }}>
