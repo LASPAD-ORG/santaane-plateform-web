@@ -129,33 +129,7 @@ export default function ContactPage() {
           <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(40% - 16px)' } }}>
             <Stack spacing={3}>
               {/* LASPAD Logo */}
-              <Paper sx={{ p: 3, borderRadius: 2, textAlign: 'center' }}>
-                <Box
-                  component="img"
-                  src="/images/logo_laspad.png"
-                  alt="LASPAD"
-                  sx={{
-                    maxWidth: '100%',
-                    height: 'auto',
-                    maxHeight: 120,
-                    mb: 2,
-                  }}
-                  onError={(e) => {
-                    // Fallback si l'image n'existe pas
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-                <Typography variant="h6" fontWeight="600" gutterBottom>
-                  LASPAD
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Laboratoire d&apos;Analyse des Sociétés et Pouvoirs
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Afrique – Diasporas
-                </Typography>
-              </Paper>
+            
 
               {/* Contact Details */}
               <Paper sx={{ p: 3, borderRadius: 2 }}>

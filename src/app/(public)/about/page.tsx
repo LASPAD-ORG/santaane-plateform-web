@@ -6,13 +6,10 @@ import {
   Typography,
   Paper,
   Stack,
-  Divider,
   Button,
-  Chip,
 } from '@mui/material';
 import {
   School,
-  MenuBook,
   Groups,
   Science,
   OpenInNew,
@@ -101,81 +98,130 @@ export default function AboutPage() {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+        {/* Santaane Platform */}
+        <Paper sx={{ p: { xs: 3, md: 5 }, borderRadius: 3, mb: 4 }}>
+          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+            <TrendingUp sx={{ fontSize: 40, color: '#59a498' }} />
+            <Typography variant="h5" fontWeight="bold">
+              La plateforme Santaane
+            </Typography>
+          </Stack>
+
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: 'center' }}>
+            {/* Text content - Left */}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8, mb: 2 }}>
+                Santaane est la plateforme numérique développée par le LASPAD pour faciliter la soumission, l&apos;évaluation
+                et la publication de travaux de recherche scientifique.
+              </Typography>
+
+              <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8, mb: 2 }}>
+                Elle permet aux chercheur.e.s de soumettre leurs manuscrits dans notre revue de presse, de bénéficier
+                d&apos;une évaluation par les pairs rigoureuse et transparente, et de contribuer à la diffusion de savoirs
+                scientifiques de qualité.
+              </Typography>
+
+              <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
+                En phase avec nos valeurs de <strong>transparence</strong>, de <strong>science ouverte</strong> et
+                d&apos;<strong>engagement social</strong>, Santaane incarne notre vision d&apos;une recherche accessible,
+                collaborative et au service des communautés africaines et de la diaspora.
+              </Typography>
+            </Box>
+
+            {/* Logo - Right */}
+            <Box
+              sx={{
+                flex: { xs: '0 0 auto', md: '0 0 250px' },
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Box
+                component="img"
+                src="/images/logo_santaane.png"
+                alt="Santaane - Plateforme de publication scientifique"
+                sx={{
+                  maxWidth: '100%',
+                  height: 'auto',
+                  maxHeight: { xs: 150, md: 200 },
+                }}
+              />
+            </Box>
+          </Box>
+        </Paper>
+
         {/* LASPAD Presentation */}
         <Paper sx={{ p: { xs: 3, md: 5 }, borderRadius: 3, mb: 4 }}>
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Box
-              component="img"
-              src="/images/logo_laspad.png"
-              alt="LASPAD"
-              sx={{
-                maxWidth: '100%',
-                height: 'auto',
-                maxHeight: 150,
-                mb: 3,
-              }}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-              }}
-            />
-            <Chip
-              icon={<MenuBook />}
-              label="Laboratoire Panafricain"
-              sx={{
-                bgcolor: '#ff9d00',
-                color: 'white',
-                fontWeight: 600,
-                mb: 2,
-              }}
-            />
-          </Box>
-
-          <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center">
+          <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center" sx={{ mb: 1 }}>
             Le LASPAD
           </Typography>
-          <Typography variant="h6" color="primary" gutterBottom textAlign="center" sx={{ mb: 3 }}>
+          <Typography variant="h6" color="primary" gutterBottom textAlign="center" sx={{ mb: 4 }}>
             Laboratoire d&apos;Analyse des Sociétés et Pouvoirs / Afrique – Diasporas
           </Typography>
 
-          <Typography variant="body1" paragraph sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
-            Créé en 2014, le LASPAD est l&apos;un des laboratoires les plus dynamiques de l&apos;Université Gaston
-            Berger de Saint-Louis au Sénégal (UGB).
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: 'center' }}>
+            {/* Text content - Left */}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8, mb: 2 }}>
+                Créé en 2014, le LASPAD est l&apos;un des laboratoires les plus dynamiques de l&apos;Université Gaston
+                Berger de Saint-Louis au Sénégal (UGB).
+              </Typography>
 
-          <Typography variant="body1" paragraph sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
-            Notre axiome, <strong>la connaissance est le bien collectif ultime</strong>, nous permet d&apos;impulser une
-            recherche innovante et en phase avec la science citoyenne, la science de la durabilité et la science
-            ouverte.
-          </Typography>
+              <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8, mb: 2 }}>
+                Notre axiome, <strong>la connaissance est le bien collectif ultime</strong>, nous permet d&apos;impulser une
+                recherche innovante et en phase avec la science citoyenne, la science de la durabilité et la science
+                ouverte.
+              </Typography>
 
-          <Typography variant="body1" paragraph sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
-            Pour nous, la recherche doit être impliquée, éthique et orientée vers une priorité absolue :{' '}
-            <strong>la construction de sociétés décentes et conviviales</strong>. Cela suppose de prendre à bras le
-            corps les défis extrêmement sérieux auxquels les sociétés africaines sont confrontées.
-          </Typography>
+              <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8, mb: 3 }}>
+                Pour nous, la recherche doit être impliquée, éthique et orientée vers une priorité absolue :{' '}
+                <strong>la construction de sociétés décentes et conviviales</strong>. Cela suppose de prendre à bras le
+                corps les défis extrêmement sérieux auxquels les sociétés africaines sont confrontées.
+              </Typography>
 
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Button
-              component="a"
-              href="https://laspad.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="outlined"
-              endIcon={<OpenInNew />}
-              sx={{
-                borderColor: '#59a498',
-                color: '#59a498',
-                '&:hover': {
+              <Button
+                component="a"
+                href="https://laspad.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="outlined"
+                endIcon={<OpenInNew />}
+                sx={{
                   borderColor: '#59a498',
-                  bgcolor: 'rgba(89, 164, 152, 0.08)',
-                },
-                px: 3,
-                py: 1.5,
+                  color: '#59a498',
+                  '&:hover': {
+                    borderColor: '#59a498',
+                    bgcolor: 'rgba(89, 164, 152, 0.08)',
+                  },
+                  px: 3,
+                  py: 1.5,
+                }}
+              >
+                Visiter le site du LASPAD
+              </Button>
+            </Box>
+
+            {/* Logo - Right */}
+            <Box
+              sx={{
+                flex: { xs: '0 0 auto', md: '0 0 250px' },
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
-              Visiter le site du LASPAD
-            </Button>
+              <Box
+                component="img"
+                src="/images/logo/LASPAD-logo-noir.png"
+                alt="LASPAD - Laboratoire d'Analyse des Sociétés et Pouvoirs / Afrique – Diasporas"
+                sx={{
+                  maxWidth: '100%',
+                  height: 'auto',
+                  maxHeight: { xs: 150, md: 200 },
+                }}
+              />
+            </Box>
           </Box>
         </Paper>
 
@@ -188,44 +234,17 @@ export default function AboutPage() {
             </Typography>
           </Stack>
 
-          <Typography variant="body1" paragraph sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
+          <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8, mb: 2 }}>
             Une communauté qui partage une cause commune : faire de nos universités non pas seulement des espaces de
             production du savoir, de sa transmission et sa discussion, mais le lieu ouvert de la définition par
             nous-mêmes et pour nous-mêmes de notre projet de société.
           </Typography>
 
-          <Typography variant="body1" paragraph sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
+          <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8, mb: 2 }}>
             Nous sommes des enseignant.e.s, des chercheur.e.s, senior.e.s et junior.e.s, des praticien.ne.s de
             disciplines et secteurs différents convaincus que{' '}
             <strong>la recherche collective et collaborative</strong> est seule à même de produire un savoir au service
             des sociétés humaines et de l&apos;intérêt public.
-          </Typography>
-        </Paper>
-
-        {/* Santaane Platform */}
-        <Paper sx={{ p: { xs: 3, md: 5 }, borderRadius: 3, mb: 4 }}>
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-            <TrendingUp sx={{ fontSize: 40, color: '#59a498' }} />
-            <Typography variant="h5" fontWeight="bold">
-              La plateforme Santaane
-            </Typography>
-          </Stack>
-
-          <Typography variant="body1" paragraph sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
-            Santaane est la plateforme numérique développée par le LASPAD pour faciliter la soumission, l&apos;évaluation
-            et la publication de travaux de recherche scientifique.
-          </Typography>
-
-          <Typography variant="body1" paragraph sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
-            Elle permet aux chercheur.e.s de soumettre leurs manuscrits dans notre revue de presse, de bénéficier
-            d&apos;une évaluation par les pairs rigoureuse et transparente, et de contribuer à la diffusion de savoirs
-            scientifiques de qualité.
-          </Typography>
-
-          <Typography variant="body1" sx={{ fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.8 }}>
-            En phase avec nos valeurs de <strong>transparence</strong>, de <strong>science ouverte</strong> et
-            d&apos;<strong>engagement social</strong>, Santaane incarne notre vision d&apos;une recherche accessible,
-            collaborative et au service des communautés africaines et de la diaspora.
           </Typography>
         </Paper>
 
