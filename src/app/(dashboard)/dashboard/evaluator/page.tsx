@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Grid, CircularProgress, Alert, Container, Stack } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, Container, Stack } from '@mui/material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -71,23 +71,25 @@ export default function EvaluatorDashboard() {
         </Box>
 
         {/* Charts Grid */}
-        <Grid container spacing={3}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, md: 3 } }}>
           {/* Bar Chart - Full width */}
-          <Grid size={12}>
+          <Box>
             <DashboardBarChart data={data.status_bar_chart} />
-          </Grid>
+          </Box>
 
           {/* Time Series - 3 columns */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <DashboardLineChart data={data.weekly_evaluations} color="#3B82F6" />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <DashboardLineChart data={data.monthly_evaluations} color="#8B5CF6" />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <DashboardLineChart data={data.yearly_evaluations} color="#06B6D4" />
-          </Grid>
-        </Grid>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 } }}>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 16px)' } }}>
+              <DashboardLineChart data={data.weekly_evaluations} color="#3B82F6" />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 16px)' } }}>
+              <DashboardLineChart data={data.monthly_evaluations} color="#8B5CF6" />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 16px)' } }}>
+              <DashboardLineChart data={data.yearly_evaluations} color="#06B6D4" />
+            </Box>
+          </Box>
+        </Box>
       </Container>
     </RoleGuard>
   );

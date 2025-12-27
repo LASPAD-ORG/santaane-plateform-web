@@ -175,17 +175,11 @@ export default function EditorManuscriptsPage() {
           Aucun manuscrit trouvé avec ces critères de recherche.
         </Alert>
       ) : (
-        <Box
-          display="grid"
-          gridTemplateColumns={{
-            xs: '1fr',
-            sm: 'repeat(2, 1fr)',
-            lg: 'repeat(3, 1fr)',
-          }}
-          gap={3}
-        >
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
           {manuscripts.map((manuscript) => (
-            <ManuscriptCard key={manuscript.id} manuscript={manuscript} onUpdate={refetch} />
+            <Box key={manuscript.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+              <ManuscriptCard manuscript={manuscript} onUpdate={refetch} />
+            </Box>
           ))}
         </Box>
       )}

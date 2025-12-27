@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Grid, CircularProgress, Alert, Container } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, Container } from '@mui/material';
 import { useFetchSuperAdminDashboard } from './fetchers/useFetchSuperAdminDashboard';
 import StatsGrid from './components/StatsGrid';
 import DashboardBarChart from './components/DashboardBarChart';
@@ -59,61 +59,61 @@ export default function SuperAdminDashboard() {
         Répartition des Soumissions
       </Typography>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 4 }}>
         {/* Status Distribution */}
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(50% - 12px)' } }}>
           <DashboardBarChart data={data.status_bar_chart} />
-        </Grid>
+        </Box>
 
         {/* Theme Distribution */}
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(50% - 12px)' } }}>
           <DashboardBarChart data={data.theme_bar_chart} />
-        </Grid>
+        </Box>
 
         {/* Section Distribution */}
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(50% - 12px)' } }}>
           <DashboardBarChart data={data.section_bar_chart} />
-        </Grid>
+        </Box>
 
         {/* Language Distribution */}
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(50% - 12px)' } }}>
           <DashboardBarChart data={data.language_bar_chart} />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Time Series - Submissions Section */}
       <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3, mt: 6 }}>
         Évolution des Soumissions
       </Typography>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, lg: 4 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 4 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(33.333% - 16px)' } }}>
           <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(33.333% - 16px)' } }}>
           <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(33.333% - 16px)' } }}>
           <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Time Series - Authors Section */}
       <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3, mt: 6 }}>
         Évolution des Auteurs
       </Typography>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, lg: 4 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 4 }}>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(33.333% - 16px)' } }}>
           <DashboardLineChart data={data.weekly_authors} color="#10B981" />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(33.333% - 16px)' } }}>
           <DashboardLineChart data={data.monthly_authors} color="#22C55E" />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
+        </Box>
+        <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(33.333% - 16px)' } }}>
           <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Container>
   );
 }

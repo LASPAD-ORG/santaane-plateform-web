@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Grid, CircularProgress, Alert, Container, Stack, Divider } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, Container, Stack, Divider } from '@mui/material';
 import RoleGuard from '@/components/guards/RoleGuard';
 import { UserRole } from '@/types/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -74,19 +74,20 @@ export default function EditorDashboard() {
         <Typography variant="h6" fontWeight="600" sx={{ mb: 2 }}>
           Répartition
         </Typography>
-        
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-            gap: 2,
-            mb: 4,
-          }}
-        >
-          <DashboardBarChart data={data.status_bar_chart} />
-          <DashboardBarChart data={data.theme_bar_chart} />
-          <DashboardBarChart data={data.section_bar_chart} />
-          <DashboardBarChart data={data.language_bar_chart} />
+
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 4 }}>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' } }}>
+            <DashboardBarChart data={data.status_bar_chart} />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' } }}>
+            <DashboardBarChart data={data.theme_bar_chart} />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' } }}>
+            <DashboardBarChart data={data.section_bar_chart} />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 12px)' } }}>
+            <DashboardBarChart data={data.language_bar_chart} />
+          </Box>
         </Box>
 
         {/* Time Series */}
@@ -94,29 +95,28 @@ export default function EditorDashboard() {
           Évolution
         </Typography>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-            gap: 2,
-            mb: 3,
-          }}
-        >
-          <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
-          <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
-          <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 3 }}>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
+          </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-            gap: 2,
-          }}
-        >
-          <DashboardLineChart data={data.weekly_authors} color="#10B981" />
-          <DashboardLineChart data={data.monthly_authors} color="#22C55E" />
-          <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 } }}>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            <DashboardLineChart data={data.weekly_authors} color="#10B981" />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            <DashboardLineChart data={data.monthly_authors} color="#22C55E" />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
+          </Box>
         </Box>
       </Container>
     </RoleGuard>

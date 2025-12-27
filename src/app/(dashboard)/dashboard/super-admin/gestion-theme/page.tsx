@@ -24,7 +24,6 @@ import {
   Select,
   MenuItem,
   Chip,
-  Grid,
 } from '@mui/material';
 import { Add, Search, Edit, Delete, FilterList } from '@mui/icons-material';
 import { useFetchThemes } from './fetchers/useFetchThemes';
@@ -112,8 +111,8 @@ export default function GestionThemePage() {
 
       <Card>
         <CardContent>
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid size={{ xs: 12, md: 8 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 8px)' } }}>
               <TextField
                 fullWidth
                 placeholder="Rechercher par titre ou description..."
@@ -130,8 +129,8 @@ export default function GestionThemePage() {
                   ),
                 }}
               />
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 8px)' } }}>
               <FormControl fullWidth>
                 <InputLabel id="filter-label">Filtrer par statut</InputLabel>
                 <Select
@@ -146,8 +145,8 @@ export default function GestionThemePage() {
                   <MenuItem value="expired">Thèmes expirés</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
 
           <TableContainer>
             <Table>

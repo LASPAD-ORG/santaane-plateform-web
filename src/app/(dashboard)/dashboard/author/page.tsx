@@ -1,11 +1,10 @@
 'use client';
 
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  CircularProgress, 
-  Alert, 
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Alert,
   Container,
   Card,
   CardContent,
@@ -78,20 +77,12 @@ export default function AuthorDashboard() {
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header Section */}
         <Box sx={{ mb: 4 }}>
-          <Grid container spacing={3} alignItems="center">
-            <Grid size={{ xs: 12, md: 8 }}>
-              <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                <Box>
-                  <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 0.5 }}>
-                    Bienvenue, {user?.fullName}
-                  </Typography>
-                  <Typography variant="subtitle1" color="text.secondary">
-                    Tableau de bord Auteur
-                  </Typography>
-                </Box>
-              </Stack>
-            </Grid>
-          </Grid>
+          <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 0.5 }}>
+            Bienvenue, {user?.fullName}
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Tableau de bord Auteur
+          </Typography>
         </Box>
 
         {/* Quick Actions Section */}
@@ -100,8 +91,8 @@ export default function AuthorDashboard() {
             <DashboardIcon sx={{ mr: 1 }} />
             Actions Rapides
           </Typography>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 8px)' } }}>
               <Link href="/dashboard/author/soumission" style={{ textDecoration: 'none' }}>
                 <Card
                   sx={{
@@ -125,8 +116,8 @@ export default function AuthorDashboard() {
                   </Typography>
                 </Card>
               </Link>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 8px)' } }}>
               <Link href="/dashboard/author/manuscripts" style={{ textDecoration: 'none' }}>
                 <Card
                   sx={{
@@ -150,16 +141,14 @@ export default function AuthorDashboard() {
                   </Typography>
                 </Card>
               </Link>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Paper>
 
         {/* Statistics Section */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid size={{ xs: 12 }}>
-            <StatsGrid stats={data.stats} />
-          </Grid>
-        </Grid>
+        <Box sx={{ mb: 4 }}>
+          <StatsGrid stats={data.stats} />
+        </Box>
 
 
       </Container>

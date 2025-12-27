@@ -262,14 +262,16 @@ export default function EditorManuscriptDetailsPage() {
               Informations de contact
             </Typography>
             
-            <Box 
-              display="grid" 
-              gridTemplateColumns={{ xs: '1fr', sm: 'repeat(2, 1fr)' }} 
-              gap={3}
-              mb={3}
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 3,
+                mb: 3
+              }}
             >
               {/* Email */}
-              <Box display="flex" alignItems="center" gap={2}>
+              <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)' }, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box 
                   sx={{ 
                     p: 1, 
@@ -294,7 +296,7 @@ export default function EditorManuscriptDetailsPage() {
 
               {/* ORCID */}
               {manuscript.author.orcidId && (
-                <Box display="flex" alignItems="center" gap={2}>
+                <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)' }, display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Box 
                     sx={{ 
                       p: 1, 
