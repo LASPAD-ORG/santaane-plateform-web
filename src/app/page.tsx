@@ -8,7 +8,6 @@ import {
   TextField,
   InputAdornment,
   Paper,
-  Grid,
   Chip,
   Stack,
   Skeleton,
@@ -20,6 +19,11 @@ import {
   AppBar,
   Toolbar,
   Button,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
 } from '@mui/material';
 import {
   Search,
@@ -31,6 +35,8 @@ import {
   Login,
   Schedule,
   TrendingUp,
+  Menu as MenuIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -180,6 +186,7 @@ export default function HomePage() {
   const [stats, setStats] = useState<PublicStats | null>(null);
   const [activeThemes, setActiveThemes] = useState<ActiveTheme[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -226,25 +233,54 @@ export default function HomePage() {
     return text.substring(0, maxLength).trim() + '...';
   };
 
+  const menuItems = [
+    { label: 'Accueil', path: '/' },
+    { label: 'Publications', path: '/manuscripts' },
+    { label: 'Thèmes Ouverts', path: '/themes' },
+    { label: 'Connexion', path: '/login', variant: 'outlined' as const },
+  ];
+
+  const handleMobileMenuToggle = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#fafafa' }}>
       {/* Header */}
-      <AppBar 
-        position="sticky" 
+      <AppBar
+        position="sticky"
         elevation={0}
-        sx={{ 
-          bgcolor: 'white', 
+        sx={{
+          bgcolor: 'white',
           borderBottom: '1px solid',
           borderColor: 'divider'
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <img src="/images/logo_santaane.png" alt="Santaane" style={{ height: 100, padding: 10 }} />
+          <Toolbar
+            disableGutters
+            sx={{
+              justifyContent: 'space-between',
+              minHeight: { xs: 56, sm: 64, md: 70 },
+              py: { xs: 0.5, sm: 1 }
+            }}
+          >
+            {/* Logo */}
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              <Box
+                component="img"
+                src="/images/logo_santaane.png"
+                alt="Santaane"
+                sx={{
+                  height: { xs: 50, sm: 70, md: 100 },
+                  width: 'auto',
+                  py: { xs: 0.5, sm: 1 },
+                }}
+              />
             </Link>
-            
-            <Stack direction="row" spacing={2}>
+
+            {/* Desktop Navigation */}
+            <Box sx={{ display: { xs: 'none', sm: 'flex' }, gap: { sm: 1, md: 2 } }}>
               <Link href="/manuscripts" style={{ textDecoration: 'none' }}>
                 <Button color="inherit" sx={{ color: 'text.secondary' }}>
                   Publications
@@ -256,10 +292,10 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/login" style={{ textDecoration: 'none' }}>
-                <Button 
-                  variant="outlined" 
+                <Button
+                  variant="outlined"
                   startIcon={<Login />}
-                  sx={{ 
+                  sx={{
                     borderRadius: 2,
                     borderColor: '#59a498',
                     color: '#59a498',
@@ -272,10 +308,75 @@ export default function HomePage() {
                   Connexion
                 </Button>
               </Link>
-            </Stack>
+            </Box>
+
+            {/* Mobile Menu Icon */}
+            <IconButton
+              sx={{ display: { xs: 'block', sm: 'none' } }}
+              onClick={handleMobileMenuToggle}
+              edge="end"
+            >
+              <MenuIcon />
+            </IconButton>
           </Toolbar>
         </Container>
       </AppBar>
+
+      {/* Mobile Drawer Menu */}
+      <Drawer
+        anchor="right"
+        open={mobileMenuOpen}
+        onClose={handleMobileMenuToggle}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': {
+            width: 280,
+          },
+        }}
+      >
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h6" fontWeight={600}>
+            Menu
+          </Typography>
+          <IconButton onClick={handleMobileMenuToggle}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Divider />
+
+        <List sx={{ px: 1, py: 2 }}>
+          {menuItems.map((item) => (
+            <ListItem key={item.path} disablePadding sx={{ mb: 1 }}>
+              <Link
+                href={item.path}
+                style={{ textDecoration: 'none', width: '100%' }}
+                onClick={handleMobileMenuToggle}
+              >
+                <ListItemButton
+                  sx={{
+                    borderRadius: 2,
+                    '&:hover': {
+                      bgcolor: 'rgba(89, 164, 152, 0.08)',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Typography
+                        fontWeight={item.variant === 'outlined' ? 600 : 400}
+                        color={item.variant === 'outlined' ? '#59a498' : 'text.primary'}
+                      >
+                        {item.label}
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
 
       {/* Main Content */}
       <Box component="main" sx={{ flex: 1 }}>
@@ -381,13 +482,13 @@ export default function HomePage() {
           </Stack>
 
           {loading ? (
-            <Grid container spacing={3}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={i}>
+                <Box key={i} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
                   <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2 }} />
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           ) : recentManuscripts.length === 0 ? (
             <Paper
               elevation={0}
@@ -405,9 +506,9 @@ export default function HomePage() {
               </Typography>
             </Paper>
           ) : (
-            <Grid container spacing={3}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
               {recentManuscripts.map((manuscript) => (
-                <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={manuscript.id}>
+                <Box key={manuscript.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
                   <Card
                     elevation={0}
                     sx={{
@@ -517,9 +618,9 @@ export default function HomePage() {
                       </CardContent>
                     </CardActionArea>
                   </Card>
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           )}
         </Container>
 
@@ -542,13 +643,13 @@ export default function HomePage() {
                 </Typography>
               </Box>
 
-              <Grid container spacing={3}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                 {activeThemes.map((theme) => (
-                  <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={theme.id}>
+                  <Box key={theme.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
                     <ThemeCard theme={theme} />
-                  </Grid>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
 
               <Box textAlign="center" sx={{ mt: 4 }}>
                 <Link href="/themes" style={{ textDecoration: 'none' }}>
