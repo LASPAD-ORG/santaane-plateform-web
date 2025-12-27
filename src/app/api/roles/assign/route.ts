@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
 
     console.log('Assigning role to user:', { user_id, role_id });
 
-    // Call backend API - Try with camelCase and trailing slash which is common in this backend
+    // Call backend API - No trailing slash to avoid 307 redirect
     const response = await axios.post(
-      `${API_URL}/api/v1/roles/assign/`,
+      `${API_URL}/api/v1/roles/assign`,
       { userId: user_id, roleId: role_id },
       {
         headers: {
