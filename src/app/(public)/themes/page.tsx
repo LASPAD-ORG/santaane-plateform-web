@@ -203,8 +203,8 @@ export default function ThemesPage() {
         {/* Themes Grid */}
         {loading ? (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Box key={i} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <Box key={i} sx={{ flex: { xs: '1 1 100%', lg: '0 0 calc(25% - 18px)' } }}>
                 <Skeleton variant="rectangular" height={280} sx={{ borderRadius: 3 }} />
               </Box>
             ))}
@@ -226,14 +226,14 @@ export default function ThemesPage() {
               Aucun thème disponible
             </Typography>
             <Typography color="text.secondary" sx={{ maxWidth: 500, mx: 'auto' }}>
-              Il n&apos;y a pas de thème ouvert aux soumissions pour le moment. 
+              Il n&apos;y a pas de thème ouvert aux soumissions pour le moment.
               Revenez bientôt pour découvrir les nouvelles opportunités.
             </Typography>
           </Paper>
         ) : (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {themes.map((theme) => (
-              <Box key={theme.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+              <Box key={theme.id} sx={{ flex: { xs: '1 1 100%', lg: '0 0 calc(25% - 18px)' } }}>
                 <ThemeCard theme={theme} />
               </Box>
             ))}

@@ -306,7 +306,7 @@ function ManuscriptsPageContent() {
       {loading ? (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Box key={i} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+            <Box key={i} sx={{ flex: { xs: '1 1 100%', lg: '0 0 calc(25% - 18px)' } }}>
               <Skeleton variant="rectangular" height={220} sx={{ borderRadius: 2 }} />
             </Box>
           ))}
@@ -334,7 +334,7 @@ function ManuscriptsPageContent() {
         <>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {manuscripts.map((manuscript) => (
-              <Box key={manuscript.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 12px)', lg: '1 1 calc(33.333% - 16px)' } }}>
+              <Box key={manuscript.id} sx={{ flex: { xs: '1 1 100%', lg: '0 0 calc(25% - 18px)' } }}>
                 <Card
                   elevation={0}
                   sx={{
