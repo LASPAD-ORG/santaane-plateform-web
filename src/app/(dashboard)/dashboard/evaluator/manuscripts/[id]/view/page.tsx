@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { exportPdf } from 'react-pdf-highlighter-plus';
+import { exportPdf, type PdfScaleValue } from 'react-pdf-highlighter-plus';
 import {
   Box,
   Paper,
@@ -60,7 +60,7 @@ export default function ViewManuscriptPage({
   const [manuscript, setManuscript] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string>('');
-  const [pdfScaleValue, setPdfScaleValue] = useState<number | string>('auto');
+  const [pdfScaleValue, setPdfScaleValue] = useState<PdfScaleValue>('auto');
   const [manuscriptDetailsOpen, setManuscriptDetailsOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -134,7 +134,7 @@ export default function ViewManuscriptPage({
           console.error('Failed to parse redaction mask position:', error);
           return null;
         }
-      }).filter(Boolean); // Supprimer les masques invalides
+      }).filter((h): h is NonNullable<typeof h> => h !== null); // Supprimer les masques invalides
 
       // Utiliser notre route API Next.js qui gère l'authentification automatiquement
       const exportPdfUrl = `/api/manuscripts/${manuscriptId}/download`;
@@ -151,7 +151,7 @@ export default function ViewManuscriptPage({
       );
 
       // Télécharger le fichier PDF anonymisé
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

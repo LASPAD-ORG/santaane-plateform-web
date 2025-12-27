@@ -43,6 +43,7 @@ export interface Manuscript {
   pdfFilename: string;
   evaluators?: Evaluator[];
   evaluationStatus?: EvaluationStatus;
+  isAnonymized?: boolean;
   createdAt: string;
   updatedAt: string;
 }

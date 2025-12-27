@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import type { PdfScaleValue } from 'react-pdf-highlighter-plus';
 import {
   Box,
   Paper,
@@ -63,7 +64,7 @@ export default function EvaluationResultPage({
 
   const [manuscript, setManuscript] = useState<any>(null);
   const [authToken, setAuthToken] = useState<string>('');
-  const [pdfScaleValue, setPdfScaleValue] = useState<number | string>('auto');
+  const [pdfScaleValue, setPdfScaleValue] = useState<PdfScaleValue>('auto');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [gridDialogOpen, setGridDialogOpen] = useState(false);
   const highlighterUtilsRef = React.useRef<any>(null);

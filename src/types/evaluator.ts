@@ -195,7 +195,6 @@ export function backendAnnotationToHighlight(
           height: 20,
         },
         rects: [],
-        pageNumber: annotation.pageNumber,
       },
       content: { text: '' },
       author: annotation.evaluatorName,

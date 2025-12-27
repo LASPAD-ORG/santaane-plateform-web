@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { exportPdf } from 'react-pdf-highlighter-plus';
+import { exportPdf, type PdfScaleValue } from 'react-pdf-highlighter-plus';
 import {
   Box,
   Paper,
@@ -73,7 +73,7 @@ export default function EvaluateManuscriptPage({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authToken, setAuthToken] = useState<string>('');
   const [highlightToDelete, setHighlightToDelete] = useState<string | null>(null);
-  const [pdfScaleValue, setPdfScaleValue] = useState<number | string>('auto');
+  const [pdfScaleValue, setPdfScaleValue] = useState<PdfScaleValue>('auto');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [evaluationGridOpen, setEvaluationGridOpen] = useState(false);
   const [manuscriptDetailsOpen, setManuscriptDetailsOpen] = useState(false);
@@ -196,7 +196,7 @@ export default function EvaluateManuscriptPage({
             console.error('Failed to parse redaction mask position:', error);
             return null;
           }
-        }).filter(Boolean), // Supprimer les masques invalides
+        }).filter((h): h is NonNullable<typeof h> => h !== null), // Supprimer les masques invalides
       ];
 
       // Utiliser notre route API Next.js qui gère l'authentification automatiquement
@@ -216,7 +216,7 @@ export default function EvaluateManuscriptPage({
       );
 
       // Télécharger le fichier PDF annoté
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -248,7 +248,6 @@ export default function EvaluateManuscriptPage({
         highlights: highlights.map(h => ({
           type: h.type,
           comment: h.comment,
-          category: h.category,
           position: h.position,
         })),
       });
@@ -340,7 +339,11 @@ export default function EvaluateManuscriptPage({
               <ArrowBack />
             </IconButton>
             <Box flex={1}>
-              <Typography variant={{ xs: 'subtitle1', sm: 'h6' }} gutterBottom>
+              <Typography
+                variant="h6"
+                sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+                gutterBottom
+              >
                 {manuscript.title}
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap">

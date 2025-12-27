@@ -30,5 +30,10 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "react-pdf-higlither-plus/example"]
+  "exclude": [
+    "node_modules",
+    "react-pdf-higlither-plus/example",
+    "react-pdf-higlither-plus/tsup.config.ts",
+    "react-pdf-higlither-plus/vite.config.ts"
+  ]
 }

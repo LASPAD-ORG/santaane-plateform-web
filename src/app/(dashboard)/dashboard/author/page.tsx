@@ -79,7 +79,7 @@ export default function AuthorDashboard() {
         {/* Header Section */}
         <Box sx={{ mb: 4 }}>
           <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                 <Box>
                   <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 0.5 }}>
@@ -101,16 +101,16 @@ export default function AuthorDashboard() {
             Actions Rapides
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
               <Link href="/dashboard/author/soumission" style={{ textDecoration: 'none' }}>
-                <Card 
-                  sx={{ 
-                    p: 2, 
-                    textAlign: 'center', 
+                <Card
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    '&:hover': { 
-                      transform: 'translateY(-4px)', 
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
                       boxShadow: 3,
                       bgcolor: 'primary.50'
                     }
@@ -126,16 +126,16 @@ export default function AuthorDashboard() {
                 </Card>
               </Link>
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
               <Link href="/dashboard/author/manuscripts" style={{ textDecoration: 'none' }}>
-                <Card 
-                  sx={{ 
-                    p: 2, 
-                    textAlign: 'center', 
+                <Card
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    '&:hover': { 
-                      transform: 'translateY(-4px)', 
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
                       boxShadow: 3,
                       bgcolor: 'success.50'
                     }
@@ -156,7 +156,7 @@ export default function AuthorDashboard() {
 
         {/* Statistics Section */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <StatsGrid stats={data.stats} />
           </Grid>
         </Grid>

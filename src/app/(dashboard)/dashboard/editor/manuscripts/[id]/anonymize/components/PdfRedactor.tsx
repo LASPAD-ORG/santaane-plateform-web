@@ -11,6 +11,7 @@ import {
   type PdfSelection,
   type PdfHighlighterUtils,
   type ViewportHighlight,
+  type PdfScaleValue,
 } from 'react-pdf-highlighter-plus';
 import 'pdfjs-dist/web/pdf_viewer.css';
 import 'react-pdf-highlighter-plus/style/style.css';
@@ -24,7 +25,7 @@ interface PdfRedactorProps {
   initialRedactions?: RedactionHighlight[];
   onRedactionsChange?: (redactions: RedactionHighlight[]) => void;
   authToken?: string;
-  pdfScaleValue?: number | string;
+  pdfScaleValue?: PdfScaleValue;
   utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
   viewAnonymized?: boolean;
 }
@@ -156,11 +157,12 @@ export default function PdfRedactor({
 
       const ghostHighlight = currentSelectionRef.current.makeGhostHighlight();
 
-      // Force type to 'redaction'
+      // Force type to 'area' (required by library) with redaction flag
       const newRedaction: RedactionHighlight = {
         ...ghostHighlight,
         id: getNextId(),
-        type: 'redaction',
+        type: 'area',
+        isRedaction: true,
         comment,
       };
 

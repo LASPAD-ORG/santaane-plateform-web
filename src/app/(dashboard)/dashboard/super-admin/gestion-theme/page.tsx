@@ -113,7 +113,7 @@ export default function GestionThemePage() {
       <Card>
         <CardContent>
           <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <TextField
                 fullWidth
                 placeholder="Rechercher par titre ou description..."
@@ -131,7 +131,7 @@ export default function GestionThemePage() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <FormControl fullWidth>
                 <InputLabel id="filter-label">Filtrer par statut</InputLabel>
                 <Select

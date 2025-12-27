@@ -7,10 +7,11 @@ import type { Highlight as BaseHighlight } from 'react-pdf-highlighter-plus';
 
 /**
  * Frontend redaction highlight (used in react-pdf-highlighter-plus)
- * Always type='redaction' to distinguish from evaluator annotations
+ * Uses type='area' (required by library), identified by presence of 'isRedaction' flag
  */
 export interface RedactionHighlight extends BaseHighlight {
-  type: 'redaction';
+  type: 'area';
+  isRedaction: true;
   comment: string;
   author?: string;
 }
@@ -113,7 +114,8 @@ export function backendRedactionToHighlight(
 
     return {
       id: String(redaction.id),
-      type: 'redaction',
+      type: 'area',
+      isRedaction: true,
       comment: redaction.comment,
       position: position,
       content: content,
@@ -125,7 +127,8 @@ export function backendRedactionToHighlight(
     // Fallback: create basic redaction rectangle
     return {
       id: String(redaction.id),
-      type: 'redaction',
+      type: 'area',
+      isRedaction: true,
       comment: redaction.comment,
       position: {
         boundingRect: {
@@ -138,7 +141,6 @@ export function backendRedactionToHighlight(
           height: 30,
         },
         rects: [],
-        pageNumber: redaction.pageNumber,
       },
       content: { text: '' },
       author: redaction.editorName,

@@ -17,7 +17,7 @@ interface StatsGridProps {
 export default function StatsGrid({ stats }: StatsGridProps) {
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} sm={6} md={3}>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <StatCard
           title="Manuscrits Soumis"
           value={stats.total_submitted}
@@ -25,7 +25,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#3B82F6"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={3}>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <StatCard
           title="Manuscrits Acceptés"
           value={stats.total_accepted}
@@ -33,7 +33,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#22C55E"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={3}>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <StatCard
           title="Manuscrits Rejetés"
           value={stats.total_rejected}
@@ -41,7 +41,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#EF4444"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={3}>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <StatCard
           title="Manuscrits Publiés"
           value={stats.total_published}

@@ -61,22 +61,22 @@ export default function SuperAdminDashboard() {
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {/* Status Distribution */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <DashboardBarChart data={data.status_bar_chart} />
         </Grid>
 
         {/* Theme Distribution */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <DashboardBarChart data={data.theme_bar_chart} />
         </Grid>
 
         {/* Section Distribution */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <DashboardBarChart data={data.section_bar_chart} />
         </Grid>
 
         {/* Language Distribution */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <DashboardBarChart data={data.language_bar_chart} />
         </Grid>
       </Grid>
@@ -87,13 +87,13 @@ export default function SuperAdminDashboard() {
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardLineChart data={data.weekly_submissions} color="#3B82F6" />
         </Grid>
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardLineChart data={data.monthly_submissions} color="#8B5CF6" />
         </Grid>
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardLineChart data={data.yearly_submissions} color="#06B6D4" />
         </Grid>
       </Grid>
@@ -104,13 +104,13 @@ export default function SuperAdminDashboard() {
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardLineChart data={data.weekly_authors} color="#10B981" />
         </Grid>
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardLineChart data={data.monthly_authors} color="#22C55E" />
         </Grid>
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <DashboardLineChart data={data.yearly_authors} color="#14B8A6" />
         </Grid>
       </Grid>

@@ -25,7 +25,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
   return (
     <Grid container spacing={3}>
       {/* Row 1: 3 cards */}
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Total Manuscripts"
           value={stats.total_manuscripts}
@@ -33,7 +33,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#3B82F6"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="En Évaluation"
           value={stats.in_evaluation}
@@ -41,7 +41,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#F59E0B"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Soumis"
           value={stats.total_submitted}
@@ -51,7 +51,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Grid>
 
       {/* Row 2: 3 cards */}
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="En Attente d'Évaluateur"
           value={stats.awaiting_evaluators}
@@ -59,7 +59,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#F97316"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Acceptés"
           value={stats.total_accepted}
@@ -68,7 +68,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           subtitle={`Taux: ${stats.acceptance_rate}%`}
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Rejetés"
           value={stats.total_rejected}
@@ -79,7 +79,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Grid>
 
       {/* Row 3: 3 cards */}
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Publiés"
           value={stats.total_published}
@@ -88,7 +88,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           subtitle={`Taux: ${stats.publication_rate}%`}
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Auteurs"
           value={stats.total_authors}
@@ -96,7 +96,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#10B981"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Éditeurs"
           value={stats.total_editors}
@@ -106,7 +106,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Grid>
 
       {/* Row 4: 3 cards */}
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Évaluateurs"
           value={stats.total_evaluators}
@@ -114,7 +114,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
           color="#06B6D4"
         />
       </Grid>
-      <Grid item xs={12} sm={6} md={4}>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
         <StatCard
           title="Taux d'Évaluation"
           value={`${stats.evaluation_rate}%`}

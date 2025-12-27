@@ -14,10 +14,11 @@ import {
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
 } from '@mui/icons-material';
+import type { PdfScaleValue } from 'react-pdf-highlighter-plus';
 
 interface PdfZoomControlsProps {
-  currentZoom: number | string;
-  onZoomChange: (value: number | string) => void;
+  currentZoom: PdfScaleValue;
+  onZoomChange: (value: PdfScaleValue) => void;
 }
 
 const ZOOM_OPTIONS = [

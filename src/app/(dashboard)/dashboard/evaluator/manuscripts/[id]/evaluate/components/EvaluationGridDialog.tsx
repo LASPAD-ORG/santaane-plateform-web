@@ -132,7 +132,7 @@ export function EvaluationGridDialog({
       strengths,
       weaknesses,
       suggestions,
-      recommendation,
+      recommendation: recommendation as Exclude<typeof recommendation, ''>,
     };
 
     try {
@@ -172,7 +172,7 @@ export function EvaluationGridDialog({
         strengths,
         weaknesses,
         suggestions,
-        recommendation,
+        recommendation: recommendation as Exclude<typeof recommendation, ''>,
       };
       await saveGrid(data);
 

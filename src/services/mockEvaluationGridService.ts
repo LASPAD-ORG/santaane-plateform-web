@@ -100,8 +100,8 @@ export const mockEvaluationGridService = {
 
     // Get evaluator info from authStore
     const authState = useAuthStore.getState();
-    const evaluatorId = authState.user?.id || 0;
-    const defaultEvaluatorName = authState.user?.name || 'Évaluateur';
+    const evaluatorId = authState.user?.id ? parseInt(authState.user.id) : 0;
+    const defaultEvaluatorName = authState.user?.fullName || 'Évaluateur';
 
     const grid: EvaluationGrid = {
       id: existingGrid?.id || generateMockId(),

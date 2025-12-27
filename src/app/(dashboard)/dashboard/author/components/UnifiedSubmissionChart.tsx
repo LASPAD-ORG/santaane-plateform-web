@@ -21,7 +21,7 @@ type PeriodType = 'weekly' | 'monthly' | 'yearly';
 
 interface UnifiedChartProps {
   weeklyData?: {
-    period_type: string;
+    period_type: 'week' | 'month' | 'year';
     title: string;
     data: Array<{
       period: string;
@@ -29,7 +29,7 @@ interface UnifiedChartProps {
     }>;
   };
   monthlyData?: {
-    period_type: string;
+    period_type: 'week' | 'month' | 'year';
     title: string;
     data: Array<{
       period: string;
@@ -37,7 +37,7 @@ interface UnifiedChartProps {
     }>;
   };
   yearlyData?: {
-    period_type: string;
+    period_type: 'week' | 'month' | 'year';
     title: string;
     data: Array<{
       period: string;
