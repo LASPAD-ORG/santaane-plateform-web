@@ -20,6 +20,7 @@ export interface ManuscriptDetail {
   languageName: string;
   status: string;
   pdfFilename: string;
+  docxFilename?: string | null;
   author: AuthorInfo;
   createdAt: string;
   updatedAt: string;

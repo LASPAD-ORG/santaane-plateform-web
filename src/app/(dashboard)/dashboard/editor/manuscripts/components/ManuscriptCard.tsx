@@ -31,6 +31,7 @@ import {
   CheckCircleOutline,
   History,
   Block,
+  Description,
 } from '@mui/icons-material';
 import { Manuscript, MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import { useState } from 'react';
@@ -125,6 +126,13 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
 
   const handleCloseHistoryDialog = () => {
     setOpenHistoryDialog(false);
+  };
+
+  const handleDownloadDocx = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (manuscript.docxFilename) {
+      window.open(`/api/files/download/${manuscript.docxFilename}`, '_blank');
+    }
   };
 
   // Statistiques des évaluateurs (logique originale restaurée)
@@ -435,6 +443,14 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
             </Typography>
           </Box>
 
+          {/* DOCX Download button if available */}
+          {manuscript.docxFilename && (
+            <Tooltip title="Télécharger le DOCX">
+              <IconButton size="small" color="success" onClick={handleDownloadDocx}>
+                <Description fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </CardContent>
 

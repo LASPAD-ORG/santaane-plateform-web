@@ -29,6 +29,7 @@ import { useState } from 'react';
 import { useManuscriptDetails } from './hooks/useManuscriptDetails';
 import { MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import PdfViewer from './components/PdfViewer';
+import DocxUploadSection from './components/DocxUploadSection';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -36,7 +37,7 @@ export default function ManuscriptDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { loading, manuscript } = useManuscriptDetails(id);
+  const { loading, manuscript, refetch } = useManuscriptDetails(id);
   const [currentTab, setCurrentTab] = useState(0);
 
   const formatDate = (dateString: string) => {
@@ -113,6 +114,15 @@ export default function ManuscriptDetailsPage() {
           </Button>
         )}
       </Box>
+
+      {/* DOCX Upload Section - Only for accepted manuscripts */}
+      {manuscript.status === 'accepted' && (
+        <DocxUploadSection
+          manuscriptId={id}
+          currentDocxFilename={manuscript.docxFilename}
+          onUploadSuccess={refetch}
+        />
+      )}
 
       {/* Onglets */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>

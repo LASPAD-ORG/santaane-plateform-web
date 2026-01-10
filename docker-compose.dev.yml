@@ -20,6 +20,7 @@ services:
         - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}
 
     container_name: santaane_web_dev
+    user: root
     restart: unless-stopped
 
     environment:
@@ -32,19 +33,19 @@ services:
 
     ports:
       - "3000:3000"
-
     volumes:
-      # Hot reload source code (read-only for security)
+      # Code source en lecture seule (c'est ok)
       - ./src:/app/src:ro
       - ./public:/app/public:ro
-      - ./middleware.ts:/app/middleware.ts:ro
-      - ./next.config.ts:/app/next.config.ts:ro
-      - ./tsconfig.json:/app/tsconfig.json:ro
+      
+      # Retirez le :ro sur ces fichiers de configuration
+      - ./middleware.ts:/app/middleware.ts
+      - ./next.config.ts:/app/next.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
 
-      # Exclude from volume mounts (use container's versions)
+      # Volumes anonymes pour isoler les dossiers de build et dépendances
       - /app/node_modules
       - /app/.next
-
     # Connect to backend network
     networks:
       - santaane_network

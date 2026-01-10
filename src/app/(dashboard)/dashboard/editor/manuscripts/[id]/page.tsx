@@ -26,6 +26,8 @@ import {
   Business,
   Work,
   Info,
+  Description,
+  Refresh,
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useManuscriptStaffDetails } from './hooks/useManuscriptStaffDetails';
@@ -38,8 +40,9 @@ export default function EditorManuscriptDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const { loading, manuscript } = useManuscriptStaffDetails(id);
+  const { loading, manuscript, refetch } = useManuscriptStaffDetails(id);
   const [currentTab, setCurrentTab] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   const formatDate = (dateString: string) => {
     try {
@@ -60,6 +63,18 @@ export default function EditorManuscriptDetailsPage() {
     if (manuscript?.pdfFilename) {
       window.open(`/api/files/download/${manuscript.pdfFilename}`, '_blank');
     }
+  };
+
+  const handleDownloadDocx = () => {
+    if (manuscript?.docxFilename) {
+      window.open(`/api/files/download/${manuscript.docxFilename}`, '_blank');
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
   };
 
   if (loading) {
@@ -95,6 +110,15 @@ export default function EditorManuscriptDetailsPage() {
             Détails du Manuscrit
           </Typography>
         </Box>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<Refresh />}
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          {refreshing ? 'Actualisation...' : 'Actualiser'}
+        </Button>
         <Chip
           label={MANUSCRIPT_STATUS_LABELS[manuscript.status as keyof typeof MANUSCRIPT_STATUS_LABELS]}
           color={MANUSCRIPT_STATUS_COLORS[manuscript.status as keyof typeof MANUSCRIPT_STATUS_COLORS]}
@@ -420,10 +444,21 @@ export default function EditorManuscriptDetailsPage() {
         // Onglet PDF
         <Card elevation={2}>
           <CardContent sx={{ p: 2 }}>
-            <Box display="flex" justifyContent="flex-end" mb={2}>
+            <Box display="flex" justifyContent="flex-end" gap={2} mb={2}>
               <Button variant="outlined" size="small" startIcon={<PictureAsPdf />} onClick={handleDownloadPdf}>
-                Télécharger
+                Télécharger PDF
               </Button>
+              {manuscript.docxFilename && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="success"
+                  startIcon={<Description />}
+                  onClick={handleDownloadDocx}
+                >
+                  Télécharger DOCX
+                </Button>
+              )}
             </Box>
             <PdfViewer pdfUrl={`${API_URL}/api/v1/files/view/${manuscript.pdfFilename}`} />
           </CardContent>

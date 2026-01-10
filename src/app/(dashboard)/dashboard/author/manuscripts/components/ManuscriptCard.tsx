@@ -16,6 +16,8 @@ import {
   PictureAsPdf,
   CalendarToday,
   Assignment,
+  CloudUpload,
+  CheckCircle,
 } from '@mui/icons-material';
 import type { Manuscript } from '@/types/manuscript';
 import { MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
@@ -149,6 +151,22 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
                 <Assignment fontSize="small" />
               </IconButton>
             </Tooltip>
+          )}
+          {/* DOCX Upload button for accepted manuscripts */}
+          {manuscript.status === 'accepted' && (
+            manuscript.docxFilename ? (
+              <Tooltip title="DOCX téléversé">
+                <IconButton size="small" color="success" onClick={() => onView?.(manuscript)}>
+                  <CheckCircle fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Téléverser le DOCX">
+                <IconButton size="small" color="warning" onClick={() => onView?.(manuscript)}>
+                  <CloudUpload fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )
           )}
           <Tooltip title={`Télécharger le PDF`}>
             <IconButton size="small" onClick={handleDownloadPdf}>
