@@ -16,7 +16,7 @@ import {
   PictureAsPdf,
   CalendarToday,
   Assignment,
-  CloudUpload,
+  UploadFile,
   CheckCircle,
 } from '@mui/icons-material';
 import type { Manuscript } from '@/types/manuscript';
@@ -163,7 +163,7 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
             ) : (
               <Tooltip title="Téléverser le DOCX">
                 <IconButton size="small" color="warning" onClick={() => onView?.(manuscript)}>
-                  <CloudUpload fontSize="small" />
+                  <UploadFile fontSize="small" />
                 </IconButton>
               </Tooltip>
             )
