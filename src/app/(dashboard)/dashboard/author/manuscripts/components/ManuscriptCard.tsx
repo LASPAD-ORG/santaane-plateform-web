@@ -9,6 +9,7 @@ import {
   Box,
   IconButton,
   Tooltip,
+  Badge,
 } from '@mui/material';
 import {
   Visibility,
@@ -161,10 +162,35 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
                 </IconButton>
               </Tooltip>
             ) : (
-              <Tooltip title="Téléverser le DOCX">
-                <IconButton size="small" color="warning" onClick={() => onView?.(manuscript)}>
-                  <UploadFile fontSize="small" />
-                </IconButton>
+              <Tooltip title="Action requise : Téléverser le DOCX pour publication">
+                <Badge
+                  variant="dot"
+                  color="error"
+                  overlap="circular"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      animation: 'pulse 2s infinite',
+                      '@keyframes pulse': {
+                        '0%': {
+                          transform: 'scale(1)',
+                          opacity: 1,
+                        },
+                        '50%': {
+                          transform: 'scale(1.2)',
+                          opacity: 0.8,
+                        },
+                        '100%': {
+                          transform: 'scale(1)',
+                          opacity: 1,
+                        },
+                      },
+                    },
+                  }}
+                >
+                  <IconButton size="small" color="warning" onClick={() => onView?.(manuscript)}>
+                    <UploadFile fontSize="small" />
+                  </IconButton>
+                </Badge>
               </Tooltip>
             )
           )}

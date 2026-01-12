@@ -131,7 +131,7 @@ export default function EditorManuscriptDetailsPage() {
         <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
           <Tab label="Informations" />
           <Tab label="Auteur" />
-          <Tab label="PDF" />
+          <Tab label="Manuscrit" />
         </Tabs>
       </Box>
 
@@ -441,7 +441,7 @@ export default function EditorManuscriptDetailsPage() {
           </CardContent>
         </Card>
       ) : (
-        // Onglet PDF
+        // Onglet Manuscrit
         <Card elevation={2}>
           <CardContent sx={{ p: 2 }}>
             <Box display="flex" justifyContent="flex-end" gap={2} mb={2}>

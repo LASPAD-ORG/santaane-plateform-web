@@ -15,6 +15,7 @@ import {
   ListItem,
   Avatar,
   Button,
+  CircularProgress,
 } from '@mui/material';
 import {
   Close,
@@ -26,11 +27,13 @@ import {
   AccessTime,
   Event,
   Visibility,
+  Send,
 } from '@mui/icons-material';
 import { Evaluator } from '@/types/manuscript';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useAlertStore } from '@/stores/alertStore';
 
 interface EvaluatorHistoryDialogProps {
   open: boolean;
@@ -48,7 +51,31 @@ export default function EvaluatorHistoryDialog({
   evaluators,
 }: EvaluatorHistoryDialogProps) {
   const router = useRouter();
-  
+  const { showSuccess, showError } = useAlertStore();
+  const [sendingReminder, setSendingReminder] = useState<number | null>(null);
+
+  const handleSendReminder = async (evaluatorId: number, evaluatorName: string) => {
+    try {
+      setSendingReminder(evaluatorId);
+
+      const response = await axios.post(
+        `/api/manuscripts/${manuscriptId}/evaluator/${evaluatorId}/send-reminder`
+      );
+
+      showSuccess(`Mail de relance envoyé avec succès à ${evaluatorName}`);
+    } catch (error) {
+      console.error('Error sending reminder:', error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.detail || error.response?.data?.message || 'Erreur lors de l\'envoi du mail de relance';
+        showError(errorMessage);
+      } else {
+        showError('Erreur lors de l\'envoi du mail de relance');
+      }
+    } finally {
+      setSendingReminder(null);
+    }
+  };
+
   // Calculer le statut global d'évaluation basé sur les évaluateurs individuels
   const calculateGlobalEvaluationStatus = () => {
     if (!evaluators || evaluators.length === 0) {
@@ -331,6 +358,33 @@ export default function EvaluatorHistoryDialog({
                           </Box>
                         )}
                       </Stack>
+
+                      {/* Bouton de relance pour les évaluateurs en attente */}
+                      {evaluator.status === 'pending' && (
+                        <Box mt={2} display="flex" justifyContent="flex-end">
+                          <Button
+                            variant="contained"
+                            size="small"
+                            startIcon={sendingReminder === evaluator.evaluatorId ? <CircularProgress size={16} color="inherit" /> : <Send />}
+                            onClick={() => handleSendReminder(evaluator.evaluatorId, evaluator.evaluatorName)}
+                            disabled={sendingReminder === evaluator.evaluatorId}
+                            sx={{
+                              textTransform: 'none',
+                              backgroundColor: 'warning.main',
+                              color: 'white',
+                              '&:hover': {
+                                backgroundColor: 'warning.dark',
+                              },
+                              '&:disabled': {
+                                backgroundColor: 'warning.light',
+                                color: 'white',
+                              }
+                            }}
+                          >
+                            {sendingReminder === evaluator.evaluatorId ? 'Envoi en cours...' : 'Envoyer un mail de relance'}
+                          </Button>
+                        </Box>
+                      )}
 
                       {/* Bouton de consultation pour les évaluations terminées */}
                       {evaluator.status === 'accepted' && evaluator.evaluationStatus === 'completed' && (
