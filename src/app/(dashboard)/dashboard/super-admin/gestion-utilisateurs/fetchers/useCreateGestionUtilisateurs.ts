@@ -64,32 +64,32 @@ export function useCreateGestionUtilisateurs() {
         }
       }
 
-      // Envoyer l'email de bienvenue si demandé (only if user was created successfully)
-      if (data.sendWelcomeEmail && !roleAssignmentFailed) {
-        try {
-          await apiClient.post('/users/send-welcome-email', {
-            email: data.email,
-            prenom: data.prenom,
-            nom: data.nom,
-            temporaryPassword,
-          });
-          showSuccess('Succès', 'Utilisateur créé avec succès. Un email de bienvenue a été envoyé.');
-        } catch (emailError) {
-          console.error('Erreur lors de l\'envoi de l\'email:', emailError);
-          showSuccess('Succès', 'Utilisateur créé avec succès, mais l\'email n\'a pas pu être envoyé.');
-        }
-      } else if (!roleAssignmentFailed) {
+      // Afficher le message de succès
+      if (!roleAssignmentFailed) {
         showSuccess('Succès', 'Utilisateur créé avec succès');
       }
 
       return userWithRoles;
     } catch (error: any) {
-      // If user was created but role assignment failed, don't show creation error
-      if (newUser && roleAssignmentFailed) {
-        // Error already shown above
+      // If user was created but role assignment failed
+      if (newUser) {
+        if (roleAssignmentFailed) {
+          // Show success with warning about role assignment
+          showSuccess(
+            'Utilisateur créé avec succès',
+            'L\'utilisateur a été créé mais l\'assignation des rôles a échoué. Vous pouvez réessayer en modifiant l\'utilisateur.'
+          );
+          return newUser;
+        }
+        // If we have a newUser but no roleAssignmentFailed, it's a different error
+        showError(
+          'Attention',
+          'L\'utilisateur a été créé mais une erreur est survenue. Veuillez vérifier les détails et réessayer.'
+        );
         return newUser;
       }
 
+      // If we get here, user creation itself failed
       showError(
         'Erreur de création',
         error.response?.data?.error || 'Impossible de créer l\'utilisateur'

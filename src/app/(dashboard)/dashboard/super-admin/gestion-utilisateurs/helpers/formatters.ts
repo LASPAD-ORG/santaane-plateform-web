@@ -180,12 +180,16 @@ export function mapFrontendUserToBackendCreate(data: CreateUserData): { payload:
   const payload = {
     email: data.email,
     fullName: `${data.prenom} ${data.nom}`.trim(),
-    // Roles are handled separately after creation
     password: temporaryPassword,
-    // Optional fields that match BackendUser/RegisterPayload
+    // Inclure le premier rôle de la liste (comme avant la modification)
+    role_id: data.roleIds && data.roleIds.length > 0 ? data.roleIds[0] : undefined,
+    // Champs optionnels
     orcid_id: data.telephone || undefined,
+    laboratoire: data.laboratoire || undefined,
+    specialite: data.specialite || undefined,
   };
 
+  console.log('Payload pour la création d\'utilisateur:', payload);
   return { payload, temporaryPassword };
 }
 
