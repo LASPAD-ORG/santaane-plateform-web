@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { useCreateGestionUtilisateurs } from '../fetchers/useCreateGestionUtilisateurs';
 import { useFetchRoles } from '../../../developer/gestion-roles/fetchers/useFetchRoles';
+import RoleSelector from './RoleSelector';
 
 interface CreateUserDialogProps {
   open: boolean;
@@ -30,25 +31,46 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: CreateUse
   const [prenom, setPrenom] = useState('');
   const [nom, setNom] = useState('');
   const [roleIds, setRoleIds] = useState<number[]>([]);
+  const [roleId, setRoleId] = useState<number | undefined>(undefined);
   
   const { createUser, loading } = useCreateGestionUtilisateurs();
   const { data: roles } = useFetchRoles();
 
+  const handleRoleChange = (roleValue: number | number[] | undefined) => {
+    if (Array.isArray(roleValue)) {
+      setRoleIds(roleValue);
+      setRoleId(roleValue.length > 0 ? roleValue[0] : undefined);
+    } else if (roleValue !== null && roleValue !== undefined) {
+      setRoleIds([roleValue]);
+      setRoleId(roleValue);
+    } else {
+      setRoleIds([]);
+      setRoleId(undefined);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email.trim() || !prenom.trim() || !nom.trim()) {
+    if (!email.trim() || !prenom.trim() || !nom.trim() || (roleIds.length === 0 && !roleId)) {
       return;
     }
 
+    const userData = {
+      email: email.trim(),
+      prenom: prenom.trim(),
+      nom: nom.trim(),
+      roleIds: roleIds.length > 0 ? roleIds : undefined,
+      role_id: roleId || undefined,
+      sendWelcomeEmail: true,
+    };
+
+    console.log('CreateUserDialog - Données envoyées:', userData);
+    console.log('CreateUserDialog - roleIds:', roleIds);
+    console.log('CreateUserDialog - roleId:', roleId);
+
     try {
-      await createUser({
-        email: email.trim(),
-        prenom: prenom.trim(),
-        nom: nom.trim(),
-        roleIds,
-        sendWelcomeEmail: true,
-      });
+      await createUser(userData);
       handleClose();
       onSuccess();
     } catch (error) {
@@ -61,6 +83,7 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: CreateUse
     setPrenom('');
     setNom('');
     setRoleIds([]);
+    setRoleId(undefined);
     onClose();
   };
 
@@ -94,27 +117,12 @@ export default function CreateUserDialog({ open, onClose, onSuccess }: CreateUse
               fullWidth
             />
             <FormControl fullWidth>
-              <InputLabel>Rôles</InputLabel>
-              <Select
-                multiple
-                value={roleIds}
-                onChange={(e) => setRoleIds(e.target.value as number[])}
-                input={<OutlinedInput label="Rôles" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((roleId) => {
-                      const role = roles.find((r) => r.id === roleId);
-                      return <Chip key={roleId} label={role?.name || roleId} size="small" />;
-                    })}
-                  </Box>
-                )}
-              >
-                {roles.map((role) => (
-                  <MenuItem key={role.id} value={role.id}>
-                    {role.name}
-                  </MenuItem>
-                ))}
-              </Select>
+              <RoleSelector
+                roles={roles || []}
+                onRoleChange={handleRoleChange}
+                value={roleIds.length > 0 ? roleIds : (roleId || undefined)}
+                allowMultiple={true}
+              />
             </FormControl>
           </Box>
         </DialogContent>

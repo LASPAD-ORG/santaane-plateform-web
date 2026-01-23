@@ -30,6 +30,7 @@ import {
 import { useState, useEffect } from 'react';
 import { CreateUserData, useFetchRoles } from '../fetchers/useFetchGestionUtilisateurs';
 import { ROLE_CONFIGS } from '@/config/roles';
+import RoleSelector from './RoleSelector';
 
 interface CreateUserModalProps {
   open: boolean;
@@ -96,6 +97,36 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
     }
   };
 
+  const handleRoleChange = (roleValue: number | number[] | undefined) => {
+    if (Array.isArray(roleValue)) {
+      setFormData(prev => ({ 
+        ...prev, 
+        roleIds: roleValue, 
+        role_id: undefined 
+      }));
+    } else if (roleValue !== null && roleValue !== undefined) {
+      setFormData(prev => ({ 
+        ...prev, 
+        roleIds: [roleValue], 
+        role_id: roleValue 
+      }));
+    } else {
+      setFormData(prev => ({ 
+        ...prev, 
+        roleIds: [], 
+        role_id: undefined 
+      }));
+    }
+
+    // Clear role error
+    if (errors.roleIds) {
+      setErrors(prev => ({
+        ...prev,
+        roleIds: '',
+      }));
+    }
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -113,7 +144,7 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
       newErrors.nom = 'Le nom est requis';
     }
 
-    if (formData.roleIds.length === 0) {
+    if ((!formData.roleIds || formData.roleIds.length === 0) && !formData.role_id) {
       newErrors.roleIds = 'Au moins un rôle doit être sélectionné';
     }
 
@@ -127,6 +158,10 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
+
+    console.log('Données du formulaire avant envoi:', formData);
+    console.log('Rôles sélectionnés - roleIds:', formData.roleIds);
+    console.log('Rôle unique - role_id:', formData.role_id);
 
     setLoading(true);
     try {
@@ -145,6 +180,7 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
       prenom: '',
       nom: '',
       roleIds: [],
+      role_id: undefined,
       laboratoire: '',
       specialite: '',
       telephone: '',
@@ -154,7 +190,8 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
     onClose();
   };
 
-  const isHighPrivilegeRole = formData.roleIds.some(roleId => {
+  const isHighPrivilegeRole = [...(formData.roleIds || []), formData.role_id].some(roleId => {
+    if (!roleId) return false;
     const role = availableRoles.find(r => r.id === roleId);
     return role && ['SUPER_ADMIN', 'EDITOR'].includes(role.name);
   });
@@ -250,38 +287,13 @@ export function CreateUserModal({ open, onClose, onCreateUser }: CreateUserModal
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <Autocomplete
-              multiple
-              options={roleOptions}
-              getOptionLabel={(option) => option.label}
-              value={roleOptions.filter(option => formData.roleIds.includes(option.id))}
-              onChange={(event, newValue) => {
-                handleInputChange('roleIds', newValue.map(v => v.id));
-              }}
-              loading={rolesLoading}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option.id}
-                    label={option.label}
-                    style={{
-                      backgroundColor: option.color + '20',
-                      color: option.color,
-                      border: `1px solid ${option.color}40`,
-                    }}
-                  />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Rôles *"
-                  placeholder="Sélectionner des rôles"
-                  error={!!errors.roleIds}
-                  helperText={errors.roleIds || 'Sélectionnez un ou plusieurs rôles pour cet utilisateur'}
-                />
-              )}
+            <RoleSelector
+              roles={availableRoles}
+              onRoleChange={handleRoleChange}
+              value={formData.roleIds && formData.roleIds.length > 0 ? formData.roleIds : formData.role_id}
+              allowMultiple={true}
+              error={errors.roleIds}
+              helperText={errors.roleIds || 'Sélectionnez un ou plusieurs rôles pour cet utilisateur'}
             />
           </Grid>
 

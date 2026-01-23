@@ -177,17 +177,24 @@ export function mapFrontendUserToBackendUpdate(data: UpdateUserData): Record<str
 export function mapFrontendUserToBackendCreate(data: CreateUserData): { payload: Record<string, any>; temporaryPassword: string } {
   const temporaryPassword = generateRandomPassword(12);
   
-  const payload = {
+  const payload: Record<string, any> = {
     email: data.email,
     fullName: `${data.prenom} ${data.nom}`.trim(),
     password: temporaryPassword,
-    // Inclure le premier rôle de la liste (comme avant la modification)
-    role_id: data.roleIds && data.roleIds.length > 0 ? data.roleIds[0] : undefined,
     // Champs optionnels
     orcid_id: data.telephone || undefined,
     laboratoire: data.laboratoire || undefined,
     specialite: data.specialite || undefined,
   };
+
+  // Gérer les deux formats de rôle
+  if (data.roleIds && data.roleIds.length > 0) {
+    // Toujours envoyer roleIds pour la cohérence
+    payload.roleIds = data.roleIds;
+  } else if (data.role_id) {
+    // Convertir role_id en roleIds pour la cohérence
+    payload.roleIds = [data.role_id];
+  }
 
   console.log('Payload pour la création d\'utilisateur:', payload);
   return { payload, temporaryPassword };

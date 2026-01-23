@@ -23,73 +23,30 @@ export function useCreateGestionUtilisateurs() {
 
   const createUser = async (data: CreateUserData): Promise<User> => {
     setLoading(true);
-    let newUser: User | null = null;
-    let roleAssignmentFailed = false;
 
     try {
       const { payload, temporaryPassword } = mapFrontendUserToBackendCreate(data);
       const response = await apiClient.post<BackendUser>('/users', payload);
-      newUser = mapBackendUserToFrontend(response.data);
+      const newUser = mapBackendUserToFrontend(response.data);
 
-      // Assign roles after creation
-      if (data.roleIds && data.roleIds.length > 0) {
-        try {
-          for (const roleId of data.roleIds) {
-            console.log(`Assigning role ${roleId} to user ${newUser.id}`);
-            await apiClient.post('/roles/assign', {
-              user_id: newUser.id,
-              role_id: roleId,
-            });
-          }
-        } catch (roleError: any) {
-          console.error('Error assigning roles:', roleError);
-          roleAssignmentFailed = true;
-          // Don't throw yet - continue to email
-          showError(
-            'Attention',
-            `L'utilisateur a été créé mais l'assignation des rôles a échoué. Veuillez réessayer via la modification de l'utilisateur. Erreur: ${roleError.response?.data?.error || roleError.message}`
-          );
-        }
-      }
-
-      // Re-fetch user to get updated roles from backend (only if role assignment didn't fail)
+      // Le backend assigne maintenant automatiquement les rôles
+      // Plus besoin d'assignation manuelle
+      
+      // Re-fetch user to get updated roles from backend
       let userWithRoles = newUser;
-      if (!roleAssignmentFailed) {
-        try {
-          const updatedResponse = await apiClient.get<BackendUser>(`/users/${newUser.id}`);
-          userWithRoles = mapBackendUserToFrontend(updatedResponse.data);
-        } catch (fetchError) {
-          console.error('Error fetching updated user:', fetchError);
-          // Use the original user data
-        }
+      try {
+        const updatedResponse = await apiClient.get<BackendUser>(`/users/${newUser.id}`);
+        userWithRoles = mapBackendUserToFrontend(updatedResponse.data);
+      } catch (fetchError) {
+        console.error('Error fetching updated user:', fetchError);
+        // Use the original user data
       }
 
       // Afficher le message de succès
-      if (!roleAssignmentFailed) {
-        showSuccess('Succès', 'Utilisateur créé avec succès');
-      }
+      showSuccess('Succès', 'Utilisateur créé avec succès et email envoyé avec les rôles assignés');
 
       return userWithRoles;
     } catch (error: any) {
-      // If user was created but role assignment failed
-      if (newUser) {
-        if (roleAssignmentFailed) {
-          // Show success with warning about role assignment
-          showSuccess(
-            'Utilisateur créé avec succès',
-            'L\'utilisateur a été créé mais l\'assignation des rôles a échoué. Vous pouvez réessayer en modifiant l\'utilisateur.'
-          );
-          return newUser;
-        }
-        // If we have a newUser but no roleAssignmentFailed, it's a different error
-        showError(
-          'Attention',
-          'L\'utilisateur a été créé mais une erreur est survenue. Veuillez vérifier les détails et réessayer.'
-        );
-        return newUser;
-      }
-
-      // If we get here, user creation itself failed
       showError(
         'Erreur de création',
         error.response?.data?.error || 'Impossible de créer l\'utilisateur'

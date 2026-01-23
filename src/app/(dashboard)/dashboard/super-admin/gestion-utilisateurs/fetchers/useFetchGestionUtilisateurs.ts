@@ -96,7 +96,8 @@ export interface CreateUserData {
   email: string;
   prenom: string;
   nom: string;
-  roleIds: number[];
+  roleIds?: number[];     // Nouveau format - multiple rôles
+  role_id?: number;       // Ancien format - single rôle (compatibilité)
   laboratoire?: string;
   specialite?: string;
   telephone?: string;
