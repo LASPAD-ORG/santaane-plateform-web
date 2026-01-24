@@ -26,6 +26,19 @@ export interface EvaluationStatus {
   evaluationProgress: number;
 }
 
+/**
+ * Interface pour le suivi des versions de fichiers Word 
+ * lors de la phase éditoriale (après acceptation)
+ */
+export interface EditorialVersion {
+  id: number;
+  versionNumber: number;
+  filename: string;
+  filePath: string;
+  editorName: string;
+  createdAt: string;
+}
+
 export interface Manuscript {
   id: number;
   title: string;
@@ -47,6 +60,8 @@ export interface Manuscript {
   isAnonymized?: boolean;
   createdAt: string;
   updatedAt: string;
+  // Ajout de la relation pour le versionnage éditorial
+  editorialVersions?: EditorialVersion[]; 
 }
 
 export interface ManuscriptsResponse {
@@ -62,6 +77,7 @@ export const MANUSCRIPT_STATUS_LABELS: Record<ManuscriptStatus, string> = {
   revision_requested: 'Révision demandée',
   published: 'Publié',
 };
+
 export const MANUSCRIPT_STATUS_COLORS: Record<ManuscriptStatus, 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
   submitted: 'info',
   re_submitted: 'info',
@@ -69,4 +85,4 @@ export const MANUSCRIPT_STATUS_COLORS: Record<ManuscriptStatus, 'default' | 'pri
   rejected: 'error',
   revision_requested: 'warning',
   published: 'success',
-}
+};

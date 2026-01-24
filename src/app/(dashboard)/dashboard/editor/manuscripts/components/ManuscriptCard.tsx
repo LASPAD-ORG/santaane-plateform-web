@@ -39,6 +39,8 @@ import axios from 'axios';
 import { useAlertStore } from '@/stores/alertStore';
 import AssignEvaluatorDialog from './AssignEvaluatorDialog';
 import EvaluatorHistoryDialog from './EvaluatorHistoryDialog';
+// Importation du nouveau dialogue de gestion éditoriale
+import EditorialManagerDialog from './EditorialManagerDialog';
 
 interface ManuscriptCardProps {
   manuscript: Manuscript;
@@ -52,6 +54,8 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
   const [updating, setUpdating] = useState(false);
   const [openAssignDialog, setOpenAssignDialog] = useState(false);
   const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
+  // 1. Nouvel état pour le dialogue de gestion éditoriale
+  const [openEditorialDialog, setOpenEditorialDialog] = useState(false);
 
   const formatDate = (dateString: string) => {
     try {
@@ -234,7 +238,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
           />
           <Box display="flex" gap={0.5}>
             <Tooltip title="Voir détails">
-              <IconButton size="small" onClick={handleViewDetails} disabled={updating}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleViewDetails(); }} disabled={updating}>
                 <Visibility fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -258,6 +262,24 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
                 <PersonAdd fontSize="small" />
               </IconButton>
             </Tooltip>
+
+            {/* 2. Correction ICI : e.preventDefault() ajouté pour bloquer la redirection native du clic */}
+            {manuscript.status === 'accepted' && (
+              <Tooltip title="Gestion éditoriale (Versions Word)">
+                <IconButton 
+                  size="small" 
+                  color="primary" 
+                  onClick={(e) => { 
+                    e.preventDefault(); 
+                    e.stopPropagation(); 
+                    setOpenEditorialDialog(true); 
+                  }}
+                >
+                  <RateReview fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+
             <Tooltip title="Actions">
               <IconButton size="small" onClick={handleMenuOpen} disabled={updating}>
                 <MoreVert fontSize="small" />
@@ -381,7 +403,6 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
               </Tooltip>
             </Box>
             
-            {/* Badge de statut d'évaluation global */}
             {globalEvaluationStatus && (
               <Box mb={1}>
                 <Chip
@@ -443,7 +464,6 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
             </Typography>
           </Box>
 
-          {/* DOCX Download button if available */}
           {manuscript.docxFilename && (
             <Tooltip title="Télécharger le DOCX">
               <IconButton size="small" color="success" onClick={handleDownloadDocx}>
@@ -454,23 +474,31 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
         </Box>
       </CardContent>
 
-      {/* Assign Evaluator Dialog */}
-      <AssignEvaluatorDialog
-        open={openAssignDialog}
-        onClose={handleCloseAssignDialog}
-        manuscriptId={manuscript.id}
-        manuscriptTitle={manuscript.title}
-        onSuccess={onUpdate}
-      />
+      {/* Dialogs - Ajout de stopPropagation pour isoler les interactions */}
+      <Box onClick={(e) => e.stopPropagation()}>
+        <AssignEvaluatorDialog
+          open={openAssignDialog}
+          onClose={handleCloseAssignDialog}
+          manuscriptId={manuscript.id}
+          manuscriptTitle={manuscript.title}
+          onSuccess={onUpdate}
+        />
 
-      {/* Evaluator History Dialog */}
-      <EvaluatorHistoryDialog
-        open={openHistoryDialog}
-        onClose={handleCloseHistoryDialog}
-        manuscriptTitle={manuscript.title}
-        manuscriptId={manuscript.id}
-        evaluators={evaluators}
-      />
+        <EvaluatorHistoryDialog
+          open={openHistoryDialog}
+          onClose={handleCloseHistoryDialog}
+          manuscriptTitle={manuscript.title}
+          manuscriptId={manuscript.id}
+          evaluators={evaluators}
+        />
+
+        <EditorialManagerDialog
+          open={openEditorialDialog}
+          onClose={() => setOpenEditorialDialog(false)}
+          manuscript={manuscript}
+          onUpdate={onUpdate}
+        />
+      </Box>
     </Card>
   );
 }
