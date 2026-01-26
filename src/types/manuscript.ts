@@ -55,11 +55,11 @@ export interface ManuscriptsResponse {
 }
 
 export const MANUSCRIPT_STATUS_LABELS: Record<ManuscriptStatus, string> = {
-  submitted: 'Soumis',
+  submitted: 'En attente d\'évaluation',
   re_submitted: 'Re-soumis',
   accepted: 'Accepté',
   rejected: 'Rejeté',
-  revision_requested: 'Révision demandée',
+  revision_requested: 'Accepter provisoirement',
   published: 'Publié',
 };
 export const MANUSCRIPT_STATUS_COLORS: Record<ManuscriptStatus, 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {

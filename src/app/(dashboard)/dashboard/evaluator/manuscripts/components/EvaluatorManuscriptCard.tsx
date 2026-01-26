@@ -319,7 +319,7 @@ export default function EvaluatorManuscriptCard({
                   onClick={() => handleResponse(true)}
                   disabled={responding}
                 >
-                  Accepter
+                  Accepter d'évaluer
                 </Button>
                 <Button
                   variant="outlined"
@@ -330,7 +330,7 @@ export default function EvaluatorManuscriptCard({
                   onClick={() => handleResponse(false)}
                   disabled={responding}
                 >
-                  Refuser
+                  Refuser d'évaluer
                 </Button>
               </Stack>
             </Stack>

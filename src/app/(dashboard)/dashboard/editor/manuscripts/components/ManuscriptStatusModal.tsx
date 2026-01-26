@@ -36,7 +36,7 @@ interface ManuscriptStatusModalProps {
 const STATUS_OPTIONS = [
   { value: 'accepted' as ManuscriptStatus, label: 'Accepter', icon: <CheckCircle color="success" /> },
   { value: 'rejected' as ManuscriptStatus, label: 'Rejeter', icon: <Cancel color="error" /> },
-  { value: 'revision_requested' as ManuscriptStatus, label: 'Demander une révision', icon: <RateReview color="warning" /> },
+  { value: 'revision_requested' as ManuscriptStatus, label: 'Accepter provisoirement', icon: <RateReview sx={{ color: '#4caf50' }} /> },
   { value: 'published' as ManuscriptStatus, label: 'Publier', icon: <Visibility color="primary" /> },
 ];
 
