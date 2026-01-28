@@ -1,5 +1,3 @@
-'use client';
-
 import { createTheme } from '@mui/material/styles';
 
 // Create a custom Material-UI theme

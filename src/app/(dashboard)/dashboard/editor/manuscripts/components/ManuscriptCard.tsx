@@ -7,8 +7,6 @@ import {
   Chip,
   IconButton,
   Tooltip,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
   Badge,
@@ -21,9 +19,6 @@ import {
   CalendarToday,
   MoreVert,
   Edit,
-  CheckCircle,
-  Cancel,
-  RateReview,
   PersonAdd,
   HourglassEmpty,
   ThumbUp,
@@ -32,6 +27,7 @@ import {
   History,
   Block,
   Description,
+  RateReview,
 } from '@mui/icons-material';
 import { Manuscript, MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import { useState } from 'react';
@@ -41,6 +37,7 @@ import AssignEvaluatorDialog from './AssignEvaluatorDialog';
 import EvaluatorHistoryDialog from './EvaluatorHistoryDialog';
 // Importation du nouveau dialogue de gestion éditoriale
 import EditorialManagerDialog from './EditorialManagerDialog';
+import ManuscriptStatusModal from './ManuscriptStatusModal';
 
 interface ManuscriptCardProps {
   manuscript: Manuscript;
@@ -50,13 +47,12 @@ interface ManuscriptCardProps {
 export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardProps) {
   const router = useRouter();
   const { showSuccess, showError } = useAlertStore();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [updating, setUpdating] = useState(false);
   const [openAssignDialog, setOpenAssignDialog] = useState(false);
   const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
   // 1. Nouvel état pour le dialogue de gestion éditoriale
   const [openEditorialDialog, setOpenEditorialDialog] = useState(false);
-
+  const [openStatusModal, setOpenStatusModal] = useState(false);
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -84,34 +80,13 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
     router.push(`/dashboard/editor/manuscripts/${manuscript.id}/anonymize`);
   };
 
-  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
+  const handleOpenStatusModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setAnchorEl(e.currentTarget);
+    setOpenStatusModal(true);
   };
 
-  const handleMenuClose = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setAnchorEl(null);
-  };
-
-  const handleStatusChange = async (e: React.MouseEvent, newStatus: string) => {
-    e.stopPropagation();
-    handleMenuClose();
-    
-    setUpdating(true);
-    try {
-      await axios.put(`/api/manuscripts/detail/${manuscript.id}/status`, {
-        status: newStatus,
-      });
-
-      showSuccess('Statut mis à jour avec succès');
-      onUpdate?.();
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du statut:', error);
-      showError('Erreur lors de la mise à jour du statut');
-    } finally {
-      setUpdating(false);
-    }
+  const handleCloseStatusModal = () => {
+    setOpenStatusModal(false);
   };
 
   const handleOpenAssignDialog = (e: React.MouseEvent) => {
@@ -263,7 +238,6 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
               </IconButton>
             </Tooltip>
 
-            {/* 2. Correction ICI : e.preventDefault() ajouté pour bloquer la redirection native du clic */}
             {manuscript.status === 'accepted' && (
               <Tooltip title="Gestion éditoriale (Versions Word)">
                 <IconButton 
@@ -279,46 +253,14 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
                 </IconButton>
               </Tooltip>
             )}
-
-            <Tooltip title="Actions">
-              <IconButton size="small" onClick={handleMenuOpen} disabled={updating}>
+            <Tooltip title="Gestion du statut">
+              <IconButton size="small" onClick={handleOpenStatusModal} disabled={updating}>
                 <MoreVert fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
         </Box>
 
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={() => handleMenuClose()}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <MenuItem onClick={(e) => handleStatusChange(e, 'revision_requested')}>
-            <ListItemIcon>
-              <RateReview fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Demander révision</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={(e) => handleStatusChange(e, 'accepted')}>
-            <ListItemIcon>
-              <CheckCircle fontSize="small" color="success" />
-            </ListItemIcon>
-            <ListItemText>Accepter</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={(e) => handleStatusChange(e, 'rejected')}>
-            <ListItemIcon>
-              <Cancel fontSize="small" color="error" />
-            </ListItemIcon>
-            <ListItemText>Rejeter</ListItemText>
-          </MenuItem>
-          <MenuItem onClick={(e) => handleStatusChange(e, 'published')}>
-            <ListItemIcon>
-              <Visibility fontSize="small" color="primary" />
-            </ListItemIcon>
-            <ListItemText>Publier</ListItemText>
-          </MenuItem>
-        </Menu>
 
         {/* Titre */}
         <Typography
@@ -484,6 +426,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
           onSuccess={onUpdate}
         />
 
+
         <EvaluatorHistoryDialog
           open={openHistoryDialog}
           onClose={handleCloseHistoryDialog}
@@ -499,6 +442,26 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
           onUpdate={onUpdate}
         />
       </Box>
+
+      {/* Manuscript Status Modal */}
+      <ManuscriptStatusModal
+        open={openStatusModal}
+        onClose={handleCloseStatusModal}
+        manuscriptId={manuscript.id}
+        manuscriptTitle={manuscript.title}
+        currentStatus={manuscript.status}
+        onSuccess={onUpdate}
+      />
+
+      {/* Evaluator History Dialog */}
+      <EvaluatorHistoryDialog
+        open={openHistoryDialog}
+        onClose={handleCloseHistoryDialog}
+        manuscriptTitle={manuscript.title}
+        manuscriptId={manuscript.id}
+        evaluators={evaluators}
+      />
+      
     </Card>
   );
 }
