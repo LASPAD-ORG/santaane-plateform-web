@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button,
   Typography, Box, List, ListItem, ListItemText, ListItemIcon,
-  IconButton, Divider, CircularProgress, Alert,
+  IconButton, Divider, CircularProgress, Alert, Chip,
 } from '@mui/material';
 import {
-  CloudUpload, Description, GetApp, History, CheckCircle,
+  CloudUpload, Description, GetApp, History, CheckCircle, Person,
 } from '@mui/icons-material';
 import { Manuscript, EditorialVersion } from '@/types/manuscript';
 import { useAlertStore } from '@/stores/alertStore';
@@ -200,8 +200,21 @@ export default function EditorialManagerDialog({
                     <Description color="primary" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Version ${version.versionNumber}`}
-                    secondary={`${version.editorName} • ${formatDate(version.createdAt)}`}
+                    primary={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Typography variant="body1" fontWeight="medium">
+                          Version {version.versionNumber}
+                        </Typography>
+                        <Chip
+                          label={version.editorName}
+                          size="small"
+                          icon={<Person />}
+                          color="secondary"
+                          variant="outlined"
+                        />
+                      </Box>
+                    }
+                    secondary={formatDate(version.createdAt)}
                   />
                 </ListItem>
                 <Divider variant="inset" component="li" />

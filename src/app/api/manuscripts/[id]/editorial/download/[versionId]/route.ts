@@ -19,10 +19,22 @@ export async function GET(
       }
     );
 
+    // Récupérer le nom du fichier depuis le backend (si disponible dans les headers)
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = `version_${versionId}.docx`; // Valeur par défaut
+
+    // Extraire le filename du header Content-Disposition si présent
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
+      if (filenameMatch && filenameMatch[1]) {
+        filename = filenameMatch[1];
+      }
+    }
+
     return new NextResponse(response.data, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="version_${versionId}.docx"`,
+        'Content-Disposition': `attachment; filename="${filename}"`,
       },
     });
   } catch (error: any) {
