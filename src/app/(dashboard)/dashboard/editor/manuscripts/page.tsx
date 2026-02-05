@@ -65,6 +65,7 @@ export default function EditorManuscriptsPage() {
           <Box
             display="flex"
             flexDirection={{ xs: 'column', md: 'row' }}
+            flexWrap="wrap"
             gap={2}
           >
             {/* Recherche */}
@@ -73,7 +74,7 @@ export default function EditorManuscriptsPage() {
               placeholder="Titre, résumé, mots-clés..."
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              fullWidth
+              sx={{ flex: '1 1 100%' }}
               InputProps={{
                 startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />,
               }}
@@ -85,7 +86,7 @@ export default function EditorManuscriptsPage() {
               label="Statut des évaluateurs"
               value={filters.evaluatorStatus || 'all'}
               onChange={(e) => handleFilterChange('evaluatorStatus', e.target.value)}
-              sx={{ minWidth: 220 }}
+              sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 11px)' } }}
             >
               <MenuItem value="all">Tous les manuscrits</MenuItem>
               <MenuItem value="none">Sans évaluateur</MenuItem>
@@ -100,7 +101,7 @@ export default function EditorManuscriptsPage() {
               label="Statut d'évaluation"
               value={filters.evaluationStatus || 'all'}
               onChange={(e) => handleFilterChange('evaluationStatus', e.target.value)}
-              sx={{ minWidth: 200 }}
+              sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 11px)' } }}
             >
               <MenuItem value="all">Tous</MenuItem>
               <MenuItem value="completed">Évaluations terminées</MenuItem>
@@ -113,7 +114,7 @@ export default function EditorManuscriptsPage() {
               label="Langue"
               value={filters.languageId || ''}
               onChange={(e) => handleFilterChange('languageId', e.target.value ? Number(e.target.value) : null)}
-              sx={{ minWidth: 200 }}
+              sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 11px)' } }}
             >
               <MenuItem value="">Toutes</MenuItem>
               {languages.map((lang) => (
@@ -129,7 +130,7 @@ export default function EditorManuscriptsPage() {
               label="Thème"
               value={filters.themeId || ''}
               onChange={(e) => handleFilterChange('themeId', e.target.value ? Number(e.target.value) : null)}
-              sx={{ minWidth: 200 }}
+              sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)' } }}
             >
               <MenuItem value="">Tous</MenuItem>
               {themes.map((theme) => (
@@ -145,7 +146,7 @@ export default function EditorManuscriptsPage() {
               label="Rubrique"
               value={filters.sectionId || ''}
               onChange={(e) => handleFilterChange('sectionId', e.target.value ? Number(e.target.value) : null)}
-              sx={{ minWidth: 200 }}
+              sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)' } }}
             >
               <MenuItem value="">Toutes</MenuItem>
               {sections.map((section) => (
