@@ -19,6 +19,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <AuthGuard>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         {/* Mobile AppBar */}
+        {/* Mobile AppBar */}
         <AppBar
           position="fixed"
           sx={{

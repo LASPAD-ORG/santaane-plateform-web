@@ -41,6 +41,8 @@ import {
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { publicApiService, PublicManuscriptSummary, PublicStats, ActiveTheme } from '@/services/publicApiService';
+import GoogleTranslate from '@/components/ui/GoogleTranslate';
+
 
 // Composant ThemeCard pour éviter l'erreur d'hydratation avec Date.now()
 function ThemeCard({ theme }: { theme: ActiveTheme }) {
@@ -282,61 +284,69 @@ export default function HomePage() {
               />
             </Link>
 
-            {/* Desktop Navigation */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-              <Link href="/manuscripts" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Publications
-                </Button>
-              </Link>
-              <Link href="/themes" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Thèmes
-                </Button>
-              </Link>
-              <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Guide
-                </Button>
-              </Link>
-              <Link href="/about" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  À propos
-                </Button>
-              </Link>
-              <Link href="/contact" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Contact
-                </Button>
-              </Link>
-              <Link href="/login" style={{ textDecoration: 'none' }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<Login />}
-                  sx={{
-                    borderRadius: 2,
-                    borderColor: '#59a498',
-                    color: '#59a498',
-                    fontSize: '0.875rem',
-                    '&:hover': {
-                      borderColor: '#59a498',
-                      bgcolor: 'rgba(89, 164, 152, 0.08)',
-                    }
-                  }}
-                >
-                  Connexion
-                </Button>
-              </Link>
-            </Box>
+            {/* Right side: Nav + Translate + Login */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {/* Desktop Navigation Links */}
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
+                <Link href="/manuscripts" style={{ textDecoration: 'none' }}>
+                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                    Publications
+                  </Button>
+                </Link>
+                <Link href="/themes" style={{ textDecoration: 'none' }}>
+                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                    Thèmes
+                  </Button>
+                </Link>
+                <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>
+                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                    Guide
+                  </Button>
+                </Link>
+                <Link href="/about" style={{ textDecoration: 'none' }}>
+                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                    À propos
+                  </Button>
+                </Link>
+                <Link href="/contact" style={{ textDecoration: 'none' }}>
+                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+                    Contact
+                  </Button>
+                </Link>
+              </Box>
 
-            {/* Mobile Menu Icon */}
-            <IconButton
-              sx={{ display: { xs: 'block', sm: 'none' } }}
-              onClick={handleMobileMenuToggle}
-              edge="end"
-            >
-              <MenuIcon />
-            </IconButton>
+              {/* Google Translate - visible on all screen sizes */}
+              <GoogleTranslate />
+
+              {/* Desktop: Login button */}
+              <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                <Link href="/login" style={{ textDecoration: 'none' }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Login />}
+                    sx={{
+                      borderRadius: 2,
+                      borderColor: '#59a498',
+                      color: '#59a498',
+                      fontSize: '0.875rem',
+                      '&:hover': {
+                        borderColor: '#59a498',
+                        bgcolor: 'rgba(89, 164, 152, 0.08)',
+                      }
+                    }}
+                  >
+                    Connexion
+                  </Button>
+                </Link>
+              </Box>
+
+              {/* Mobile Menu Icon */}
+              <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                <IconButton onClick={handleMobileMenuToggle} edge="end">
+                  <MenuIcon />
+                </IconButton>
+              </Box>
+            </Box>
           </Toolbar>
         </Container>
       </AppBar>

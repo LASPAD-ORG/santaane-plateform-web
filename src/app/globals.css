@@ -41,6 +41,39 @@ a {
   }
 }
 
+/* === Google Translate : masquer tout le chrome === */
+
+/* Empêcher le décalage du body par Google Translate */
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+/* Cacher la barre/banner Google Translate en haut */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+/* Cacher la toolbar fixe qui apparait quand une traduction est active */
+.skiptranslate {
+  display: none !important;
+}
+
+/* Garder visible uniquement notre conteneur caché (le select interne) */
+#google_translate_element .skiptranslate {
+  display: block !important;
+}
+
+/* Retirer l'iframe de la barre Google */
+iframe.goog-te-banner-frame,
+iframe[name="google_translate_banner"] {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  border: none !important;
+}
+
 /* Styles pour les masques de rédaction uniquement */
 /* Utilise data-redaction="true" pour cibler uniquement les masques */
 div[data-redaction="true"] .AreaHighlight__part,
