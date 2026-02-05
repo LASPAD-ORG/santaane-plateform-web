@@ -41,7 +41,11 @@ import {
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { publicApiService, PublicManuscriptSummary, PublicStats, ActiveTheme } from '@/services/publicApiService';
-import GoogleTranslate from '@/components/ui/GoogleTranslate';
+import dynamic from 'next/dynamic';
+
+const GoogleTranslate = dynamic(() => import('@/components/ui/GoogleTranslate'), {
+  ssr: false,
+});
 
 
 // Composant ThemeCard pour éviter l'erreur d'hydratation avec Date.now()

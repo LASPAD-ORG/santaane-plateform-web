@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 
 declare global {
   interface Window {
@@ -27,16 +27,9 @@ const LANGUAGES = [
 ];
 
 export default function GoogleTranslate() {
-  const [mounted, setMounted] = useState(false);
   const [currentLang, setCurrentLang] = useState('fr');
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
     window.googleTranslateElementInit = () => {
       if (window.google?.translate) {
         new window.google.translate.TranslateElement(
@@ -65,10 +58,9 @@ export default function GoogleTranslate() {
     if (match) {
       setCurrentLang(match[1]);
     }
-  }, [mounted]);
+  }, []);
 
   const switchLanguage = useCallback((langCode: string) => {
-    // Update the hidden Google Translate select
     const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
     if (select) {
       select.value = langCode;
@@ -76,8 +68,6 @@ export default function GoogleTranslate() {
       setCurrentLang(langCode);
     }
   }, []);
-
-  if (!mounted) return null;
 
   return (
     <>
