@@ -173,7 +173,7 @@ export default function NotFound() {
                     '&:hover': { color: '#ff9d00', bgcolor: 'rgba(255, 157, 0, 0.08)' },
                   }}
                 >
-                  Thèmes ouverts
+                  Appels ouverts
                 </Button>
               </Link>
               <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>

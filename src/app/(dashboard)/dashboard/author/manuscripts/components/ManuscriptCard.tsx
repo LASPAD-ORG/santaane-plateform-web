@@ -90,7 +90,7 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
           {manuscript.themeName && (
             <Box display="flex" alignItems="center" gap={1}>
               <Typography variant="caption" color="text.secondary" fontWeight="600">
-                Thème:
+                Appel:
               </Typography>
               <Typography variant="caption">{manuscript.themeName}</Typography>
             </Box>
@@ -135,8 +135,8 @@ export default function ManuscriptCard({ manuscript, onView, onEdit }: Manuscrip
               </IconButton>
             </Tooltip>
           )}
-          {onEdit && manuscript.status === 'revision_requested' && (
-            <Tooltip title="Réviser">
+          {onEdit && (manuscript.status === 'revision_requested' || manuscript.status === 'submitted' || manuscript.status === 're_submitted') && (
+            <Tooltip title="Modifier">
               <IconButton size="small" color="warning" onClick={() => onEdit(manuscript)}>
                 <Edit fontSize="small" />
               </IconButton>

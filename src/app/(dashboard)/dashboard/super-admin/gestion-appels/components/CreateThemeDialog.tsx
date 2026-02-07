@@ -59,11 +59,11 @@ export default function CreateThemeDialog({ open, onClose, onSuccess }: CreateTh
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <form onSubmit={handleSubmit}>
-          <DialogTitle>Créer un nouveau thème</DialogTitle>
+          <DialogTitle>Créer un nouvel appel</DialogTitle>
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
               <TextField
-                label="Titre du thème"
+                label="Titre de l'appel"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required

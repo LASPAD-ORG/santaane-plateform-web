@@ -125,14 +125,62 @@ export function useManuscriptRevision(manuscriptId: string) {
 
       await axios.put(`/api/manuscripts/${manuscriptId}/revise`, payload);
 
-      showSuccess('Manuscrit révisé avec succès', 'Il sera re-soumis pour révision.');
+      showSuccess('Manuscrit modifié avec succès', 'Les modifications ont été enregistrées.');
       router.push('/dashboard/author/manuscripts');
     } catch (error) {
-      console.error('Erreur lors de la révision:', error);
+      console.error('Erreur lors de la modification:', error);
       if (axios.isAxiosError(error) && error.response) {
-        showError(error.response.data.detail || 'Erreur lors de la révision');
+        showError(error.response.data.detail || 'Erreur lors de la modification');
       } else {
-        showError('Erreur lors de la révision du manuscrit');
+        showError('Erreur lors de la modification du manuscrit');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSubmitForSubmitted = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation
+    if (!formData.title.trim()) {
+      showError('Le titre est requis');
+      return;
+    }
+
+    if (!formData.abstract.trim() || formData.abstract.length < 10) {
+      showError('Le résumé doit contenir au moins 10 caractères');
+      return;
+    }
+
+    if (!formData.keywords.trim()) {
+      showError('Les mots-clés sont requis');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        title: formData.title,
+        abstract: formData.abstract,
+        keywords: formData.keywords,
+      };
+
+      // Only include pdfFilename if a new file was uploaded
+      if (formData.pdfFile && formData.pdfFilePath) {
+        (payload as any).pdfFilename = formData.pdfFilePath;
+      }
+
+      await axios.put(`/api/manuscripts/${manuscriptId}/detail`, payload);
+
+      showSuccess('Manuscrit modifié avec succès', 'Les modifications ont été enregistrées.');
+      router.push('/dashboard/author/manuscripts');
+    } catch (error) {
+      console.error('Erreur lors de la modification:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        showError(error.response.data.detail || 'Erreur lors de la modification');
+      } else {
+        showError('Erreur lors de la modification du manuscrit');
       }
     } finally {
       setSubmitting(false);
@@ -143,7 +191,7 @@ export function useManuscriptRevision(manuscriptId: string) {
     formData,
     handleFieldChange,
     handlePdfChange,
-    handleSubmit,
+    handleSubmit: manuscript?.status === 'submitted' || manuscript?.status === 're_submitted' ? handleSubmitForSubmitted : handleSubmit,
     uploading,
     submitting,
   };

@@ -29,7 +29,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   const menuItems = [
     { label: 'Accueil', path: '/' },
     { label: 'Publications', path: '/manuscripts' },
-    { label: 'Thèmes Ouverts', path: '/themes' },
+    { label: 'Appels Ouverts', path: '/themes' },
     { label: 'Guide de soumission', path: '/guide-soumission' },
     { label: 'À propos', path: '/about' },
     { label: 'Contact', path: '/contact' },
@@ -80,7 +80,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </Link>
               <Link href="/themes" style={{ textDecoration: 'none' }}>
                 <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Thèmes
+                  Appels
                 </Button>
               </Link>
               <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>

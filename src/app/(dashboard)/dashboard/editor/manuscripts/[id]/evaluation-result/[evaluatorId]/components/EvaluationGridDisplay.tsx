@@ -70,7 +70,7 @@ export function EvaluationGridDisplay({ open, onClose, grid }: EvaluationGridDis
       <DialogTitle sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Typography variant="h6" fontWeight="600">
-            Grille d'Évaluation
+            Grille d'évaluation
           </Typography>
           <IconButton onClick={onClose}>
             <Close />
@@ -136,7 +136,7 @@ export function EvaluationGridDisplay({ open, onClose, grid }: EvaluationGridDis
           {/* Critères d'évaluation simples */}
           <Box>
             <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mb: 3 }}>
-              Critères d'Évaluation
+              Critères d'évaluation
             </Typography>
 
             <Stack spacing={2}>
@@ -213,7 +213,7 @@ export function EvaluationGridDisplay({ open, onClose, grid }: EvaluationGridDis
           {/* Synthèse simple et claire */}
           <Box>
             <Typography variant="h6" fontWeight="600" color="text.primary" sx={{ mb: 3 }}>
-              Synthèse de l'Évaluation
+              Synthèse de l'évaluation
             </Typography>
 
             <Stack spacing={2}>

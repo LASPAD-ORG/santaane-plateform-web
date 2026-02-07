@@ -24,7 +24,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     >
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatCard
-          title="En Attente d'Évaluation"
+          title="En attente d'évaluation"
           value={stats.awaiting_evaluation}
           icon={<PendingActionsIcon />}
           color="#F59E0B"
@@ -32,7 +32,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatCard
-          title="En Cours d'Évaluation"
+          title="En cours d'évaluation"
           value={stats.in_progress}
           icon={<AssessmentIcon />}
           color="#3B82F6"
@@ -40,7 +40,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatCard
-          title="Manuscrits Évalués"
+          title="Manuscrits évalués"
           value={stats.evaluated}
           icon={<CheckCircleIcon />}
           color="#22C55E"

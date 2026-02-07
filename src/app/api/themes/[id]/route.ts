@@ -34,7 +34,7 @@ export async function GET(
         console.error(`GET /api/themes/${id} error:`, error);
         if (axios.isAxiosError(error)) {
             return NextResponse.json(
-                { error: error.response?.data?.detail || 'Erreur lors de la récupération du thème' },
+                { error: error.response?.data?.detail || 'Erreur lors de la récupération de l\'appel' },
                 { status: error.response?.status || 500 }
             );
         }
@@ -63,7 +63,7 @@ export async function PUT(
             console.error('Backend error detail:', JSON.stringify(error.response?.data, null, 2));
             return NextResponse.json(
                 {
-                    error: 'Erreur lors de la modification du thème',
+                    error: 'Erreur lors de la modification de l\'appel',
                     detail: error.response?.data
                 },
                 { status: error.response?.status || 500 }
@@ -91,7 +91,7 @@ export async function DELETE(
         console.error(`DELETE /api/themes/${id} error:`, error);
         if (axios.isAxiosError(error)) {
             return NextResponse.json(
-                { error: error.response?.data?.detail || 'Erreur lors de la suppression du thème' },
+                { error: error.response?.data?.detail || 'Erreur lors de la suppression de l\'appel' },
                 { status: error.response?.status || 500 }
             );
         }

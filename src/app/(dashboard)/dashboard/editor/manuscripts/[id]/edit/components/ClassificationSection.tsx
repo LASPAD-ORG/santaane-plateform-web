@@ -48,14 +48,14 @@ export default function ClassificationSection({
         <Box display="flex" flexDirection="column" gap={2}>
           <TextField
             select
-            label="Thème (optionnel)"
+            label="Appel (optionnel)"
             value={themeId || ''}
             onChange={(e) => onFieldChange('themeId', e.target.value ? Number(e.target.value) : null)}
             fullWidth
             variant="outlined"
           >
             <MenuItem value="">
-              <em>Aucun thème</em>
+              <em>Aucun appel</em>
             </MenuItem>
             {themes.map((theme) => (
               <MenuItem key={theme.id} value={theme.id}>

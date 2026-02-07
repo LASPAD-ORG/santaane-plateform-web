@@ -46,7 +46,7 @@ export default function SuperAdminDashboard() {
   return (
     <Box sx={{ p: 3 }}>
       <PageHeader
-        title="Tableau de Bord Super Admin"
+        title="Tableau de bord super admin"
       />
 
       {/* Statistics Grid */}
@@ -56,7 +56,7 @@ export default function SuperAdminDashboard() {
 
       {/* Bar Charts Section */}
       <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3, mt: 6 }}>
-        Répartition des Soumissions
+        Répartition des soumissions
       </Typography>
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 4 }}>
@@ -65,7 +65,7 @@ export default function SuperAdminDashboard() {
           <DashboardBarChart data={data.status_bar_chart} />
         </Box>
 
-        {/* Theme Distribution */}
+        {/* Appels Distribution */}
         <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 calc(50% - 12px)' } }}>
           <DashboardBarChart data={data.theme_bar_chart} />
         </Box>
@@ -83,7 +83,7 @@ export default function SuperAdminDashboard() {
 
       {/* Time Series - Submissions Section */}
       <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3, mt: 6 }}>
-        Évolution des Soumissions
+        Évolution des soumissions
       </Typography>
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 4 }}>
@@ -100,7 +100,7 @@ export default function SuperAdminDashboard() {
 
       {/* Time Series - Authors Section */}
       <Typography variant="h5" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 3, mt: 6 }}>
-        Évolution des Auteurs
+        Évolution des auteurs
       </Typography>
 
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mb: 4 }}>

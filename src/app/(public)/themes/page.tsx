@@ -193,7 +193,7 @@ export default function ThemesPage() {
             }}
           />
           <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Thèmes Ouverts aux Soumissions
+            Appels Ouverts aux Soumissions
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto' }}>
             Vous avez des travaux de recherche à partager ? Ces thématiques n&apos;attendent que vos contributions !
@@ -223,10 +223,10 @@ export default function ThemesPage() {
           >
             <Schedule sx={{ fontSize: 80, color: 'text.disabled', mb: 3 }} />
             <Typography variant="h5" fontWeight="bold" gutterBottom>
-              Aucun thème disponible
+              Aucun appel disponible
             </Typography>
             <Typography color="text.secondary" sx={{ maxWidth: 500, mx: 'auto' }}>
-              Il n&apos;y a pas de thème ouvert aux soumissions pour le moment.
+              Il n&apos;y a pas d'appel ouvert aux soumissions pour le moment.
               Revenez bientôt pour découvrir les nouvelles opportunités.
             </Typography>
           </Paper>

@@ -235,16 +235,16 @@ function ManuscriptsPageContent() {
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(33.333% - 11px)' } }}>
               <FormControl fullWidth size="small">
-                <InputLabel>Thème</InputLabel>
+                <InputLabel>Appel</InputLabel>
                 <Select
                   value={selectedTheme}
-                  label="Thème"
+                  label="Appel"
                   onChange={(e) => {
                     setSelectedTheme(e.target.value);
                     updateFilters({ themeId: e.target.value });
                   }}
                 >
-                  <MenuItem value="">Tous les thèmes</MenuItem>
+                  <MenuItem value="">Tous les appels</MenuItem>
                   {filters?.themes.map((theme) => (
                     <MenuItem key={theme.id} value={theme.id.toString()}>
                       {theme.name}
