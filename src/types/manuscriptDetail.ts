@@ -1,3 +1,5 @@
+import { Coauthor } from './manuscript';
+
 export interface AuthorInfo {
   email: string;
   fullName: string;
@@ -22,6 +24,7 @@ export interface ManuscriptDetail {
   pdfFilename: string;
   docxFilename?: string | null;
   author: AuthorInfo;
+  coauthors?: Coauthor[];
   createdAt: string;
   updatedAt: string;
 }

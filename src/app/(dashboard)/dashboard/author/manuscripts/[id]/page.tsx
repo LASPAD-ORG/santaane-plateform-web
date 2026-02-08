@@ -14,6 +14,7 @@ import {
   Tooltip,
   Tabs,
   Tab,
+  Avatar,
 } from '@mui/material';
 import {
   ArrowBack,
@@ -24,6 +25,10 @@ import {
   Language,
   Label,
   Visibility,
+  People,
+  Email,
+  Business,
+  Badge,
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useManuscriptDetails } from './hooks/useManuscriptDetails';
@@ -215,15 +220,79 @@ export default function ManuscriptDetailsPage() {
               <Typography variant="h6" fontWeight="600" mb={2}>
                 Document
               </Typography>
-              <Button 
-                variant="contained" 
-                startIcon={<PictureAsPdf />} 
+              <Button
+                variant="contained"
+                startIcon={<PictureAsPdf />}
                 onClick={handleDownloadPdf}
                 sx={{ mt: 1 }}
               >
-                Télécharger le PDF
+                Telecharger le PDF
               </Button>
             </Box>
+
+            {/* Co-auteurs */}
+            {manuscript.coauthors && manuscript.coauthors.length > 0 && (
+              <>
+                <Divider sx={{ my: 3 }} />
+                <Box mb={3}>
+                  <Typography variant="h6" fontWeight="600" mb={2} display="flex" alignItems="center" gap={1}>
+                    <People color="primary" />
+                    Co-auteurs ({manuscript.coauthors.length})
+                  </Typography>
+                  <Box display="flex" flexDirection="column" gap={2}>
+                    {manuscript.coauthors.map((coauthor, index) => (
+                      <Box
+                        key={coauthor.id}
+                        sx={{
+                          p: 2,
+                          bgcolor: 'grey.50',
+                          borderRadius: 2,
+                          border: '1px solid',
+                          borderColor: 'divider'
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" gap={2} mb={1}>
+                          <Avatar sx={{ width: 40, height: 40, bgcolor: 'secondary.main' }}>
+                            {coauthor.firstName.charAt(0).toUpperCase()}
+                          </Avatar>
+                          <Box flex={1}>
+                            <Typography variant="subtitle1" fontWeight="600">
+                              {index + 1}. {coauthor.firstName} {coauthor.lastName}
+                            </Typography>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
+                              <Typography variant="body2" color="text.secondary">
+                                {coauthor.email}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Box>
+                        {(coauthor.institution || coauthor.orcidId) && (
+                          <Box display="flex" flexWrap="wrap" gap={2} mt={1} pl={7}>
+                            {coauthor.institution && (
+                              <Box display="flex" alignItems="center" gap={0.5}>
+                                <Business sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                <Typography variant="body2" color="text.secondary">
+                                  {coauthor.institution}
+                                </Typography>
+                              </Box>
+                            )}
+                            {coauthor.orcidId && (
+                              <Box display="flex" alignItems="center" gap={0.5}>
+                                <Badge sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                <Typography variant="body2" color="text.secondary">
+                                  ORCID: {coauthor.orcidId}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              </>
+            )}
 
             <Divider sx={{ my: 3 }} />
 

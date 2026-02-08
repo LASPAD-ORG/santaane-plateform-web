@@ -1,4 +1,4 @@
-export type ManuscriptStatus = 
+export type ManuscriptStatus =
   | 'submitted'
   | 're_submitted'
   | 'accepted'
@@ -7,6 +7,24 @@ export type ManuscriptStatus =
   | 'published';
 
 export type EvaluatorStatus = 'pending' | 'accepted' | 'rejected' | 'completed';
+
+export interface Coauthor {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  institution?: string | null;
+  orcidId?: string | null;
+  order: number;
+}
+
+export interface CoauthorInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  institution?: string;
+  orcidId?: string;
+}
 
 export interface Evaluator {
   evaluatorId: number;
@@ -58,10 +76,10 @@ export interface Manuscript {
   evaluators?: Evaluator[];
   evaluationStatus?: EvaluationStatus;
   isAnonymized?: boolean;
+  coauthors?: Coauthor[];
   createdAt: string;
   updatedAt: string;
-  // Ajout de la relation pour le versionnage éditorial
-  editorialVersions?: EditorialVersion[]; 
+  editorialVersions?: EditorialVersion[];
 }
 
 export interface ManuscriptsResponse {

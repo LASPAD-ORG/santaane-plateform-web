@@ -31,8 +31,10 @@ import { useAlertStore } from '@/stores/alertStore';
 import GeneralInfoSection from './components/GeneralInfoSection';
 import ClassificationSection from './components/ClassificationSection';
 import PdfUploadSection from './components/PdfUploadSection';
+import CoauthorsSection from './components/CoauthorsSection';
 import { useManuscriptData } from './hooks/useManuscriptData';
 import { useManuscriptSubmission } from './hooks/useManuscriptSubmission';
+import { CoauthorInput } from '@/types/manuscript';
 
 interface ManuscriptData {
   title: string;
@@ -42,6 +44,7 @@ interface ManuscriptData {
   sectionId: number | '';
   languageId: number | '';
   pdfFile: File | null;
+  coauthors: CoauthorInput[];
 }
 
 export default function AuthorSoumission() {
@@ -70,6 +73,7 @@ export default function AuthorSoumission() {
     sectionId: '',
     languageId: '',
     pdfFile: null,
+    coauthors: [],
   });
 
   // Définition des étapes
@@ -85,6 +89,10 @@ export default function AuthorSoumission() {
     {
       label: 'Informations générales',
       description: 'Titre, résumé et mots-clés de votre manuscrit'
+    },
+    {
+      label: 'Co-auteurs',
+      description: 'Ajoutez les co-auteurs de votre manuscrit (optionnel)'
     },
     {
       label: 'Document PDF',
@@ -123,7 +131,7 @@ export default function AuthorSoumission() {
           return false;
         }
         return true;
-      
+
       case 1: // Classification
         if (!formData.sectionId) {
           showError('Veuillez sélectionner une rubrique');
@@ -134,7 +142,7 @@ export default function AuthorSoumission() {
           return false;
         }
         return true;
-      
+
       case 2: // Informations générales
         if (formData.title.length < 3 || formData.title.length > 500) {
           showError('Le titre doit contenir entre 3 et 500 caractères');
@@ -145,14 +153,27 @@ export default function AuthorSoumission() {
           return false;
         }
         return true;
-      
-      case 3: // Document PDF
+
+      case 3: // Co-auteurs (optionnel mais validation des données si présentes)
+        for (const coauthor of formData.coauthors) {
+          if (!coauthor.firstName.trim() || !coauthor.lastName.trim() || !coauthor.email.trim()) {
+            showError('Veuillez remplir tous les champs obligatoires pour chaque co-auteur (prénom, nom, email)');
+            return false;
+          }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coauthor.email)) {
+            showError(`L'email "${coauthor.email}" n'est pas valide`);
+            return false;
+          }
+        }
+        return true;
+
+      case 4: // Document PDF
         if (!formData.pdfFile) {
           showError('Veuillez sélectionner un fichier PDF');
           return false;
         }
         return true;
-      
+
       default:
         return true;
     }
@@ -195,9 +216,13 @@ export default function AuthorSoumission() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateStep(3)) { // Validation finale (dernière étape)
+    if (validateStep(4)) { // Validation finale (dernière étape)
       await submitManuscript(formData);
     }
+  };
+
+  const handleCoauthorsChange = (coauthors: CoauthorInput[]) => {
+    setFormData((prev) => ({ ...prev, coauthors }));
   };
 
   if (loading) {
@@ -339,6 +364,12 @@ export default function AuthorSoumission() {
                       <GeneralInfoSection formData={formData} onChange={handleChange} />
                     )}
                     {index === 3 && (
+                      <CoauthorsSection
+                        coauthors={formData.coauthors}
+                        onChange={handleCoauthorsChange}
+                      />
+                    )}
+                    {index === 4 && (
                       <PdfUploadSection
                         pdfFile={formData.pdfFile}
                         onFileChange={handleFileChange}
