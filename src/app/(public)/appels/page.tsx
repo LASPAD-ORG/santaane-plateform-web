@@ -21,8 +21,8 @@ import {
 import Link from 'next/link';
 import { publicApiService, ActiveTheme } from '@/services/publicApiService';
 
-// Composant ThemeCard identique à celui de la page d'accueil
-function ThemeCard({ theme }: { theme: ActiveTheme }) {
+// Composant AppelCard identique à celui de la page d'accueil
+function AppelCard({ theme }: { theme: ActiveTheme }) {
   const [mounted, setMounted] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [formattedDate, setFormattedDate] = useState<string>('');
@@ -200,7 +200,7 @@ export default function ThemesPage() {
           </Typography>
         </Box>
 
-        {/* Themes Grid */}
+        {/* Appels Grid */}
         {loading ? (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -234,7 +234,7 @@ export default function ThemesPage() {
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {themes.map((theme) => (
               <Box key={theme.id} sx={{ flex: { xs: '1 1 100%', lg: '0 0 calc(25% - 18px)' } }}>
-                <ThemeCard theme={theme} />
+                <AppelCard theme={theme} />
               </Box>
             ))}
           </Box>
