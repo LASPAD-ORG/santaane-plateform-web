@@ -124,7 +124,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
           if (!userData.email) throw new Error('Email requis');
           if (!userData.prenom) throw new Error('Prénom requis');
           if (!userData.nom) throw new Error('Nom requis');
-          if (userData.roleIds.length === 0) throw new Error('Au moins un rôle requis');
+          if (!userData.roleIds || userData.roleIds.length === 0) throw new Error('Au moins un rôle requis');
 
           users.push(userData);
         } catch (error) {
@@ -319,7 +319,7 @@ export function UserImportModal({ open, onClose, onImportUsers }: UserImportModa
                     </ListItemIcon>
                     <ListItemText
                       primary={`${user.prenom} ${user.nom}`}
-                      secondary={`${user.email} - Rôles: ${user.roleIds.join(', ')}`}
+                      secondary={`${user.email} - Rôles: ${user.roleIds?.join(', ')}`}
                     />
                   </ListItem>
                 ))}
