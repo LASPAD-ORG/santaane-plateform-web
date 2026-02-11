@@ -241,7 +241,7 @@ export default function AuthorSoumission() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom fontWeight="bold">
-        Soumettre un Manuscrit
+                    Soumettre un manuscrit
       </Typography>
       <Typography variant="body2" color="text.secondary" mb={4}>
         Suivez les étapes ci-dessous pour soumettre votre manuscrit

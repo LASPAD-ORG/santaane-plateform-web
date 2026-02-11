@@ -46,7 +46,7 @@ export default function ManuscriptsPage() {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
           <Typography variant="h4" fontWeight="bold">
-            Mes Manuscrits
+            Mes manuscrits
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {total} manuscrit{total > 1 ? 's' : ''} au total
