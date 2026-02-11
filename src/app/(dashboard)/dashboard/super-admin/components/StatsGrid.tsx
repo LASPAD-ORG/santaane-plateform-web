@@ -32,7 +32,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     >
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatCard
-          title="Total Manuscripts"
+          title="Total manuscrits"
           value={stats.total_manuscripts}
           icon={<DescriptionIcon />}
           color="#3B82F6"
@@ -40,7 +40,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatCard
-          title="En Évaluation"
+          title="En évaluation"
           value={stats.in_evaluation}
           icon={<AssessmentIcon />}
           color="#F59E0B"
@@ -56,7 +56,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatCard
-          title="En Attente d'Évaluateur"
+          title="En attente d'évaluateur"
           value={stats.awaiting_evaluators}
           icon={<PendingActionsIcon />}
           color="#F97316"
@@ -115,7 +115,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatCard
-          title="Taux d'Évaluation"
+          title="Taux d'évaluation"
           value={`${stats.evaluation_rate}%`}
           icon={<TrendingUpIcon />}
           color="#8B5CF6"

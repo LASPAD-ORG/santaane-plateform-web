@@ -25,7 +25,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     >
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(25% - 18px)' } }}>
         <StatCard
-          title="Manuscrits Soumis"
+          title="Manuscrits soumis"
           value={stats.total_submitted}
           icon={<SendIcon />}
           color="#3B82F6"
@@ -33,7 +33,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(25% - 18px)' } }}>
         <StatCard
-          title="Manuscrits Acceptés"
+          title="Manuscrits acceptés"
           value={stats.total_accepted}
           icon={<CheckCircleIcon />}
           color="#22C55E"
@@ -41,7 +41,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(25% - 18px)' } }}>
         <StatCard
-          title="Manuscrits Rejetés"
+          title="Manuscrits rejetés"
           value={stats.total_rejected}
           icon={<CancelIcon />}
           color="#EF4444"
@@ -49,7 +49,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(25% - 18px)' } }}>
         <StatCard
-          title="Manuscrits Publiés"
+          title="Manuscrits publiés"
           value={stats.total_published}
           icon={<PublishIcon />}
           color="#6366F1"

@@ -1,4 +1,4 @@
-// Utilitaires pour la gestion des dates des thèmes
+// Utilitaires pour la gestion des dates des appels
 
 export const calculateDaysRemaining = (dateLimite: string | null): number | null => {
   if (!dateLimite) return null;
@@ -11,13 +11,13 @@ export const calculateDaysRemaining = (dateLimite: string | null): number | null
   return diffDays;
 };
 
-export const isThemeExpired = (dateLimite: string | null): boolean => {
+export const isAppelExpired = (dateLimite: string | null): boolean => {
   if (!dateLimite) return false;
   const daysRemaining = calculateDaysRemaining(dateLimite);
   return daysRemaining !== null && daysRemaining <= 0;
 };
 
-export const getThemeStatusText = (dateLimite: string | null): { text: string; color: string } => {
+export const getAppelStatusText = (dateLimite: string | null): { text: string; color: string } => {
   if (!dateLimite) {
     return { text: 'Pas de limite', color: 'text.secondary' };
   }

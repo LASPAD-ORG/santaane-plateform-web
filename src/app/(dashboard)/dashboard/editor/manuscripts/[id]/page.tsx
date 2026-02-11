@@ -170,7 +170,7 @@ export default function EditorManuscriptDetailsPage() {
                     <Category sx={{ color: 'text.secondary' }} />
                     <Box>
                       <Typography variant="caption" color="text.secondary" display="block">
-                        Thème
+                        Appel
                       </Typography>
                       <Typography variant="body1">{manuscript.themeName}</Typography>
                     </Box>

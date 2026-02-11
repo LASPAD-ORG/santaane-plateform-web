@@ -77,14 +77,14 @@ export default function AuthorDashboard() {
       <Box>
         <PageHeader
           title={`Bienvenue, ${user?.fullName}`}
-          subtitle="Tableau de bord Auteur"
+          subtitle="Tableau de bord auteur"
         />
 
         {/* Quick Actions Section */}
         <Paper elevation={0} sx={{ p: 3, mb: 4, bgcolor: 'background.paper', borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
           <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
             <DashboardIcon sx={{ mr: 1 }} />
-            Actions Rapides
+            Actions rapides
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 8px)' } }}>
@@ -104,7 +104,7 @@ export default function AuthorDashboard() {
                 >
                   <AddIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
                   <Typography variant="h6" fontWeight="bold">
-                    Nouveau Manuscrit
+                    Nouveau manuscrit
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Soumettre un article
@@ -129,7 +129,7 @@ export default function AuthorDashboard() {
                 >
                   <ManuscriptIcon sx={{ fontSize: 40, color: 'success.main', mb: 1 }} />
                   <Typography variant="h6" fontWeight="bold">
-                    Mes Manuscrits
+                    Mes manuscrits
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Voir tous les manuscrits

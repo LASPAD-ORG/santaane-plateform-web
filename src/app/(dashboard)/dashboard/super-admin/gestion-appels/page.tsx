@@ -31,11 +31,11 @@ import { useThemeActions } from './fetchers/useThemeActions';
 import CreateThemeDialog from './components/CreateThemeDialog';
 import EditThemeDialog from './components/EditThemeDialog';
 import { useAlertStore } from '@/stores/alertStore';
-import { getThemeStatusText, formatDateForDisplay } from './utils/themeUtils';
+import { getAppelStatusText, formatDateForDisplay } from './utils/themeUtils';
 import type { Theme } from './fetchers/useFetchThemes';
 import PageHeader from '@/components/ui/PageHeader';
 
-export default function GestionThemePage() {
+export default function GestionAppelsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'active' | 'expired'>('all');
@@ -65,7 +65,7 @@ export default function GestionThemePage() {
 
   const handleDelete = async (theme: Theme) => {
     const confirmed = await showConfirm(
-      `Êtes-vous sûr de vouloir supprimer le thème "${theme.title}" ?`,
+      `Êtes-vous sûr de vouloir supprimer l'appel "${theme.title}" ?`,
       'Cette action est irréversible.'
     );
 
@@ -100,9 +100,9 @@ export default function GestionThemePage() {
   return (
     <Box>
       <PageHeader
-        title="Gestion des Thèmes"
+        title="Gestion des Appels"
         action={{
-          label: 'Nouveau thème',
+          label: 'Nouvel appel',
           icon: <Add />,
           onClick: () => setOpenCreateDialog(true),
         }}
@@ -139,9 +139,9 @@ export default function GestionThemePage() {
                   onChange={(e) => handleFilterChange(e.target.value as 'all' | 'active' | 'expired')}
                   startAdornment={<FilterList sx={{ mr: 1 }} />}
                 >
-                  <MenuItem value="all">Tous les thèmes</MenuItem>
-                  <MenuItem value="active">Thèmes actifs</MenuItem>
-                  <MenuItem value="expired">Thèmes expirés</MenuItem>
+                  <MenuItem value="all">Tous les appels</MenuItem>
+                  <MenuItem value="active">Appels actifs</MenuItem>
+                  <MenuItem value="expired">Appels expirés</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -163,13 +163,13 @@ export default function GestionThemePage() {
                   <TableRow>
                     <TableCell colSpan={5} align="center">
                       <Typography variant="body2" color="text.secondary">
-                        Aucun thème trouvé
+                        Aucun appel trouvé
                       </Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedThemes.map((theme) => {
-                    const statusInfo = getThemeStatusText(theme.date_limite);
+                    const statusInfo = getAppelStatusText(theme.date_limite);
                     return (
                     <TableRow key={theme.id} hover>
                       <TableCell>

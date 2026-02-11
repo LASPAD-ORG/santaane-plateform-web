@@ -95,7 +95,7 @@ export default function EditorManuscriptsPage() {
               <MenuItem value="rejected">Évaluateur refusé</MenuItem>
             </TextField>
 
-            {/* Filtre Statut d'Évaluation */}
+            {/* Filtre Statut d'évaluation */}
             <TextField
               select
               label="Statut d'évaluation"
@@ -124,10 +124,10 @@ export default function EditorManuscriptsPage() {
               ))}
             </TextField>
 
-            {/* Filtre Thème */}
+            {/* Filtre Appel */}
             <TextField
               select
-              label="Thème"
+              label="Appel"
               value={filters.themeId || ''}
               onChange={(e) => handleFilterChange('themeId', e.target.value ? Number(e.target.value) : null)}
               sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)' } }}

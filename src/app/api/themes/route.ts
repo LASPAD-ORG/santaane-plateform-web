@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(
         {
-          error: error.response?.data?.detail || 'Erreur lors de la récupération des thèmes'
+          error: error.response?.data?.detail || 'Erreur lors de la récupération des appels'
         },
         { status: error.response?.status || 500 }
       );
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     if (axios.isAxiosError(error)) {
       return NextResponse.json(
         {
-          error: error.response?.data?.detail || 'Erreur lors de la création du thème'
+          error: error.response?.data?.detail || 'Erreur lors de la création de l\'appel'
         },
         { status: error.response?.status || 500 }
       );

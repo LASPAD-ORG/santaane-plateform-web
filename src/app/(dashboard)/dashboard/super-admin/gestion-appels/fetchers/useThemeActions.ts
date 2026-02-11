@@ -25,10 +25,10 @@ export const useThemeActions = () => {
     setLoading(true);
     try {
       const response = await apiClient.post<Theme>('/themes/', data);
-      showSuccess('Thème créé avec succès');
+      showSuccess('Appel créé avec succès');
       return response.data;
     } catch (error: any) {
-      showError(error.response?.data?.detail || 'Erreur lors de la création du thème');
+      showError(error.response?.data?.detail || 'Erreur lors de la création de l\'appel');
       throw error;
     } finally {
       setLoading(false);
@@ -39,10 +39,10 @@ export const useThemeActions = () => {
     setLoading(true);
     try {
       const response = await apiClient.put<Theme>(`/themes/${id}`, data);
-      showSuccess('Thème mis à jour avec succès');
+      showSuccess('Appel mis à jour avec succès');
       return response.data;
     } catch (error: any) {
-      showError(error.response?.data?.detail || 'Erreur lors de la mise à jour du thème');
+      showError(error.response?.data?.detail || 'Erreur lors de la mise à jour de l\'appel');
       throw error;
     } finally {
       setLoading(false);
@@ -53,9 +53,9 @@ export const useThemeActions = () => {
     setLoading(true);
     try {
       await apiClient.delete(`/themes/${id}`);
-      showSuccess('Thème supprimé avec succès');
+      showSuccess('Appel supprimé avec succès');
     } catch (error: any) {
-      showError(error.response?.data?.detail || 'Erreur lors de la suppression du thème');
+      showError(error.response?.data?.detail || 'Erreur lors de la suppression de l\'appel');
       throw error;
     } finally {
       setLoading(false);

@@ -97,7 +97,7 @@ export function ManuscriptDetailsDialog({
             </Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Chip
-                label={`Thème: ${manuscript.themeName}`}
+                label={`Appel: ${manuscript.themeName}`}
                 color="primary"
                 variant="outlined"
                 size="small"

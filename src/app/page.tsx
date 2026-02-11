@@ -48,8 +48,8 @@ const GoogleTranslate = dynamic(() => import('@/components/ui/GoogleTranslate'),
 });
 
 
-// Composant ThemeCard pour éviter l'erreur d'hydratation avec Date.now()
-function ThemeCard({ theme }: { theme: ActiveTheme }) {
+// Composant AppelCard pour éviter l'erreur d'hydratation avec Date.now()
+function AppelCard({ theme }: { theme: ActiveTheme }) {
   const [mounted, setMounted] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [formattedDate, setFormattedDate] = useState<string>('');
@@ -193,6 +193,11 @@ export default function HomePage() {
   const [activeThemes, setActiveThemes] = useState<ActiveTheme[]>([]);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -242,7 +247,7 @@ export default function HomePage() {
   const menuItems = [
     { label: 'Accueil', path: '/' },
     { label: 'Publications', path: '/manuscripts' },
-    { label: 'Thèmes Ouverts', path: '/themes' },
+    { label: 'Appels Ouverts', path: '/appels' },
     { label: 'Guide de soumission', path: '/guide-soumission' },
     { label: 'À propos', path: '/about' },
     { label: 'Contact', path: '/contact' },
@@ -297,9 +302,9 @@ export default function HomePage() {
                     Publications
                   </Button>
                 </Link>
-                <Link href="/themes" style={{ textDecoration: 'none' }}>
+                <Link href="/appels" style={{ textDecoration: 'none' }}>
                   <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                    Thèmes
+                    Appels
                   </Button>
                 </Link>
                 <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>
@@ -562,7 +567,7 @@ export default function HomePage() {
                       sx={{ height: '100%' }}
                     >
                       <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        {/* Theme & Section */}
+                        {/* Appel & Section */}
                         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                           {manuscript.themeName && (
                             <Chip
@@ -657,7 +662,7 @@ export default function HomePage() {
           )}
         </Container>
 
-        {/* Active Themes Section */}
+        {/* Active Appels Section */}
         {activeThemes.length > 0 && (
           <Box sx={{ bgcolor: '#fff7ed', py: 8 }}>
             <Container maxWidth="xl">
@@ -669,7 +674,7 @@ export default function HomePage() {
                   sx={{ mb: 2 }}
                 />
                 <Typography variant="h4" fontWeight="bold" gutterBottom>
-                  Thèmes Ouverts aux Soumissions
+                  Appels Ouverts aux Soumissions
                 </Typography>
                 <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto' }}>
                   Vous avez des travaux de recherche à partager ? Ces thématiques n&apos;attendent que vos contributions !
@@ -679,7 +684,7 @@ export default function HomePage() {
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                 {activeThemes.map((theme) => (
                   <Box key={theme.id} sx={{ flex: { xs: '1 1 100%', lg: '0 0 calc(25% - 18px)' } }}>
-                    <ThemeCard theme={theme} />
+                    <AppelCard theme={theme} />
                   </Box>
                 ))}
               </Box>
@@ -699,7 +704,7 @@ export default function HomePage() {
                       }
                     }}
                   >
-                    Voir tous les thèmes
+                    Voir tous les appels
                   </Button>
                 </Link>
               </Box>
@@ -757,7 +762,7 @@ export default function HomePage() {
         <Container maxWidth="xl">
           <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="center" spacing={2}>
             <Typography variant="body2" color="text.secondary">
-              © {new Date().getFullYear()} Santaane - Plateforme de publication scientifique
+              © {mounted ? new Date().getFullYear() : 2024} Santaane - Plateforme de publication scientifique
             </Typography>
             <Stack direction="row" spacing={3} flexWrap="wrap" justifyContent="center">
               <Link href="/about" style={{ textDecoration: 'none' }}>

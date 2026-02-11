@@ -30,7 +30,7 @@ export default function EvaluatorManuscriptsPage() {
       {/* Header */}
       <Box mb={3}>
         <Typography variant="h4" fontWeight="bold" mb={1}>
-          Mes Assignations
+          Mes assignations
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Manuscrits qui vous ont été assignés pour évaluation

@@ -239,7 +239,7 @@ export default function ContactPage() {
                   </IconButton>
                   <IconButton
                     component="a"
-                    href="https://youtube.com/laspad"
+                    href="https://www.youtube.com/@ugblaspad"
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{

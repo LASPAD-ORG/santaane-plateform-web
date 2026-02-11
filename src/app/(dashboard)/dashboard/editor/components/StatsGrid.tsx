@@ -80,7 +80,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
     >
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatItem
-          label="Total Manuscrits"
+          label="Total manuscrits"
           value={stats.total_manuscripts}
           icon={<Description />}
           color="#3B82F6"
@@ -88,7 +88,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       </Box>
       <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)', md: '1 1 calc(33.333% - 16px)' } }}>
         <StatItem
-          label="En Évaluation"
+          label="En évaluation"
           value={stats.in_evaluation}
           icon={<Assessment />}
           color="#F59E0B"

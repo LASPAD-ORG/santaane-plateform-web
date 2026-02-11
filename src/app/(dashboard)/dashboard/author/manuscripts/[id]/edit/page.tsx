@@ -59,11 +59,11 @@ export default function EditManuscriptPage() {
     );
   }
 
-  if (manuscript.status !== 'revision_requested') {
+  if (manuscript.status !== 'revision_requested' && manuscript.status !== 'submitted' && manuscript.status !== 're_submitted') {
     return (
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="60vh" gap={2}>
         <Alert severity="warning">
-          Ce manuscrit ne peut pas être révisé. Seuls les manuscrits avec le statut "Révision demandée" peuvent être modifiés.
+          Ce manuscrit ne peut pas être modifié. Seuls les manuscrits avec le statut "En attente d'évaluation", "Re-soumis" ou "Révision demandée" peuvent être modifiés.
         </Alert>
         <Button variant="contained" onClick={() => router.back()}>
           Retour
@@ -81,7 +81,7 @@ export default function EditManuscriptPage() {
         </IconButton>
         <Box flex={1}>
           <Typography variant="h4" fontWeight="bold">
-            Réviser le Manuscrit
+            Modifier le Manuscrit
           </Typography>
         </Box>
       </Box>
@@ -90,7 +90,7 @@ export default function EditManuscriptPage() {
         <Typography variant="body2">
           <strong>Éléments modifiables :</strong> titre, résumé, mots-clés et fichier PDF.
           <br />
-          <strong>Éléments non modifiables :</strong> thème, section et langue.
+          <strong>Éléments non modifiables :</strong> appel, section et langue.
         </Typography>
       </Alert>
 
@@ -116,7 +116,7 @@ export default function EditManuscriptPage() {
               {manuscript.themeName && (
                 <Box>
                   <Typography variant="caption" color="text.secondary">
-                    Thème
+                    Appel
                   </Typography>
                   <Typography variant="body1">{manuscript.themeName}</Typography>
                 </Box>

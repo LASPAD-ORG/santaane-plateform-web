@@ -80,7 +80,7 @@ export default function AuthorSoumission() {
     },
     {
       label: 'Classification',
-      description: 'Thème, rubrique et langue de publication'
+      description: 'Appel, rubrique et langue de publication'
     },
     {
       label: 'Informations générales',

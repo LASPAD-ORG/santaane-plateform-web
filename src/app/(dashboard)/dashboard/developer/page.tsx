@@ -8,7 +8,7 @@ export default function DevloperDashboard() {
   return (
     <Box>
       <PageHeader
-        title="Tableau de Bord Developer"
+        title="Tableau de bord developer"
         subtitle="Console de développement"
       />
     </Box>

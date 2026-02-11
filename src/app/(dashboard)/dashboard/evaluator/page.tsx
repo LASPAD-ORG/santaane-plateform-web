@@ -58,7 +58,7 @@ export default function EvaluatorDashboard() {
       <Box>
         <PageHeader
           title={`Bienvenue, ${user?.fullName}`}
-          subtitle="Tableau de bord Évaluateur"
+          subtitle="Tableau de bord évaluateur"
         />
 
         {/* Statistics */}

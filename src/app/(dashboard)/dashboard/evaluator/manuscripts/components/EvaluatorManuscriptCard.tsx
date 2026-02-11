@@ -236,7 +236,7 @@ export default function EvaluatorManuscriptCard({
         <Box display="flex" flexDirection="column" gap={1} mb={2}>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="caption" color="text.secondary">
-              Thème:
+              Appel:
             </Typography>
             <Typography variant="caption" fontWeight="500">
               {manuscript.themeName}

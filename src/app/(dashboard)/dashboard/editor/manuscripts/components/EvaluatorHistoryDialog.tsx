@@ -103,7 +103,7 @@ export default function EvaluatorHistoryDialog({
       case 'completed':
         return (
           <Chip
-            label="Toutes les Évaluations sont Terminées"
+            label="Toutes les évaluations sont terminées"
             color="success"
             size="small"
             icon={<CheckCircleOutline />}
@@ -112,7 +112,7 @@ export default function EvaluatorHistoryDialog({
       case 'in_progress':
         return (
           <Chip
-            label="Évaluations en Cours"
+            label="Évaluations en cours"
             color="primary"
             size="small"
             icon={<HourglassEmpty />}
@@ -121,7 +121,7 @@ export default function EvaluatorHistoryDialog({
       case 'not_started':
         return (
           <Chip
-            label="Aucune Évaluation Commencée"
+            label="Aucune évaluation commencée"
             color="default"
             size="small"
             icon={<PersonAdd />}
@@ -137,7 +137,7 @@ export default function EvaluatorHistoryDialog({
       case 'completed':
         return (
           <Chip
-            label="Évaluation Terminée"
+            label="Évaluation terminée"
             color="success"
             size="small"
             variant="outlined"
@@ -148,7 +148,7 @@ export default function EvaluatorHistoryDialog({
       default:
         return (
           <Chip
-            label="Évaluation En Cours"
+            label="Évaluation en cours"
             color="primary"
             size="small"
             variant="outlined"

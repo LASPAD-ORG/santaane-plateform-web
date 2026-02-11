@@ -105,8 +105,8 @@ export const MENU_ITEMS: MenuItem[] = [
   },
 
   {
-    label: 'Thèmes',
-    path: '/dashboard/super-admin/gestion-theme',
+    label: 'Appels',
+    path: '/dashboard/super-admin/gestion-appels',
     icon: SettingsIcon,
     roles: [UserRole.SUPER_ADMIN],
   },

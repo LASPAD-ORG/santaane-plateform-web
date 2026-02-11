@@ -54,7 +54,7 @@ export default function ClassificationSection({
       // Si Varia sélectionné, vider le themeId
       onChange('themeId')({ target: { value: '' } } as any);
     } else {
-      // Si thème sélectionné, s'assurer qu'on a une valeur vide pour forcer la sélection
+      // Si appel sélectionné, s'assurer qu'on a une valeur vide pour forcer la sélection
       if (formData.themeId === '') {
         onChange('themeId')({ target: { value: '' } } as any);
       }
@@ -68,7 +68,7 @@ export default function ClassificationSection({
       </Typography>
 
       <Box display="flex" flexDirection="column" gap={3}>
-        {/* Choix Varia ou Thème */}
+        {/* Choix Varia ou Appel */}
         <FormControl component="fieldset">
           <FormLabel component="legend" sx={{ mb: 1, fontWeight: 500 }}>
             Publication
@@ -86,29 +86,29 @@ export default function ClassificationSection({
             <FormControlLabel 
               value="theme" 
               control={<Radio />} 
-              label="Thème spécifique" 
+              label="Appel spécifique" 
             />
           </RadioGroup>
         </FormControl>
 
         <Box display="flex" gap={2} flexWrap="wrap">
-          {/* Select des thèmes - affiché seulement si "Thème spécifique" est sélectionné */}
+          {/* Select des appels - affiché seulement si "Appel spécifique" est sélectionné */}
           {publicationType === 'theme' && (
             <Box flex={1} minWidth={{ xs: '100%', md: 'calc(50% - 8px)' }}>
               <TextField
                 select
                 fullWidth
                 required
-                label="Choisir un thème"
+                label="Choisir un appel"
                 value={formData.themeId}
                 onChange={onChange('themeId')}
-                helperText="Seuls les thèmes avec des dates limites non expirées sont affichés"
+                helperText="Seuls les appels avec des dates limites non expirées sont affichés"
                 InputProps={{
                   startAdornment: <Category sx={{ mr: 1, color: 'text.secondary' }} />,
                 }}
               >
                 <MenuItem value="">
-                  <em>Sélectionnez un thème</em>
+                  <em>Sélectionnez un appel</em>
                 </MenuItem>
                 {themes.map((theme) => {
                   const formatDateLimit = (dateLimit: string | null) => {

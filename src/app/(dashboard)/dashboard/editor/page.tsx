@@ -58,7 +58,7 @@ export default function EditorDashboard() {
       <Box>
         <PageHeader
           title={`Bienvenue, ${user?.fullName}`}
-          subtitle="Tableau de bord Éditeur"
+          subtitle="Tableau de bord éditeur"
         />
 
         {/* Stats */}
