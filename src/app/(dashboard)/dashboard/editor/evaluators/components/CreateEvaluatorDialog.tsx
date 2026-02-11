@@ -71,7 +71,7 @@ export default function CreateEvaluatorDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Créer un Évaluateur</DialogTitle>
+        <DialogTitle>Créer un évaluateur</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} pt={1}>
             <TextField

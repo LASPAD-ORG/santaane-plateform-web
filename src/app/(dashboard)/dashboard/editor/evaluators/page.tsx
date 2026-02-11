@@ -66,7 +66,7 @@ export default function EvaluatorsPage() {
                        title={`Gestion des évaluateurs`}
                        subtitle={`${total} évaluateur${total > 1 ? 's' : ''} au total`}
                       action={{
-                                       label: 'Ajouter un Évaluateur',
+                                       label: 'Ajouter un évaluateur',
                                        icon: <Add />,
                                        onClick: () => handleOpenDialog(),
                                      }}
