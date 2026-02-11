@@ -61,11 +61,27 @@ export default function GoogleTranslate() {
   }, []);
 
   const switchLanguage = useCallback((langCode: string) => {
-    const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
-    if (select) {
-      select.value = langCode;
-      select.dispatchEvent(new Event('change'));
-      setCurrentLang(langCode);
+    setCurrentLang(langCode);
+
+    const doSwitch = () => {
+      const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
+      if (select) {
+        select.value = langCode;
+        select.dispatchEvent(new Event('change'));
+        return true;
+      }
+      return false;
+    };
+
+    if (!doSwitch()) {
+      // Google Translate pas encore chargé, on réessaie toutes les 200ms pendant 3s
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (doSwitch() || attempts >= 15) {
+          clearInterval(interval);
+        }
+      }, 200);
     }
   }, []);
 

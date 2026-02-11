@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useAlertStore } from '@/stores/alertStore';
+import { CoauthorInput } from '@/types/manuscript';
 
 interface ManuscriptData {
   title: string;
@@ -11,6 +12,7 @@ interface ManuscriptData {
   sectionId: number | '';
   languageId: number | '';
   pdfFile: File | null;
+  coauthors: CoauthorInput[];
 }
 
 export function useManuscriptSubmission() {
@@ -78,6 +80,7 @@ export function useManuscriptSubmission() {
         sectionId: Number(formData.sectionId),
         languageId: Number(formData.languageId),
         pdfFilename: pdfFilePath,
+        coauthors: formData.coauthors.length > 0 ? formData.coauthors : undefined,
       };
 
       await axios.post('/api/manuscripts/submit', submitData);

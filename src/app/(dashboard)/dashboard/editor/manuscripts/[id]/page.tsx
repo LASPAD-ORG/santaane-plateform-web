@@ -28,6 +28,9 @@ import {
   Info,
   Description,
   Refresh,
+  People,
+  Person,
+  Badge,
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useManuscriptStaffDetails } from './hooks/useManuscriptStaffDetails';
@@ -404,10 +407,10 @@ export default function EditorManuscriptDetailsPage() {
                 <Typography variant="h6" fontWeight="600" mb={2}>
                   Biographie
                 </Typography>
-                <Box 
-                  sx={{ 
-                    p: 3, 
-                    bgcolor: 'grey.50', 
+                <Box
+                  sx={{
+                    p: 3,
+                    bgcolor: 'grey.50',
                     borderRadius: 2,
                     border: '1px solid',
                     borderColor: 'divider'
@@ -420,14 +423,76 @@ export default function EditorManuscriptDetailsPage() {
               </>
             )}
 
-            {/* Message si aucune info supplémentaire */}
-            {!manuscript.author.bio && !manuscript.author.orcidId && !manuscript.author.institution && !manuscript.author.position && (
+            {/* Co-auteurs */}
+            {manuscript.coauthors && manuscript.coauthors.length > 0 && (
               <>
                 <Divider sx={{ my: 3 }} />
-                <Box 
-                  sx={{ 
-                    p: 3, 
-                    bgcolor: 'grey.50', 
+                <Typography variant="h6" fontWeight="600" mb={2} display="flex" alignItems="center" gap={1}>
+                  <People color="primary" />
+                  Co-auteurs ({manuscript.coauthors.length})
+                </Typography>
+                <Box display="flex" flexDirection="column" gap={2}>
+                  {manuscript.coauthors.map((coauthor, index) => (
+                    <Box
+                      key={coauthor.id}
+                      sx={{
+                        p: 2,
+                        bgcolor: 'grey.50',
+                        borderRadius: 2,
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}
+                    >
+                      <Box display="flex" alignItems="center" gap={2} mb={1}>
+                        <Avatar sx={{ width: 40, height: 40, bgcolor: 'secondary.main' }}>
+                          {coauthor.firstName.charAt(0).toUpperCase()}
+                        </Avatar>
+                        <Box flex={1}>
+                          <Typography variant="subtitle1" fontWeight="600">
+                            {index + 1}. {coauthor.firstName} {coauthor.lastName}
+                          </Typography>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Email sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="body2" color="text.secondary">
+                              {coauthor.email}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                      {(coauthor.institution || coauthor.orcidId) && (
+                        <Box display="flex" flexWrap="wrap" gap={2} mt={1} pl={7}>
+                          {coauthor.institution && (
+                            <Box display="flex" alignItems="center" gap={0.5}>
+                              <Business sx={{ fontSize: 16, color: 'text.secondary' }} />
+                              <Typography variant="body2" color="text.secondary">
+                                {coauthor.institution}
+                              </Typography>
+                            </Box>
+                          )}
+                          {coauthor.orcidId && (
+                            <Box display="flex" alignItems="center" gap={0.5}>
+                              <Badge sx={{ fontSize: 16, color: 'text.secondary' }} />
+                              <Typography variant="body2" color="text.secondary">
+                                ORCID: {coauthor.orcidId}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              </>
+            )}
+
+            {/* Message si aucune info supplémentaire */}
+            {!manuscript.author.bio && !manuscript.author.orcidId && !manuscript.author.institution && !manuscript.author.position && (!manuscript.coauthors || manuscript.coauthors.length === 0) && (
+              <>
+                <Divider sx={{ my: 3 }} />
+                <Box
+                  sx={{
+                    p: 3,
+                    bgcolor: 'grey.50',
                     borderRadius: 2,
                     textAlign: 'center'
                   }}
