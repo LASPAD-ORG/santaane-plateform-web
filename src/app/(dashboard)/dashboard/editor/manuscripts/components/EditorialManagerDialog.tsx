@@ -126,7 +126,7 @@ export default function EditorialManagerDialog({
     >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <History color="primary" />
-        Suivi Éditorial : {manuscript.title.substring(0, 40)}...
+        Suivi éditorial : {manuscript.title.substring(0, 40)}...
       </DialogTitle>
 
       <DialogContent dividers>

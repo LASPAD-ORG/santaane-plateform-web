@@ -82,7 +82,7 @@ export default function EditManuscriptStaffPage() {
         </IconButton>
         <Box flex={1}>
           <Typography variant="h4" fontWeight="bold">
-            Modifier le Manuscrit
+            Modifier le manuscrit
           </Typography>
         </Box>
       </Box>

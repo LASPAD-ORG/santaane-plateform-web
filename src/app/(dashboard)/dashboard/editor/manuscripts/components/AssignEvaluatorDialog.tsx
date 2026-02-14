@@ -80,7 +80,7 @@ export default function AssignEvaluatorDialog({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth onClick={(e) => e.stopPropagation()}>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Assigner un Évaluateur</DialogTitle>
+        <DialogTitle>Assigner un évaluateur</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} pt={1}>
             <Alert severity="info">

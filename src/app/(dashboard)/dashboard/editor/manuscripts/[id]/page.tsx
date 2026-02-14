@@ -110,7 +110,7 @@ export default function EditorManuscriptDetailsPage() {
         </IconButton>
         <Box flex={1}>
           <Typography variant="h4" fontWeight="bold">
-            Détails du Manuscrit
+            Détails du manuscrit
           </Typography>
         </Box>
         <Button
