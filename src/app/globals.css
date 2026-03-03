@@ -1,13 +1,28 @@
+/* ─── Design tokens ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f4f0;
+  --foreground: #0a0a0a;
+
+  --color-black: #0a0a0a;
+  --color-white: #ffffff;
+  --color-off-white: #f5f4f0;
+  --color-gray-100: #f0efeb;
+  --color-gray-300: #d4d2cc;
+  --color-gray-500: #8a887f;
+  --color-gray-700: #3d3c38;
+  --color-gold: #b8953a;
+  --color-gold-dim: rgba(184, 149, 58, 0.08);
+
+  --font-sans: "Noto Sans", var(--font-noto-sans), Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base reset ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 html,
@@ -19,15 +34,9 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
@@ -35,13 +44,11 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+::selection {
+  background-color: rgba(184, 149, 58, 0.18);
 }
 
-/* === Google Translate : masquer tout le chrome === */
+/* ─── Google Translate: masquer tout le chrome ─── */
 
 /* Empêcher le décalage du body par Google Translate */
 body {
@@ -74,8 +81,7 @@ iframe[name="google_translate_banner"] {
   border: none !important;
 }
 
-/* Styles pour les masques de rédaction uniquement */
-/* Utilise data-redaction="true" pour cibler uniquement les masques */
+/* ─── Styles pour les masques de rédaction uniquement ─── */
 div[data-redaction="true"] .AreaHighlight__part,
 .redaction-mask-area .AreaHighlight__part {
   background: #000000 !important;

@@ -19,10 +19,8 @@ import {
 } from '@mui/material';
 import {
   ArrowBack,
-  Person,
   CalendarMonth,
   Category,
-  Email,
   Business,
   Work,
   Article,
@@ -30,6 +28,21 @@ import {
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { publicApiService, PublicAuthorDetail } from '@/services/publicApiService';
+
+// ─── Design tokens (identiques à la charte) ───
+const TOKEN = {
+  black: '#0a0a0a',
+  white: '#ffffff',
+  offWhite: '#f5f4f0',
+  gray100: '#f0efeb',
+  gray300: '#d4d2cc',
+  gray500: '#8a887f',
+  gray700: '#3d3c38',
+  gold: '#b8953a',
+  goldDim: 'rgba(184,149,58,0.08)',
+};
+
+const fontSans = '"Noto Sans", sans-serif';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -53,7 +66,6 @@ export default function AuthorProfilePage({ params }: PageProps) {
         setLoading(false);
       }
     };
-
     fetchAuthor();
   }, [id]);
 
@@ -69,248 +81,493 @@ export default function AuthorProfilePage({ params }: PageProps) {
   const truncateText = (text: string | undefined, maxLength: number) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength).trim() + '...';
+    return text.substring(0, maxLength).trim() + '…';
   };
 
+  // ─── Loading ───
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Skeleton variant="rectangular" height={60} sx={{ mb: 4, borderRadius: 2 }} />
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 21px)' } }}>
-            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+      <Box sx={{ bgcolor: TOKEN.offWhite, minHeight: '100vh', py: 5 }}>
+        <Container maxWidth="lg">
+          <Skeleton variant="rectangular" height={40} width={120} sx={{ mb: 5, borderRadius: 1 }} />
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 calc(33.333% - 16px)' } }}>
+              <Skeleton variant="rectangular" height={360} sx={{ borderRadius: 2 }} />
+            </Box>
+            <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 16px)' } }}>
+              <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 2 }} />
+            </Box>
           </Box>
-          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 11px)' } }}>
-            <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
-          </Box>
-        </Box>
-      </Container>
+        </Container>
+      </Box>
     );
   }
 
+  // ─── Error ───
   if (error || !author) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error || 'Auteur non trouvé'}
-        </Alert>
-        <Button startIcon={<ArrowBack />} onClick={() => router.back()}>
-          Retour
-        </Button>
-      </Container>
+      <Box sx={{ bgcolor: TOKEN.offWhite, minHeight: '100vh', py: 5 }}>
+        <Container maxWidth="lg">
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              fontFamily: fontSans,
+              borderRadius: 2,
+              border: `1px solid rgba(0,0,0,0.12)`,
+            }}
+          >
+            {error || 'Auteur non trouvé'}
+          </Alert>
+          <Button
+            startIcon={<ArrowBack sx={{ fontSize: 16 }} />}
+            onClick={() => router.back()}
+            sx={{
+              fontFamily: fontSans,
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              color: TOKEN.black,
+              '&:hover': { bgcolor: TOKEN.gray100 },
+            }}
+          >
+            Retour
+          </Button>
+        </Container>
+      </Box>
     );
   }
 
+  // ─── Page ───
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Back button */}
-      <Button
-        startIcon={<ArrowBack />}
-        onClick={() => router.back()}
-        sx={{ mb: 3 }}
-        color="inherit"
-      >
-        Retour
-      </Button>
+    <Box sx={{ bgcolor: TOKEN.offWhite, minHeight: '100vh' }}>
 
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-        {/* Author Profile Card */}
-        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 21px)' } }}>
-          <Paper
-            elevation={0}
+      {/* ─── TOP BAR ─── */}
+      <Box sx={{ bgcolor: TOKEN.black, py: 2 }}>
+        <Container maxWidth="lg">
+          <Button
+            startIcon={<ArrowBack sx={{ fontSize: 15 }} />}
+            onClick={() => router.back()}
             sx={{
-              p: 4,
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: 2,
-              textAlign: 'center',
-              position: 'sticky',
-              top: 100,
+              fontFamily: fontSans,
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: TOKEN.white,
+              opacity: 0.7,
+              '&:hover': { opacity: 1, bgcolor: 'transparent' },
             }}
           >
-            <Avatar
-              sx={{
-                width: 100,
-                height: 100,
-                mx: 'auto',
-                mb: 2,
-                bgcolor: 'primary.main',
-                fontSize: 40,
-              }}
-            >
-              {author.fullName.charAt(0)}
-            </Avatar>
+            Retour
+          </Button>
+        </Container>
+      </Box>
 
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-              {author.fullName}
-            </Typography>
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'flex-start' }}>
 
-            {author.position && (
-              <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} sx={{ mb: 1 }}>
-                <Work sx={{ fontSize: 18, color: 'text.secondary' }} />
-                <Typography variant="body2" color="text.secondary">
-                  {author.position}
-                </Typography>
-              </Stack>
-            )}
-
-            {author.institution && (
-              <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} sx={{ mb: 2 }}>
-                <Business sx={{ fontSize: 18, color: 'text.secondary' }} />
-                <Typography variant="body2" color="text.secondary">
-                  {author.institution}
-                </Typography>
-              </Stack>
-            )}
-
-            <Divider sx={{ my: 2 }} />
-
-            {/* Stats */}
-            <Box sx={{ py: 2 }}>
-              <Typography variant="h3" fontWeight="bold" color="primary.main">
-                {author.publicationsCount}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Publication{author.publicationsCount !== 1 ? 's' : ''}
-              </Typography>
-            </Box>
-
-            <Divider sx={{ my: 2 }} />
-
-            {/* ORCID */}
-            {author.orcidId && (
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-                  ORCID
-                </Typography>
-                <a
-                  href={`https://orcid.org/${author.orcidId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: '#2563EB', textDecoration: 'none' }}
-                >
-                  <Typography variant="body2">{author.orcidId}</Typography>
-                </a>
-              </Box>
-            )}
-
-            {/* Bio */}
-            {author.bio && (
-              <Box sx={{ textAlign: 'left' }}>
-                <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-                  Biographie
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                  {author.bio}
-                </Typography>
-              </Box>
-            )}
-          </Paper>
-        </Box>
-
-        {/* Publications */}
-        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 11px)' } }}>
-          <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-            Publications
-          </Typography>
-
-          {author.manuscripts.length === 0 ? (
+          {/* ─── PROFILE CARD ─── */}
+          <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 calc(33.333% - 16px)' } }}>
             <Paper
               elevation={0}
               sx={{
-                p: 6,
-                textAlign: 'center',
-                border: '1px solid',
-                borderColor: 'divider',
+                border: `1px solid ${TOKEN.gray300}`,
                 borderRadius: 2,
+                overflow: 'hidden',
+                position: { md: 'sticky' },
+                top: { md: 24 },
+                bgcolor: TOKEN.white,
               }}
             >
-              <Article sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-              <Typography color="text.secondary">
-                Aucune publication disponible
-              </Typography>
-            </Paper>
-          ) : (
-            <Stack spacing={3}>
-              {author.manuscripts.map((manuscript) => (
-                <Card
-                  key={manuscript.id}
-                  elevation={0}
+              {/* Top accent stripe */}
+              <Box sx={{ height: 3, bgcolor: TOKEN.black }} />
+
+              <Box sx={{ p: { xs: 3, md: 4 }, textAlign: 'center' }}>
+                {/* Avatar */}
+                <Avatar
                   sx={{
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      boxShadow: '0 4px 20px rgba(37, 99, 235, 0.1)',
-                    },
+                    width: 88,
+                    height: 88,
+                    mx: 'auto',
+                    mb: 2.5,
+                    bgcolor: TOKEN.black,
+                    color: TOKEN.white,
+                    fontSize: '2rem',
+                    fontFamily: fontSans,
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em',
                   }}
                 >
-                  <CardActionArea component={Link} href={`/manuscripts/${manuscript.id}`}>
-                    <CardContent sx={{ p: 3 }}>
-                      {/* Categories */}
-                      <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap" gap={0.5}>
-                        {manuscript.themeName && (
-                          <Chip
-                            size="small"
-                            label={manuscript.themeName}
-                            icon={<Category sx={{ fontSize: 14 }} />}
-                            sx={{ fontSize: 11 }}
-                          />
-                        )}
-                        <Chip
-                          size="small"
-                          label={manuscript.sectionName}
-                          variant="outlined"
-                          sx={{ fontSize: 11 }}
-                        />
-                      </Stack>
+                  {author.fullName.charAt(0)}
+                </Avatar>
 
-                      {/* Title */}
-                      <Typography variant="h6" fontWeight="600" gutterBottom>
-                        {manuscript.title}
-                      </Typography>
+                <Typography
+                  variant="h5"
+                  fontWeight={700}
+                  gutterBottom
+                  sx={{
+                    fontFamily: fontSans,
+                    fontSize: '1.15rem',
+                    letterSpacing: '-0.01em',
+                    color: TOKEN.black,
+                  }}
+                >
+                  {author.fullName}
+                </Typography>
 
-                      {/* Abstract */}
+                {author.position && (
+                  <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} sx={{ mb: 0.5 }}>
+                    <Work sx={{ fontSize: 14, color: TOKEN.gray500 }} />
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: fontSans, fontSize: '0.85rem', color: TOKEN.gray500 }}
+                    >
+                      {author.position}
+                    </Typography>
+                  </Stack>
+                )}
+
+                {author.institution && (
+                  <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} sx={{ mb: 0 }}>
+                    <Business sx={{ fontSize: 14, color: TOKEN.gray500 }} />
+                    <Typography
+                      variant="body2"
+                      sx={{ fontFamily: fontSans, fontSize: '0.85rem', color: TOKEN.gray500 }}
+                    >
+                      {author.institution}
+                    </Typography>
+                  </Stack>
+                )}
+              </Box>
+
+              <Divider sx={{ borderColor: TOKEN.gray100 }} />
+
+              {/* Stats block */}
+              <Box
+                sx={{
+                  px: 4,
+                  py: 3,
+                  textAlign: 'center',
+                  bgcolor: TOKEN.goldDim,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: fontSans,
+                    fontSize: '2.5rem',
+                    fontWeight: 800,
+                    letterSpacing: '-0.04em',
+                    color: TOKEN.black,
+                    lineHeight: 1,
+                    mb: 0.5,
+                  }}
+                >
+                  {author.publicationsCount}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: fontSans,
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: TOKEN.gray500,
+                  }}
+                >
+                  Publication{author.publicationsCount !== 1 ? 's' : ''}
+                </Typography>
+              </Box>
+
+              <Divider sx={{ borderColor: TOKEN.gray100 }} />
+
+              {/* Meta fields */}
+              <Box sx={{ px: 4, py: 3 }}>
+                {author.orcidId && (
+                  <Box sx={{ mb: 2.5 }}>
+                    <Typography
+                      sx={{
+                        fontFamily: fontSans,
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        color: TOKEN.gray500,
+                        mb: 0.5,
+                      }}
+                    >
+                      ORCID
+                    </Typography>
+                    <a
+                      href={`https://orcid.org/${author.orcidId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'none' }}
+                    >
                       <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 2, lineHeight: 1.6 }}
+                        sx={{
+                          fontFamily: fontSans,
+                          fontSize: '0.85rem',
+                          color: TOKEN.gold,
+                          fontWeight: 500,
+                          '&:hover': { textDecoration: 'underline' },
+                        }}
                       >
-                        {truncateText(manuscript.abstract, 200)}
+                        {author.orcidId}
                       </Typography>
+                    </a>
+                  </Box>
+                )}
 
-                      {/* Keywords */}
-                      {manuscript.keywords && (
-                        <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5} sx={{ mb: 2 }}>
-                          {manuscript.keywords.split(',').slice(0, 4).map((keyword, idx) => (
+                {author.bio && (
+                  <Box>
+                    <Typography
+                      sx={{
+                        fontFamily: fontSans,
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        color: TOKEN.gray500,
+                        mb: 0.75,
+                      }}
+                    >
+                      Biographie
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontFamily: fontSans,
+                        color: TOKEN.gray700,
+                        lineHeight: 1.75,
+                        fontSize: '0.875rem',
+                      }}
+                    >
+                      {author.bio}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </Paper>
+          </Box>
+
+          {/* ─── PUBLICATIONS ─── */}
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(66.666% - 16px)' } }}>
+
+            {/* Section header */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+              <Box sx={{ width: 3, height: 28, bgcolor: TOKEN.gold, borderRadius: 2, flexShrink: 0 }} />
+              <Typography
+                variant="h5"
+                fontWeight={700}
+                sx={{
+                  fontFamily: fontSans,
+                  letterSpacing: '-0.02em',
+                  fontSize: { xs: '1.2rem', md: '1.4rem' },
+                }}
+              >
+                Publications
+              </Typography>
+              <Box sx={{ flex: 1, height: 1, bgcolor: TOKEN.gray300 }} />
+              <Typography
+                sx={{
+                  fontFamily: fontSans,
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: TOKEN.gray500,
+                  flexShrink: 0,
+                }}
+              >
+                {author.manuscripts.length} résultat{author.manuscripts.length > 1 ? 's' : ''}
+              </Typography>
+            </Box>
+
+            {author.manuscripts.length === 0 ? (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: { xs: 6, md: 8 },
+                  textAlign: 'center',
+                  border: `1px dashed ${TOKEN.gray300}`,
+                  borderRadius: 2,
+                  bgcolor: TOKEN.white,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: '50%',
+                    bgcolor: TOKEN.gray100,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mx: 'auto',
+                    mb: 2.5,
+                  }}
+                >
+                  <Article sx={{ fontSize: 28, color: TOKEN.gray500 }} />
+                </Box>
+                <Typography
+                  sx={{
+                    fontFamily: fontSans,
+                    color: TOKEN.gray500,
+                    fontSize: '0.95rem',
+                  }}
+                >
+                  Aucune publication disponible
+                </Typography>
+              </Paper>
+            ) : (
+              <Stack spacing={3}>
+                {author.manuscripts.map((manuscript, idx) => (
+                  <Card
+                    key={manuscript.id}
+                    elevation={0}
+                    sx={{
+                      border: `1px solid ${TOKEN.gray300}`,
+                      borderRadius: 2,
+                      bgcolor: TOKEN.white,
+                      transition: 'all 0.25s ease',
+                      overflow: 'hidden',
+                      '&:hover': {
+                        borderColor: TOKEN.black,
+                        boxShadow: `0 8px 28px rgba(0,0,0,0.07)`,
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                  >
+                    <CardActionArea component={Link} href={`/manuscripts/${manuscript.id}`}>
+                      <CardContent sx={{ p: { xs: 3, md: 3.5 } }}>
+                        {/* Top row: index + chips */}
+                        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2 }}>
+                          <Typography
+                            sx={{
+                              fontFamily: fontSans,
+                              fontSize: '0.65rem',
+                              fontWeight: 700,
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              color: TOKEN.gray500,
+                            }}
+                          >
+                            N° {String(idx + 1).padStart(2, '0')}
+                          </Typography>
+
+                          <Stack direction="row" spacing={0.75} flexWrap="wrap" justifyContent="flex-end" gap={0.5}>
+                            {manuscript.themeName && (
+                              <Chip
+                                size="small"
+                                label={manuscript.themeName}
+                                icon={<Category sx={{ fontSize: '11px !important' }} />}
+                                sx={{
+                                  fontFamily: fontSans,
+                                  fontSize: '0.68rem',
+                                  height: 20,
+                                  bgcolor: TOKEN.goldDim,
+                                  border: `1px solid ${TOKEN.gold}44`,
+                                  color: TOKEN.gray700,
+                                  '& .MuiChip-icon': { color: TOKEN.gold },
+                                }}
+                              />
+                            )}
                             <Chip
-                              key={idx}
-                              label={keyword.trim()}
                               size="small"
-                              variant="outlined"
-                              sx={{ fontSize: 10, height: 22 }}
+                              label={manuscript.sectionName}
+                              sx={{
+                                fontFamily: fontSans,
+                                fontSize: '0.68rem',
+                                height: 20,
+                                bgcolor: TOKEN.gray100,
+                                border: `1px solid ${TOKEN.gray300}`,
+                                color: TOKEN.gray700,
+                              }}
                             />
-                          ))}
+                          </Stack>
                         </Stack>
-                      )}
 
-                      {/* Date */}
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <CalendarMonth sx={{ fontSize: 16, color: 'text.disabled' }} />
-                        <Typography variant="caption" color="text.disabled">
-                          {formatDate(manuscript.publishedAt || manuscript.createdAt)}
+                        {/* Title */}
+                        <Typography
+                          variant="h6"
+                          fontWeight={700}
+                          gutterBottom
+                          sx={{
+                            fontFamily: fontSans,
+                            fontSize: { xs: '0.95rem', md: '1.05rem' },
+                            letterSpacing: '-0.01em',
+                            lineHeight: 1.45,
+                            color: TOKEN.black,
+                          }}
+                        >
+                          {manuscript.title}
                         </Typography>
-                      </Stack>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              ))}
-            </Stack>
-          )}
+
+                        {/* Abstract */}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontFamily: fontSans,
+                            color: TOKEN.gray500,
+                            lineHeight: 1.75,
+                            fontSize: '0.875rem',
+                            mb: 2.5,
+                          }}
+                        >
+                          {truncateText(manuscript.abstract, 200)}
+                        </Typography>
+
+                        {/* Keywords */}
+                        {manuscript.keywords && (
+                          <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5} sx={{ mb: 2.5 }}>
+                            {manuscript.keywords
+                              .split(',')
+                              .slice(0, 4)
+                              .map((keyword, ki) => (
+                                <Chip
+                                  key={ki}
+                                  label={keyword.trim()}
+                                  size="small"
+                                  sx={{
+                                    fontFamily: fontSans,
+                                    fontSize: '0.68rem',
+                                    height: 20,
+                                    bgcolor: 'transparent',
+                                    border: `1px solid ${TOKEN.gray300}`,
+                                    color: TOKEN.gray700,
+                                  }}
+                                />
+                              ))}
+                          </Stack>
+                        )}
+
+                        {/* Date */}
+                        <Stack direction="row" alignItems="center" spacing={0.75}>
+                          <CalendarMonth sx={{ fontSize: 14, color: TOKEN.gray300 }} />
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: fontSans,
+                              fontSize: '0.75rem',
+                              color: TOKEN.gray500,
+                              letterSpacing: '0.01em',
+                            }}
+                          >
+                            {formatDate(manuscript.publishedAt || manuscript.createdAt)}
+                          </Typography>
+                        </Stack>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                ))}
+              </Stack>
+            )}
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }

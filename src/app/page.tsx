@@ -43,12 +43,23 @@ import Link from 'next/link';
 import { publicApiService, PublicManuscriptSummary, PublicStats, ActiveTheme } from '@/services/publicApiService';
 import dynamic from 'next/dynamic';
 
-const GoogleTranslate = dynamic(() => import('@/components/ui/GoogleTranslate'), {
-  ssr: false,
-});
+const GoogleTranslate = dynamic(() => import('@/components/ui/GoogleTranslate'), { ssr: false });
 
+// ─── Design tokens ───
+const TOKEN = {
+  black: '#0a0a0a',
+  white: '#ffffff',
+  offWhite: '#f5f4f0',
+  gray100: '#f0efeb',
+  gray300: '#d4d2cc',
+  gray500: '#8a887f',
+  gray700: '#3d3c38',
+  gold: '#b8953a',
+  goldDim: 'rgba(184,149,58,0.08)',
+};
+const fontSans = '"Noto Sans", sans-serif';
 
-// Composant AppelCard pour éviter l'erreur d'hydratation avec Date.now()
+// ─── AppelCard ───
 function AppelCard({ theme }: { theme: ActiveTheme }) {
   const [mounted, setMounted] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
@@ -66,24 +77,14 @@ function AppelCard({ theme }: { theme: ActiveTheme }) {
 
   const isUrgent = daysLeft !== null && daysLeft <= 7;
 
-  // Ne pas afficher tant que le composant n'est pas monté côté client
   if (!mounted) {
     return (
-      <Card
-        elevation={0}
-        sx={{
-          height: '100%',
-          border: '2px solid',
-          borderColor: 'divider',
-          borderRadius: 3,
-          bgcolor: 'white',
-        }}
-      >
+      <Card elevation={0} sx={{ height: '100%', border: `1px solid ${TOKEN.gray300}`, borderRadius: 2, bgcolor: TOKEN.white }}>
         <CardContent sx={{ p: 3, height: '100%' }}>
           <Skeleton variant="text" width="60%" height={32} />
           <Skeleton variant="text" width="100%" height={20} sx={{ mt: 2 }} />
           <Skeleton variant="text" width="80%" height={20} />
-          <Skeleton variant="rectangular" height={40} sx={{ mt: 3, borderRadius: 2 }} />
+          <Skeleton variant="rectangular" height={40} sx={{ mt: 3, borderRadius: 1 }} />
         </CardContent>
       </Card>
     );
@@ -94,15 +95,16 @@ function AppelCard({ theme }: { theme: ActiveTheme }) {
       elevation={0}
       sx={{
         height: '100%',
-        border: '2px solid',
-        borderColor: isUrgent ? '#ff9d00' : 'divider',
-        borderRadius: 3,
-        bgcolor: 'white',
-        transition: 'all 0.2s',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 8px 30px rgba(255, 157, 0, 0.2)',
-        },
+        border: `1px solid`,
+        borderColor: isUrgent ? TOKEN.gold : TOKEN.gray300,
+        borderRadius: 2,
+        bgcolor: TOKEN.white,
+        transition: 'all 0.25s ease',
+        position: 'relative',
+        overflow: 'hidden',
+        '&:hover': { transform: 'translateY(-3px)', borderColor: TOKEN.black, boxShadow: `0 10px 28px rgba(0,0,0,0.07)` },
+        '&::before': { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 2, bgcolor: TOKEN.black, opacity: 0, transition: 'opacity 0.25s' },
+        '&:hover::before': { opacity: 1 },
       }}
     >
       <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -111,22 +113,16 @@ function AppelCard({ theme }: { theme: ActiveTheme }) {
           <Chip
             size="small"
             label={`Plus que ${daysLeft} jour${daysLeft > 1 ? 's' : ''} !`}
-            color="error"
-            sx={{ alignSelf: 'flex-start', mb: 2, fontWeight: 600 }}
+            sx={{ alignSelf: 'flex-start', mb: 2, fontFamily: fontSans, fontWeight: 700, fontSize: '0.68rem', height: 22, bgcolor: TOKEN.gold, color: TOKEN.white }}
           />
         )}
 
         {/* Title */}
         <Typography
           variant="h6"
-          fontWeight="bold"
+          fontWeight={700}
           gutterBottom
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
+          sx={{ fontFamily: fontSans, fontSize: '0.95rem', letterSpacing: '-0.01em', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', color: TOKEN.black }}
         >
           {theme.title}
         </Typography>
@@ -134,31 +130,19 @@ function AppelCard({ theme }: { theme: ActiveTheme }) {
         {/* Description */}
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            mb: 3,
-            flex: 1,
-          }}
+          sx={{ fontFamily: fontSans, color: TOKEN.gray500, lineHeight: 1.75, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 3, flex: 1 }}
         >
           {theme.description || 'Aucune description disponible'}
         </Typography>
 
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ borderColor: TOKEN.gray100, mb: 2 }} />
 
         {/* Deadline */}
         {formattedDate && (
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Schedule sx={{ fontSize: 18, color: isUrgent ? 'error.main' : 'text.secondary' }} />
-              <Typography 
-                variant="body2" 
-                fontWeight={isUrgent ? 600 : 400}
-                color={isUrgent ? 'error.main' : 'text.secondary'}
-              >
+              <Schedule sx={{ fontSize: 16, color: isUrgent ? TOKEN.gold : TOKEN.gray500 }} />
+              <Typography variant="body2" sx={{ fontFamily: fontSans, fontWeight: isUrgent ? 600 : 400, color: isUrgent ? TOKEN.gold : TOKEN.gray500, fontSize: '0.8rem' }}>
                 Date limite: {formattedDate}
               </Typography>
             </Stack>
@@ -170,12 +154,7 @@ function AppelCard({ theme }: { theme: ActiveTheme }) {
           <Button
             fullWidth
             variant="contained"
-            sx={{ 
-              borderRadius: 2, 
-              fontWeight: 600,
-              bgcolor: '#ff9d00',
-              '&:hover': { bgcolor: '#e68a00' }
-            }}
+            sx={{ fontFamily: fontSans, fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em', textTransform: 'uppercase', bgcolor: TOKEN.black, color: TOKEN.white, borderRadius: 1, py: 1.2, boxShadow: 'none', '&:hover': { bgcolor: TOKEN.gold, boxShadow: 'none' }, transition: 'background 0.2s ease' }}
           >
             Soumettre un manuscrit
           </Button>
@@ -185,6 +164,7 @@ function AppelCard({ theme }: { theme: ActiveTheme }) {
   );
 }
 
+// ─── HomePage ───
 export default function HomePage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -195,9 +175,7 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -216,7 +194,6 @@ export default function HomePage() {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -231,11 +208,7 @@ export default function HomePage() {
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    return new Date(dateString).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   const truncateText = (text: string | undefined, maxLength: number) => {
@@ -254,30 +227,21 @@ export default function HomePage() {
     { label: 'Connexion', path: '/login', variant: 'outlined' as const },
   ];
 
-  const handleMobileMenuToggle = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
+  const handleMobileMenuToggle = () => setMobileMenuOpen(!mobileMenuOpen);
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#fafafa' }}>
-      {/* Header */}
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: TOKEN.offWhite }}>
+
+      {/* ─── HEADER ─── */}
       <AppBar
         position="sticky"
         elevation={0}
-        sx={{
-          bgcolor: 'white',
-          borderBottom: '1px solid',
-          borderColor: 'divider'
-        }}
+        sx={{ bgcolor: TOKEN.white, borderBottom: `1px solid ${TOKEN.gray300}`, color: TOKEN.black }}
       >
         <Container maxWidth="xl">
           <Toolbar
             disableGutters
-            sx={{
-              justifyContent: 'space-between',
-              minHeight: { xs: 56, sm: 64, md: 70 },
-              py: { xs: 0.5, sm: 1 }
-            }}
+            sx={{ justifyContent: 'space-between', minHeight: { xs: 56, sm: 64, md: 70 }, py: { xs: 0.5, sm: 1 } }}
           >
             {/* Logo */}
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
@@ -285,43 +249,41 @@ export default function HomePage() {
                 component="img"
                 src="/images/logo_santaane.png"
                 alt="Santaane"
-                sx={{
-                  height: { xs: 50, sm: 70, md: 100 },
-                  width: 'auto',
-                  py: { xs: 0.5, sm: 1 },
-                }}
+                sx={{ height: { xs: 50, sm: 70, md: 100 }, width: 'auto', py: { xs: 0.5, sm: 1 } }}
               />
             </Link>
 
             {/* Right side: Nav + Translate + Login */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {/* Desktop Navigation Links */}
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-                <Link href="/manuscripts" style={{ textDecoration: 'none' }}>
-                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                    Publications
-                  </Button>
-                </Link>
-                <Link href="/appels" style={{ textDecoration: 'none' }}>
-                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                    Appels
-                  </Button>
-                </Link>
-                <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>
-                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                    Guide
-                  </Button>
-                </Link>
-                <Link href="/about" style={{ textDecoration: 'none' }}>
-                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                    À propos
-                  </Button>
-                </Link>
-                <Link href="/contact" style={{ textDecoration: 'none' }}>
-                  <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                    Contact
-                  </Button>
-                </Link>
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, alignItems: 'center' }}>
+                {[
+                  { label: 'Publications', path: '/manuscripts' },
+                  { label: 'Appels', path: '/appels' },
+                  { label: 'Guide', path: '/guide-soumission' },
+                  { label: 'À propos', path: '/about' },
+                  { label: 'Contact', path: '/contact' },
+                ].map((item) => (
+                  <Link key={item.path} href={item.path} style={{ textDecoration: 'none' }}>
+                    <Button
+                      color="inherit"
+                      sx={{
+                        fontFamily: fontSans,
+                        fontWeight: 500,
+                        fontSize: '0.82rem',
+                        color: TOKEN.gray500,
+                        textTransform: 'none',
+                        px: 1.5,
+                        borderBottom: '2px solid transparent',
+                        borderRadius: 0,
+                        '&:hover': { color: TOKEN.black, bgcolor: 'transparent', borderBottomColor: TOKEN.gray300 },
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {item.label}
+                    </Button>
+                  </Link>
+                ))}
               </Box>
 
               {/* Google Translate - visible on all screen sizes */}
@@ -332,16 +294,20 @@ export default function HomePage() {
                 <Link href="/login" style={{ textDecoration: 'none' }}>
                   <Button
                     variant="outlined"
-                    startIcon={<Login />}
+                    startIcon={<Login sx={{ fontSize: 16 }} />}
                     sx={{
-                      borderRadius: 2,
-                      borderColor: '#59a498',
-                      color: '#59a498',
-                      fontSize: '0.875rem',
-                      '&:hover': {
-                        borderColor: '#59a498',
-                        bgcolor: 'rgba(89, 164, 152, 0.08)',
-                      }
+                      fontFamily: fontSans,
+                      fontWeight: 700,
+                      fontSize: '0.78rem',
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                      borderColor: TOKEN.black,
+                      color: TOKEN.black,
+                      borderRadius: 1,
+                      px: 2,
+                      py: 0.85,
+                      '&:hover': { bgcolor: TOKEN.black, color: TOKEN.white, borderColor: TOKEN.black },
+                      transition: 'all 0.2s ease',
                     }}
                   >
                     Connexion
@@ -351,8 +317,12 @@ export default function HomePage() {
 
               {/* Mobile Menu Icon */}
               <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-                <IconButton onClick={handleMobileMenuToggle} edge="end">
-                  <MenuIcon />
+                <IconButton
+                  onClick={handleMobileMenuToggle}
+                  edge="end"
+                  sx={{ color: TOKEN.black, border: `1px solid ${TOKEN.gray300}`, borderRadius: 1, p: 0.75 }}
+                >
+                  <MenuIcon sx={{ fontSize: 20 }} />
                 </IconButton>
               </Box>
             </Box>
@@ -360,50 +330,37 @@ export default function HomePage() {
         </Container>
       </AppBar>
 
-      {/* Mobile Drawer Menu */}
+      {/* ─── MOBILE DRAWER ─── */}
       <Drawer
         anchor="right"
         open={mobileMenuOpen}
         onClose={handleMobileMenuToggle}
         sx={{
           display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': {
-            width: 280,
-          },
+          '& .MuiDrawer-paper': { width: 280, bgcolor: TOKEN.white, borderLeft: `1px solid ${TOKEN.gray300}` },
         }}
       >
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" fontWeight={600}>
-            Menu
-          </Typography>
-          <IconButton onClick={handleMobileMenuToggle}>
-            <CloseIcon />
+        <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${TOKEN.gray100}` }}>
+          <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, borderRadius: 1 }} />
+          <IconButton onClick={handleMobileMenuToggle} size="small" sx={{ color: TOKEN.gray500 }}>
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Box>
 
-        <Divider />
-
         <List sx={{ px: 1, py: 2 }}>
           {menuItems.map((item) => (
-            <ListItem key={item.path} disablePadding sx={{ mb: 1 }}>
-              <Link
-                href={item.path}
-                style={{ textDecoration: 'none', width: '100%' }}
-                onClick={handleMobileMenuToggle}
-              >
-                <ListItemButton
-                  sx={{
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: 'rgba(89, 164, 152, 0.08)',
-                    },
-                  }}
-                >
+            <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
+              <Link href={item.path} style={{ textDecoration: 'none', width: '100%' }} onClick={handleMobileMenuToggle}>
+                <ListItemButton sx={{ borderRadius: 1, px: 2, py: 1.25, '&:hover': { bgcolor: TOKEN.gray100 } }}>
                   <ListItemText
                     primary={
                       <Typography
-                        fontWeight={item.variant === 'outlined' ? 600 : 400}
-                        color={item.variant === 'outlined' ? '#59a498' : 'text.primary'}
+                        sx={{
+                          fontFamily: fontSans,
+                          fontWeight: item.variant === 'outlined' ? 700 : 500,
+                          fontSize: '0.9rem',
+                          color: item.variant === 'outlined' ? TOKEN.black : TOKEN.gray700,
+                        }}
                       >
                         {item.label}
                       </Typography>
@@ -416,30 +373,52 @@ export default function HomePage() {
         </List>
       </Drawer>
 
-      {/* Main Content */}
+      {/* ─── MAIN CONTENT ─── */}
       <Box component="main" sx={{ flex: 1 }}>
-        {/* Hero Section */}
+
+        {/* ─── HERO SECTION ─── */}
         <Box
           sx={{
-            background: 'linear-gradient(135deg, #59a498 0%, #ff9d00 100%)',
-            color: 'white',
+            bgcolor: TOKEN.black,
+            color: TOKEN.white,
             py: { xs: 8, md: 12 },
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 40px)',
+              pointerEvents: 'none',
+            },
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              top: '-80px',
+              right: '-100px',
+              width: '500px',
+              height: '500px',
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${TOKEN.gold}20 0%, transparent 70%)`,
+              pointerEvents: 'none',
+            },
           }}
         >
-          <Container maxWidth="lg">
+          <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
             <Box textAlign="center" mb={6}>
+              <Box sx={{ width: 48, height: 2, bgcolor: TOKEN.gold, mx: 'auto', mb: 3, borderRadius: 1 }} />
               <Typography
                 variant="h3"
                 component="h1"
-                fontWeight="bold"
+                fontWeight={800}
                 gutterBottom
-                sx={{ fontSize: { xs: '2rem', md: '3rem' } }}
+                sx={{ fontFamily: fontSans, fontSize: { xs: '2rem', md: '3rem' }, letterSpacing: '-0.03em', lineHeight: 1.1, mb: 2 }}
               >
                 Découvrez les Publications Scientifiques
               </Typography>
               <Typography
                 variant="h6"
-                sx={{ opacity: 0.9, maxWidth: 600, mx: 'auto', mb: 4 }}
+                sx={{ fontFamily: fontSans, fontWeight: 300, opacity: 0.75, maxWidth: 600, mx: 'auto', mb: 5, lineHeight: 1.7, fontSize: { xs: '1rem', md: '1.1rem' } }}
               >
                 Accédez à une collection de manuscrits scientifiques évalués par des pairs
               </Typography>
@@ -454,8 +433,10 @@ export default function HomePage() {
                   mx: 'auto',
                   display: 'flex',
                   alignItems: 'center',
-                  borderRadius: 3,
+                  borderRadius: 1,
                   overflow: 'hidden',
+                  border: `1px solid ${TOKEN.gray300}`,
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
                 }}
               >
                 <TextField
@@ -468,12 +449,16 @@ export default function HomePage() {
                     input: {
                       startAdornment: (
                         <InputAdornment position="start">
-                          <Search color="action" />
+                          <Search sx={{ color: TOKEN.gray500, fontSize: 20 }} />
                         </InputAdornment>
                       ),
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton type="submit" color="primary" size="large">
+                          <IconButton
+                            type="submit"
+                            size="large"
+                            sx={{ bgcolor: TOKEN.gold, borderRadius: 0, color: TOKEN.white, px: 2.5, '&:hover': { bgcolor: '#c9a440' } }}
+                          >
                             <ArrowForward />
                           </IconButton>
                         </InputAdornment>
@@ -482,9 +467,11 @@ export default function HomePage() {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      bgcolor: 'white',
+                      fontFamily: fontSans,
+                      bgcolor: TOKEN.white,
                       '& fieldset': { border: 'none' },
                     },
+                    '& .MuiOutlinedInput-input': { fontFamily: fontSans, fontSize: '0.9rem', color: TOKEN.black },
                   }}
                 />
               </Paper>
@@ -492,32 +479,29 @@ export default function HomePage() {
           </Container>
         </Box>
 
-        {/* Recent Publications */}
+        {/* ─── RECENT PUBLICATIONS ─── */}
         <Container maxWidth="xl" sx={{ py: 8 }}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ mb: 4 }}
-          >
-            <Typography variant="h5" fontWeight="bold">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 5 }}>
+            <Box sx={{ width: 3, height: 24, bgcolor: TOKEN.gold, borderRadius: 2, flexShrink: 0 }} />
+            <Typography variant="h5" fontWeight={700} sx={{ fontFamily: fontSans, letterSpacing: '-0.02em' }}>
               Publications Récentes
             </Typography>
+            <Box sx={{ flex: 1, height: 1, bgcolor: TOKEN.gray300 }} />
             <Link href="/manuscripts" style={{ textDecoration: 'none' }}>
-              <Chip
-                label="Voir tout"
-                icon={<ArrowForward />}
-                clickable
+              <Button
+                endIcon={<ArrowForward sx={{ fontSize: 15 }} />}
                 sx={{
-                  borderColor: '#59a498',
-                  color: '#59a498',
-                  '& .MuiChip-icon': { color: '#59a498' },
-                  '&:hover': { bgcolor: 'rgba(89, 164, 152, 0.08)' }
+                  fontFamily: fontSans, fontWeight: 700, fontSize: '0.72rem', letterSpacing: '0.06em',
+                  textTransform: 'uppercase', color: TOKEN.gray700, border: `1px solid ${TOKEN.gray300}`,
+                  borderRadius: 1, px: 2, py: 0.75,
+                  '&:hover': { bgcolor: TOKEN.black, color: TOKEN.white, borderColor: TOKEN.black },
+                  transition: 'all 0.2s',
                 }}
-                variant="outlined"
-              />
+              >
+                Voir tout
+              </Button>
             </Link>
-          </Stack>
+          </Box>
 
           {loading ? (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
@@ -528,18 +512,11 @@ export default function HomePage() {
               ))}
             </Box>
           ) : recentManuscripts.length === 0 ? (
-            <Paper
-              elevation={0}
-              sx={{
-                p: 6,
-                textAlign: 'center',
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-              }}
-            >
-              <Article sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-              <Typography color="text.secondary">
+            <Paper elevation={0} sx={{ p: 6, textAlign: 'center', border: `1px dashed ${TOKEN.gray300}`, borderRadius: 2, bgcolor: TOKEN.white }}>
+              <Box sx={{ width: 60, height: 60, borderRadius: '50%', bgcolor: TOKEN.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2 }}>
+                <Article sx={{ fontSize: 28, color: TOKEN.gray500 }} />
+              </Box>
+              <Typography sx={{ fontFamily: fontSans, color: TOKEN.gray500 }}>
                 Aucune publication disponible pour le moment
               </Typography>
             </Paper>
@@ -551,68 +528,41 @@ export default function HomePage() {
                     elevation={0}
                     sx={{
                       height: '100%',
-                      border: '1px solid',
-                      borderColor: 'divider',
+                      border: `1px solid ${TOKEN.gray300}`,
                       borderRadius: 2,
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: '#59a498',
-                        boxShadow: '0 4px 20px rgba(89, 164, 152, 0.15)',
-                      },
+                      bgcolor: TOKEN.white,
+                      transition: 'all 0.25s ease',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      '&:hover': { borderColor: TOKEN.black, transform: 'translateY(-3px)', boxShadow: `0 10px 28px rgba(0,0,0,0.07)` },
+                      '&::before': { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 2, bgcolor: TOKEN.black, opacity: 0, transition: 'opacity 0.25s' },
+                      '&:hover::before': { opacity: 1 },
                     }}
                   >
-                    <CardActionArea
-                      component={Link}
-                      href={`/manuscripts/${manuscript.id}`}
-                      sx={{ height: '100%' }}
-                    >
+                    <CardActionArea component={Link} href={`/manuscripts/${manuscript.id}`} sx={{ height: '100%' }}>
                       <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
                         {/* Appel & Section */}
-                        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                        <Stack direction="row" spacing={1} sx={{ mb: 2 }} flexWrap="wrap" gap={0.5}>
                           {manuscript.themeName && (
-                            <Chip
-                              size="small"
-                              label={manuscript.themeName}
-                              icon={<Category sx={{ fontSize: 14 }} />}
-                              sx={{ fontSize: 11 }}
+                            <Chip size="small" label={manuscript.themeName} icon={<Category sx={{ fontSize: '11px !important' }} />}
+                              sx={{ fontFamily: fontSans, fontSize: '0.65rem', height: 20, bgcolor: TOKEN.goldDim, border: `1px solid ${TOKEN.gold}44`, color: TOKEN.gray700, '& .MuiChip-icon': { color: TOKEN.gold } }}
                             />
                           )}
-                          <Chip
-                            size="small"
-                            label={manuscript.sectionName}
-                            variant="outlined"
-                            sx={{ fontSize: 11 }}
+                          <Chip size="small" label={manuscript.sectionName}
+                            sx={{ fontFamily: fontSans, fontSize: '0.65rem', height: 20, bgcolor: TOKEN.gray100, border: `1px solid ${TOKEN.gray300}`, color: TOKEN.gray700 }}
                           />
                         </Stack>
 
                         {/* Title */}
-                        <Typography
-                          variant="subtitle1"
-                          fontWeight="600"
-                          gutterBottom
-                          sx={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            lineHeight: 1.4,
-                          }}
+                        <Typography variant="subtitle1" fontWeight={700} gutterBottom
+                          sx={{ fontFamily: fontSans, fontSize: '0.95rem', letterSpacing: '-0.01em', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', color: TOKEN.black }}
                         >
                           {manuscript.title}
                         </Typography>
 
                         {/* Abstract */}
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            mb: 2,
-                            flex: 1,
-                          }}
+                        <Typography variant="body2"
+                          sx={{ fontFamily: fontSans, color: TOKEN.gray500, lineHeight: 1.75, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 2, flex: 1 }}
                         >
                           {truncateText(manuscript.abstract, 150)}
                         </Typography>
@@ -621,34 +571,26 @@ export default function HomePage() {
                         {manuscript.keywords && (
                           <Stack direction="row" spacing={0.5} flexWrap="wrap" gap={0.5} sx={{ mb: 2 }}>
                             {manuscript.keywords.split(',').slice(0, 3).map((keyword, idx) => (
-                              <Chip
-                                key={idx}
-                                label={keyword.trim()}
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontSize: 10, height: 22 }}
+                              <Chip key={idx} label={keyword.trim()} size="small"
+                                sx={{ fontFamily: fontSans, fontSize: '0.62rem', height: 18, bgcolor: 'transparent', border: `1px solid ${TOKEN.gray300}`, color: TOKEN.gray700 }}
                               />
                             ))}
                           </Stack>
                         )}
 
-                        <Divider sx={{ my: 1.5 }} />
+                        <Divider sx={{ borderColor: TOKEN.gray100, my: 1.5 }} />
 
                         {/* Author & Date */}
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
+                        <Stack direction="row" justifyContent="space-between" alignItems="center">
                           <Stack direction="row" alignItems="center" spacing={0.5}>
-                            <Person sx={{ fontSize: 16, color: 'text.secondary' }} />
-                            <Typography variant="caption" color="text.secondary">
+                            <Person sx={{ fontSize: 14, color: TOKEN.gray500 }} />
+                            <Typography sx={{ fontFamily: fontSans, fontSize: '0.72rem', color: TOKEN.gray500 }}>
                               {manuscript.authorName}
                             </Typography>
                           </Stack>
                           <Stack direction="row" alignItems="center" spacing={0.5}>
-                            <CalendarMonth sx={{ fontSize: 14, color: 'text.disabled' }} />
-                            <Typography variant="caption" color="text.disabled">
+                            <CalendarMonth sx={{ fontSize: 13, color: TOKEN.gray300 }} />
+                            <Typography sx={{ fontFamily: fontSans, fontSize: '0.7rem', color: TOKEN.gray500 }}>
                               {formatDate(manuscript.publishedAt || manuscript.createdAt)}
                             </Typography>
                           </Stack>
@@ -662,21 +604,24 @@ export default function HomePage() {
           )}
         </Container>
 
-        {/* Active Appels Section */}
+        {/* ─── ACTIVE APPELS SECTION ─── */}
         {activeThemes.length > 0 && (
-          <Box sx={{ bgcolor: '#fff7ed', py: 8 }}>
+          <Box sx={{ bgcolor: TOKEN.offWhite, borderTop: `1px solid ${TOKEN.gray300}`, borderBottom: `1px solid ${TOKEN.gray300}`, py: 8 }}>
             <Container maxWidth="xl">
               <Box textAlign="center" sx={{ mb: 5 }}>
-                <Chip 
-                  icon={<TrendingUp />} 
-                  label="Appels à contribution" 
-                  color="warning" 
-                  sx={{ mb: 2 }}
-                />
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
+                <Stack direction="row" alignItems="center" justifyContent="center" spacing={1} sx={{ mb: 2 }}>
+                  <TrendingUp sx={{ fontSize: 16, color: TOKEN.gold }} />
+                  <Typography sx={{ fontFamily: fontSans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: TOKEN.gold }}>
+                    Appels à contribution
+                  </Typography>
+                </Stack>
+                <Box sx={{ width: 40, height: 2, bgcolor: TOKEN.gold, mx: 'auto', mb: 3 }} />
+                <Typography variant="h4" fontWeight={700} gutterBottom
+                  sx={{ fontFamily: fontSans, letterSpacing: '-0.02em', fontSize: { xs: '1.6rem', md: '2rem' } }}
+                >
                   Appels Ouverts aux Soumissions
                 </Typography>
-                <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700, mx: 'auto' }}>
+                <Typography variant="h6" sx={{ fontFamily: fontSans, color: TOKEN.gray500, maxWidth: 700, mx: 'auto', fontWeight: 300, lineHeight: 1.7, fontSize: '0.95rem' }}>
                   Vous avez des travaux de recherche à partager ? Ces thématiques n&apos;attendent que vos contributions !
                 </Typography>
               </Box>
@@ -689,19 +634,17 @@ export default function HomePage() {
                 ))}
               </Box>
 
-              <Box textAlign="center" sx={{ mt: 4 }}>
+              <Box textAlign="center" sx={{ mt: 5 }}>
                 <Link href="/themes" style={{ textDecoration: 'none' }}>
-                  <Button 
-                    variant="outlined" 
-                    endIcon={<ArrowForward />}
-                    sx={{ 
-                      borderRadius: 2,
-                      borderColor: '#ff9d00',
-                      color: '#ff9d00',
-                      '&:hover': {
-                        borderColor: '#ff9d00',
-                        bgcolor: 'rgba(255, 157, 0, 0.08)',
-                      }
+                  <Button
+                    variant="outlined"
+                    endIcon={<ArrowForward sx={{ fontSize: 16 }} />}
+                    sx={{
+                      fontFamily: fontSans, fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.05em',
+                      textTransform: 'uppercase', borderColor: TOKEN.black, color: TOKEN.black, borderRadius: 1,
+                      px: 4, py: 1.3,
+                      '&:hover': { bgcolor: TOKEN.black, color: TOKEN.white, borderColor: TOKEN.black },
+                      transition: 'all 0.2s ease',
                     }}
                   >
                     Voir tous les appels
@@ -712,74 +655,76 @@ export default function HomePage() {
           </Box>
         )}
 
-        {/* Call to Action */}
-        <Box sx={{ bgcolor: '#f8fafc', py: 8 }}>
+        {/* ─── CALL TO ACTION ─── */}
+        <Box sx={{ bgcolor: TOKEN.white, borderBottom: `1px solid ${TOKEN.gray300}`, py: 8 }}>
           <Container maxWidth="md" sx={{ textAlign: 'center' }}>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
+            <Box sx={{ width: 32, height: 2, bgcolor: TOKEN.gold, mx: 'auto', mb: 3 }} />
+            <Typography variant="h5" fontWeight={700} gutterBottom
+              sx={{ fontFamily: fontSans, letterSpacing: '-0.02em', fontSize: { xs: '1.3rem', md: '1.6rem' } }}
+            >
               Vous êtes chercheur ?
             </Typography>
-            <Typography color="text.secondary" sx={{ mb: 4 }}>
+            <Typography sx={{ fontFamily: fontSans, color: TOKEN.gray500, mb: 5, lineHeight: 1.75, fontSize: '0.95rem' }}>
               Soumettez vos manuscrits et bénéficiez d&apos;une évaluation par des pairs experts
             </Typography>
-            <Stack direction="row" spacing={2} justifyContent="center">
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
               <Link href="/register" style={{ textDecoration: 'none' }}>
-                <Chip
-                  label="Créer un compte"
-                  clickable
-                  sx={{ 
-                    px: 2, 
-                    py: 2.5, 
-                    fontSize: 14,
-                    bgcolor: '#ff9d00',
-                    color: 'white',
-                    '&:hover': { bgcolor: '#e68a00' }
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    fontFamily: fontSans, fontWeight: 700, fontSize: '0.82rem', letterSpacing: '0.05em',
+                    textTransform: 'uppercase', bgcolor: TOKEN.black, color: TOKEN.white, borderRadius: 1,
+                    px: 4, py: 1.5, boxShadow: 'none',
+                    '&:hover': { bgcolor: TOKEN.gold, boxShadow: 'none' },
+                    transition: 'background 0.2s ease',
                   }}
-                />
+                >
+                  Créer un compte
+                </Button>
               </Link>
               <Link href="/manuscripts" style={{ textDecoration: 'none' }}>
-                <Chip
-                  label="Explorer les publications"
+                <Button
                   variant="outlined"
-                  clickable
-                  sx={{ px: 2, py: 2.5, fontSize: 14 }}
-                />
+                  size="large"
+                  sx={{
+                    fontFamily: fontSans, fontWeight: 600, fontSize: '0.82rem', letterSpacing: '0.04em',
+                    textTransform: 'uppercase', borderColor: TOKEN.gray300, color: TOKEN.gray700, borderRadius: 1,
+                    px: 4, py: 1.5,
+                    '&:hover': { borderColor: TOKEN.black, color: TOKEN.black, bgcolor: 'transparent' },
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  Explorer les publications
+                </Button>
               </Link>
             </Stack>
           </Container>
         </Box>
       </Box>
 
-      {/* Footer */}
-      <Box
-        component="footer"
-        sx={{
-          py: 4,
-          bgcolor: 'white',
-          borderTop: '1px solid',
-          borderColor: 'divider'
-        }}
-      >
+      {/* ─── FOOTER ─── */}
+      <Box component="footer" sx={{ py: { xs: 3, md: 4 }, bgcolor: TOKEN.black, borderTop: `1px solid rgba(255,255,255,0.06)` }}>
         <Container maxWidth="xl">
-          <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="center" spacing={2}>
-            <Typography variant="body2" color="text.secondary">
-              © {mounted ? new Date().getFullYear() : 2024} Santaane - Plateforme de publication scientifique
-            </Typography>
+          <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} spacing={2}>
+            <Box>
+              <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, mb: 1.5, borderRadius: 1 }} />
+              <Typography variant="body2" sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.8rem' }}>
+                © {mounted ? new Date().getFullYear() : 2024} Santaane — Plateforme de publication scientifique
+              </Typography>
+            </Box>
             <Stack direction="row" spacing={3} flexWrap="wrap" justifyContent="center">
-              <Link href="/about" style={{ textDecoration: 'none' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: '#ff9d00' } }}>
-                  À propos
-                </Typography>
-              </Link>
-              <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: '#ff9d00' } }}>
-                  Guide de soumission
-                </Typography>
-              </Link>
-              <Link href="/contact" style={{ textDecoration: 'none' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: '#ff9d00' } }}>
-                  Contact
-                </Typography>
-              </Link>
+              {[
+                { label: 'À propos', path: '/about' },
+                { label: 'Guide de soumission', path: '/guide-soumission' },
+                { label: 'Contact', path: '/contact' },
+              ].map((item) => (
+                <Link key={item.path} href={item.path} style={{ textDecoration: 'none' }}>
+                  <Typography variant="body2" sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.8rem', transition: 'color 0.15s ease', '&:hover': { color: TOKEN.gold } }}>
+                    {item.label}
+                  </Typography>
+                </Link>
+              ))}
             </Stack>
           </Stack>
         </Container>

@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   Drawer,
   List,
@@ -19,7 +20,21 @@ import { Logout as LogoutIcon } from '@mui/icons-material';
 import { useAuthStore } from '@/stores/authStore';
 import { getMenuItemsForRoles, ROLE_CONFIGS } from '@/config/roles';
 
-const DRAWER_WIDTH = 260;
+const DRAWER_WIDTH = 280;
+
+// ─── Design tokens ───
+const TOKEN = {
+  black: '#0a0a0a',
+  white: '#ffffff',
+  offWhite: '#f5f4f0',
+  gray100: '#f0efeb',
+  gray300: '#d4d2cc',
+  gray500: '#8a887f',
+  gray700: '#3d3c38',
+  gold: '#b8953a',
+  goldDim: 'rgba(184,149,58,0.08)',
+};
+const fontSans = '"Noto Sans", sans-serif';
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -42,56 +57,153 @@ export default function Sidebar({ mobileOpen, onMobileToggle }: SidebarProps) {
 
   const handleNavigation = (path: string) => {
     router.push(path);
-    // Close drawer on mobile after navigation
-    if (isMobile) {
-      onMobileToggle();
-    }
+    if (isMobile) onMobileToggle();
   };
 
   if (!user) return null;
 
-  // Shared drawer content
   const drawerContent = (
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        overflow: 'hidden',
+        bgcolor: TOKEN.white,
       }}
     >
-      {/* User Info Section */}
-      <Box sx={styles.userBox}>
-        <Avatar sx={styles.avatar}>{user.fullName.charAt(0).toUpperCase()}</Avatar>
-        <Box sx={styles.userTextBox}>
-          <Typography variant="subtitle1" fontWeight={600} noWrap>
+      {/* ─── Logo ─── */}
+      <Box
+        sx={{
+          px: 3,
+          pt: 3,
+          pb: 2,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderBottom: `1px solid ${TOKEN.gray100}`,
+        }}
+      >
+        <Image
+          src="/images/logo_santaane.png"
+          alt="Logo Santaane"
+          width={160}
+          height={50}
+          style={{ objectFit: 'contain' }}
+          priority
+        />
+      </Box>
+
+      {/* ─── User profile ─── */}
+      <Box sx={{ px: 3, py: 2.5, display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Avatar
+          sx={{
+            width: 42,
+            height: 42,
+            bgcolor: TOKEN.black,
+            color: TOKEN.white,
+            borderRadius: '8px',
+            fontSize: '1rem',
+            fontWeight: 700,
+            fontFamily: fontSans,
+            flexShrink: 0,
+          }}
+        >
+          {user.fullName.charAt(0).toUpperCase()}
+        </Avatar>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            noWrap
+            sx={{ fontFamily: fontSans, fontSize: '0.875rem', letterSpacing: '-0.01em', color: TOKEN.black }}
+          >
             {user.fullName}
           </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap>
-            {user.roles.map((role) => ROLE_CONFIGS[role]?.label).filter(Boolean).join(', ')}
+          <Typography
+            variant="caption"
+            sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontWeight: 500, fontSize: '0.72rem', letterSpacing: '0.01em' }}
+          >
+            {user.roles.map((role) => ROLE_CONFIGS[role]?.label).filter(Boolean).join(' · ')}
           </Typography>
         </Box>
       </Box>
 
-      <Divider />
+      <Divider sx={{ borderColor: TOKEN.gray100 }} />
 
-      {/* Menu Items - Scrollable */}
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-        <List sx={styles.list}>
+      {/* ─── Navigation ─── */}
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, py: 2 }}>
+        <Typography
+          variant="overline"
+          sx={{
+            px: 2,
+            mb: 1.5,
+            display: 'block',
+            fontFamily: fontSans,
+            color: TOKEN.gray500,
+            fontWeight: 700,
+            fontSize: '0.62rem',
+            letterSpacing: '0.12em',
+          }}
+        >
+          MENU PRINCIPAL
+        </Typography>
+        <List disablePadding>
           {menuItems.map((item) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
 
             return (
-              <ListItem key={item.path} disablePadding sx={styles.listItem}>
+              <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
                 <ListItemButton
                   onClick={() => handleNavigation(item.path)}
-                  sx={isActive ? styles.activeListItem : styles.listItemButton}
+                  sx={{
+                    borderRadius: '6px',
+                    py: 1.1,
+                    px: 2,
+                    position: 'relative',
+                    transition: 'all 0.15s ease',
+                    bgcolor: isActive ? TOKEN.goldDim : 'transparent',
+                    border: `1px solid ${isActive ? TOKEN.gold + '44' : 'transparent'}`,
+                    color: isActive ? TOKEN.black : TOKEN.gray500,
+                    '&:hover': {
+                      bgcolor: isActive ? TOKEN.goldDim : TOKEN.gray100,
+                      color: TOKEN.black,
+                      border: `1px solid ${isActive ? TOKEN.gold + '44' : TOKEN.gray300}`,
+                    },
+                  }}
                 >
-                  <ListItemIcon sx={styles.listItemIcon}>
-                    <Icon />
+                  {/* Active left bar */}
+                  {isActive && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        left: 0,
+                        top: '25%',
+                        height: '50%',
+                        width: '3px',
+                        borderRadius: '0 2px 2px 0',
+                        bgcolor: TOKEN.gold,
+                      }}
+                    />
+                  )}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 36,
+                      color: isActive ? TOKEN.gold : TOKEN.gray500,
+                      transition: '0.15s',
+                    }}
+                  >
+                    <Icon fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary={item.label} />
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontFamily: fontSans,
+                      fontSize: '0.85rem',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? TOKEN.black : TOKEN.gray700,
+                    }}
+                  />
                 </ListItemButton>
               </ListItem>
             );
@@ -99,15 +211,38 @@ export default function Sidebar({ mobileOpen, onMobileToggle }: SidebarProps) {
         </List>
       </Box>
 
-      <Divider />
+      <Divider sx={{ borderColor: TOKEN.gray100 }} />
 
-      {/* Logout Button */}
-      <Box sx={styles.logoutContainer}>
-        <ListItemButton onClick={handleLogout} sx={styles.logoutButton}>
-          <ListItemIcon sx={styles.listItemIcon}>
-            <LogoutIcon />
+      {/* ─── Logout ─── */}
+      <Box sx={{ p: 2 }}>
+        <ListItemButton
+          onClick={handleLogout}
+          sx={{
+            borderRadius: '6px',
+            py: 1.1,
+            px: 2,
+            color: TOKEN.gray500,
+            border: `1px solid transparent`,
+            transition: 'all 0.15s ease',
+            '&:hover': {
+              bgcolor: 'rgba(211,47,47,0.05)',
+              color: '#c62828',
+              borderColor: 'rgba(211,47,47,0.2)',
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
+            <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Déconnexion" />
+          <ListItemText
+            primary="Déconnexion"
+            primaryTypographyProps={{
+              fontFamily: fontSans,
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              color: 'inherit',
+            }}
+          />
         </ListItemButton>
       </Box>
     </Box>
@@ -115,26 +250,26 @@ export default function Sidebar({ mobileOpen, onMobileToggle }: SidebarProps) {
 
   return (
     <Box component="nav">
-      {/* Mobile Drawer (Temporary) */}
+      {/* Mobile Drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={onMobileToggle}
-        ModalProps={{
-          keepMounted: true, // Better mobile performance
-        }}
+        ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
+            bgcolor: TOKEN.white,
+            borderRight: `1px solid ${TOKEN.gray300}`,
           },
         }}
       >
         {drawerContent}
       </Drawer>
 
-      {/* Desktop Drawer (Permanent) */}
+      {/* Desktop Drawer */}
       <Drawer
         variant="permanent"
         sx={{
@@ -144,10 +279,13 @@ export default function Sidebar({ mobileOpen, onMobileToggle }: SidebarProps) {
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
-            borderRadius: 4,
-            m: 1,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            height: 'calc(100vh - 16px)',
+            bgcolor: TOKEN.white,
+            borderRight: `1px solid ${TOKEN.gray300}`,
+            height: 'calc(100vh - 32px)',
+            m: 2,
+            borderRadius: '12px',
+            boxShadow: `0 2px 16px rgba(0,0,0,0.06)`,
+            overflow: 'hidden',
           },
         }}
         open
@@ -157,68 +295,3 @@ export default function Sidebar({ mobileOpen, onMobileToggle }: SidebarProps) {
     </Box>
   );
 }
-
-const styles = {
-  userBox: {
-    p: { xs: 1.5, sm: 2 },
-    display: 'flex',
-    alignItems: 'center',
-    gap: { xs: 1, sm: 2 },
-    flexShrink: 0,
-  },
-  avatar: {
-    width: { xs: 48, sm: 64 },
-    height: { xs: 48, sm: 64 },
-    bgcolor: 'secondary.main',
-    borderRadius: 4,
-    boxShadow: '0 4px 10px rgba(0,0,0,0.25)',
-  },
-  userTextBox: {
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0, // Allow text truncation
-    flex: 1,
-  },
-  list: {
-    p: { xs: 0.5, sm: 1 },
-  },
-  listItem: {
-    mb: 0.5,
-  },
-  listItemButton: {
-    borderRadius: 3,
-    '&:hover': {
-      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-    },
-  },
-  listItemIcon: {
-    minWidth: { xs: 40, sm: 48 },
-  },
-  activeListItem: {
-    borderRadius: 3,
-    bgcolor: 'secondary.main',
-    color: 'primary.contrastText',
-    boxShadow: '0 3px 12px rgba(0,0,0,0.2)',
-    '&:hover': {
-      bgcolor: 'secondary.main',
-    },
-    '& .MuiListItemIcon-root': {
-      color: 'secondary.contrastText',
-    },
-  },
-  logoutContainer: {
-    p: { xs: 1, sm: 2 },
-    flexShrink: 0,
-  },
-  logoutButton: {
-    borderRadius: 3,
-    '&:hover': {
-      bgcolor: 'error.light',
-      color: 'error.contrastText',
-      '& .MuiListItemIcon-root': {
-        color: 'error.contrastText',
-      },
-      boxShadow: '0 4px 14px rgba(255,0,0,0.3)',
-    },
-  },
-};

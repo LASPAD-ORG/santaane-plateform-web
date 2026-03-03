@@ -1,19 +1,20 @@
 .page {
-  --background: #fafafa;
-  --foreground: #fff;
+  --background: var(--color-off-white, #f5f4f0);
+  --foreground: var(--color-white, #ffffff);
 
-  --text-primary: #000;
-  --text-secondary: #666;
+  --text-primary: var(--color-black, #0a0a0a);
+  --text-secondary: var(--color-gray-500, #8a887f);
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
+  --button-primary-bg: var(--color-black, #0a0a0a);
+  --button-primary-hover: var(--color-gold, #b8953a);
+  --button-secondary-hover: var(--color-gray-100, #f0efeb);
+  --button-secondary-border: var(--color-gray-300, #d4d2cc);
 
   display: flex;
   min-height: 100vh;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-geist-sans);
+  font-family: var(--font-sans, "Noto Sans", sans-serif);
   background-color: var(--background);
 }
 
@@ -27,6 +28,8 @@
   justify-content: space-between;
   background-color: var(--foreground);
   padding: 120px 60px;
+  border-left: 1px solid var(--button-secondary-border);
+  border-right: 1px solid var(--button-secondary-border);
 }
 
 .intro {
@@ -37,12 +40,22 @@
   gap: 24px;
 }
 
+/* Gold accent bar before heading */
+.intro::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 2px;
+  background-color: var(--color-gold, #b8953a);
+  border-radius: 2px;
+}
+
 .intro h1 {
   max-width: 320px;
   font-size: 40px;
-  font-weight: 600;
+  font-weight: 800;
   line-height: 48px;
-  letter-spacing: -2.4px;
+  letter-spacing: -0.03em;
   text-wrap: balance;
   color: var(--text-primary);
 }
@@ -50,14 +63,20 @@
 .intro p {
   max-width: 440px;
   font-size: 18px;
-  line-height: 32px;
+  line-height: 1.75;
   text-wrap: balance;
   color: var(--text-secondary);
+  font-weight: 300;
 }
 
 .intro a {
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-primary);
+  transition: color 0.2s ease;
+}
+
+.intro a:hover {
+  color: var(--color-gold, #b8953a);
 }
 
 .ctas {
@@ -65,44 +84,50 @@
   flex-direction: row;
   width: 100%;
   max-width: 440px;
-  gap: 16px;
-  font-size: 14px;
+  gap: 12px;
+  font-size: 13px;
 }
 
 .ctas a {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 128px;
+  height: 42px;
+  padding: 0 24px;
+  border-radius: 4px;
   border: 1px solid transparent;
-  transition: 0.2s;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
   width: fit-content;
-  font-weight: 500;
+  font-weight: 700;
+  font-family: var(--font-sans, "Noto Sans", sans-serif);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 12px;
 }
 
 a.primary {
-  background: var(--text-primary);
-  color: var(--background);
+  background: var(--button-primary-bg, #0a0a0a);
+  color: var(--color-white, #ffffff);
   gap: 8px;
 }
 
 a.secondary {
   border-color: var(--button-secondary-border);
+  color: var(--text-primary);
+  background: transparent;
 }
 
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
   a.primary:hover {
-    background: var(--button-primary-hover);
+    background: var(--button-primary-hover, #b8953a);
     border-color: transparent;
   }
 
   a.secondary:hover {
     background: var(--button-secondary-hover);
-    border-color: transparent;
+    border-color: var(--text-primary);
   }
 }
 
@@ -116,26 +141,18 @@ a.secondary {
   }
 
   .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -1.92px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
+    font-size: 28px;
+    line-height: 36px;
+    letter-spacing: -0.025em;
   }
 
-  .page {
-    --background: #000;
-    --foreground: #000;
+  .ctas {
+    flex-direction: column;
+    max-width: 100%;
+  }
 
-    --text-primary: #ededed;
-    --text-secondary: #999;
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
+  .ctas a {
+    width: 100%;
+    justify-content: center;
   }
 }
