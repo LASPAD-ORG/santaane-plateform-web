@@ -10,107 +10,129 @@ import {
   Button,
   IconButton,
   Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
+  Stack,
   Divider,
 } from '@mui/material';
-import { Login, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Login, Menu as MenuIcon, Close as CloseIcon, ArrowForward } from '@mui/icons-material';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+const TOKEN = {
+  black: '#0a0a0a',
+  white: '#ffffff',
+  offWhite: '#f5f4f0',
+  gray100: '#f0efeb',
+  gray300: '#d4d2cc',
+  gray500: '#8a887f',
+  gray700: '#3d3c38',
+  gold: '#b8953a',
+  goldDim: 'rgba(184,149,58,0.08)',
+};
+
+const fontSans = '"Noto Sans", sans-serif';
+
+const navLinks = [
+  { label: 'Publications', path: '/manuscripts' },
+  { label: 'Appels', path: '/appels' },
+  { label: 'Guide', path: '/guide-soumission' },
+  { label: 'À propos', path: '/about' },
+  { label: 'Contact', path: '/contact' },
+];
+
+const footerLinks = [
+  { label: 'À propos', path: '/about' },
+  { label: 'Guide de soumission', path: '/guide-soumission' },
+  { label: 'Contact', path: '/contact' },
+];
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
-  const handleMobileMenuToggle = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const menuItems = [
-    { label: 'Accueil', path: '/' },
-    { label: 'Publications', path: '/manuscripts' },
-    { label: 'Appels Ouverts', path: '/appels' },
-    { label: 'Guide de soumission', path: '/guide-soumission' },
-    { label: 'À propos', path: '/about' },
-    { label: 'Contact', path: '/contact' },
-    { label: 'Connexion', path: '/login', variant: 'outlined' as const },
-  ];
+  const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#fafafa' }}>
-      {/* Header */}
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: TOKEN.offWhite }}>
+
+      {/* ─── NAVBAR ─── */}
       <AppBar
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: 'white',
-          borderBottom: '1px solid',
-          borderColor: 'divider',
+          bgcolor: TOKEN.white,
+          borderBottom: `1px solid ${TOKEN.gray300}`,
+          color: TOKEN.black,
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Toolbar
             disableGutters
             sx={{
               justifyContent: 'space-between',
-              minHeight: { xs: 56, sm: 64, md: 70 },
-              py: { xs: 0.5, sm: 1 },
+              minHeight: { xs: 56, sm: 64, md: 68 },
+              gap: 2,
             }}
           >
             {/* Logo */}
-            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
               <Box
                 component="img"
                 src="/images/logo_santaane.png"
                 alt="Santaane"
-                sx={{
-                  height: { xs: 50, sm: 70, md: 100 },
-                  width: 'auto',
-                  py: { xs: 0.5, sm: 1 },
-                }}
+                sx={{ height: { xs: 44, sm: 56, md: 68 }, width: 'auto', py: 0.5 }}
               />
             </Link>
 
-            {/* Desktop Navigation */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-              <Link href="/manuscripts" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Publications
-                </Button>
-              </Link>
-              <Link href="/appels" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Appels
-                </Button>
-              </Link>
-              <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Guide
-                </Button>
-              </Link>
-              <Link href="/about" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  À propos
-                </Button>
-              </Link>
-              <Link href="/contact" style={{ textDecoration: 'none' }}>
-                <Button color="inherit" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                  Contact
-                </Button>
-              </Link>
+            {/* Desktop nav */}
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, flex: 1, justifyContent: 'center' }}>
+              {navLinks.map((item) => (
+                <Link key={item.path} href={item.path} style={{ textDecoration: 'none' }}>
+                  <Button
+                    sx={{
+                      fontFamily: fontSans,
+                      fontWeight: isActive(item.path) ? 700 : 500,
+                      fontSize: '0.82rem',
+                      letterSpacing: '0.02em',
+                      color: isActive(item.path) ? TOKEN.black : TOKEN.gray500,
+                      textTransform: 'none',
+                      px: 1.5,
+                      py: 0.75,
+                      borderRadius: 1,
+                      borderBottom: isActive(item.path) ? `2px solid ${TOKEN.gold}` : '2px solid transparent',
+                      borderRadius: 0,
+                      '&:hover': {
+                        color: TOKEN.black,
+                        bgcolor: 'transparent',
+                        borderBottomColor: TOKEN.gray300,
+                      },
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                </Link>
+              ))}
+            </Box>
+
+            {/* Desktop CTA */}
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, flexShrink: 0 }}>
               <Link href="/login" style={{ textDecoration: 'none' }}>
                 <Button
-                  variant="outlined"
-                  startIcon={<Login />}
+                  endIcon={<Login sx={{ fontSize: 16 }} />}
                   sx={{
-                    borderRadius: 2,
-                    borderColor: '#59a498',
-                    color: '#59a498',
-                    fontSize: '0.875rem',
-                    '&:hover': {
-                      borderColor: '#59a498',
-                      bgcolor: 'rgba(89, 164, 152, 0.08)',
-                    },
+                    fontFamily: fontSans,
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                    bgcolor: TOKEN.black,
+                    color: TOKEN.white,
+                    borderRadius: 1,
+                    px: 2.5,
+                    py: 0.9,
+                    boxShadow: 'none',
+                    '&:hover': { bgcolor: TOKEN.gold, boxShadow: 'none' },
+                    transition: 'background 0.2s ease',
                   }}
                 >
                   Connexion
@@ -118,119 +140,204 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </Link>
             </Box>
 
-            {/* Mobile Menu Icon */}
+            {/* Mobile menu icon */}
             <IconButton
-              sx={{ display: { xs: 'block', sm: 'none' } }}
-              onClick={handleMobileMenuToggle}
-              edge="end"
+              onClick={() => setMobileMenuOpen(true)}
+              sx={{
+                display: { xs: 'flex', md: 'none' },
+                color: TOKEN.black,
+                border: `1px solid ${TOKEN.gray300}`,
+                borderRadius: 1,
+                p: 0.75,
+              }}
             >
-              <MenuIcon />
+              <MenuIcon sx={{ fontSize: 22 }} />
             </IconButton>
           </Toolbar>
         </Container>
       </AppBar>
 
-      {/* Mobile Drawer Menu */}
+      {/* ─── MOBILE DRAWER ─── */}
       <Drawer
         anchor="right"
         open={mobileMenuOpen}
-        onClose={handleMobileMenuToggle}
+        onClose={() => setMobileMenuOpen(false)}
         sx={{
-          display: { xs: 'block', sm: 'none' },
+          display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
-            width: 280,
+            width: 300,
+            bgcolor: TOKEN.white,
+            borderLeft: `1px solid ${TOKEN.gray300}`,
           },
         }}
       >
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" fontWeight={600}>
-            Menu
-          </Typography>
-          <IconButton onClick={handleMobileMenuToggle}>
-            <CloseIcon />
+        {/* Drawer header */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 3,
+            py: 2,
+            borderBottom: `1px solid ${TOKEN.gray100}`,
+          }}
+        >
+          <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, borderRadius: 1 }} />
+          <IconButton
+            onClick={() => setMobileMenuOpen(false)}
+            size="small"
+            sx={{ color: TOKEN.gray500, '&:hover': { color: TOKEN.black } }}
+          >
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Box>
 
-        <Divider />
-
-        <List sx={{ px: 1, py: 2 }}>
-          {menuItems.map((item) => (
-            <ListItem key={item.path} disablePadding sx={{ mb: 1 }}>
+        {/* Nav items */}
+        <Box sx={{ p: 3 }}>
+          <Stack spacing={0.5}>
+            {navLinks.map((item) => (
               <Link
+                key={item.path}
                 href={item.path}
-                style={{ textDecoration: 'none', width: '100%' }}
-                onClick={handleMobileMenuToggle}
+                style={{ textDecoration: 'none' }}
+                onClick={() => setMobileMenuOpen(false)}
               >
-                <ListItemButton
+                <Box
                   sx={{
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: 'rgba(89, 164, 152, 0.08)',
-                    },
+                    px: 2,
+                    py: 1.5,
+                    borderRadius: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    bgcolor: isActive(item.path) ? TOKEN.goldDim : 'transparent',
+                    border: `1px solid ${isActive(item.path) ? TOKEN.gold + '44' : 'transparent'}`,
+                    transition: 'all 0.15s ease',
+                    '&:hover': { bgcolor: TOKEN.gray100 },
                   }}
                 >
-                  <ListItemText
-                    primary={
-                      <Typography
-                        fontWeight={item.variant === 'outlined' ? 600 : 400}
-                        color={item.variant === 'outlined' ? '#59a498' : 'text.primary'}
-                      >
-                        {item.label}
-                      </Typography>
-                    }
-                  />
-                </ListItemButton>
+                  <Typography
+                    sx={{
+                      fontFamily: fontSans,
+                      fontWeight: isActive(item.path) ? 700 : 500,
+                      fontSize: '0.9rem',
+                      color: isActive(item.path) ? TOKEN.black : TOKEN.gray700,
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                  {isActive(item.path) && (
+                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: TOKEN.gold }} />
+                  )}
+                </Box>
               </Link>
-            </ListItem>
-          ))}
-        </List>
+            ))}
+          </Stack>
+
+          <Divider sx={{ borderColor: TOKEN.gray100, my: 3 }} />
+
+          <Link href="/login" style={{ textDecoration: 'none' }} onClick={() => setMobileMenuOpen(false)}>
+            <Button
+              fullWidth
+              endIcon={<Login sx={{ fontSize: 16 }} />}
+              sx={{
+                fontFamily: fontSans,
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                bgcolor: TOKEN.black,
+                color: TOKEN.white,
+                borderRadius: 1,
+                py: 1.3,
+                boxShadow: 'none',
+                '&:hover': { bgcolor: TOKEN.gold, boxShadow: 'none' },
+              }}
+            >
+              Connexion
+            </Button>
+          </Link>
+        </Box>
+
+        {/* Drawer footer */}
+        <Box sx={{ mt: 'auto', p: 3, borderTop: `1px solid ${TOKEN.gray100}` }}>
+          <Typography sx={{ fontFamily: fontSans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: TOKEN.gray500 }}>
+            © {new Date().getFullYear()} LASPAD · UGB
+          </Typography>
+        </Box>
       </Drawer>
 
-      {/* Main Content */}
+      {/* ─── MAIN ─── */}
       <Box component="main" sx={{ flex: 1 }}>
         {children}
       </Box>
 
-      {/* Footer */}
+      {/* ─── FOOTER ─── */}
       <Box
         component="footer"
         sx={{
-          py: { xs: 3, md: 4 },
-          bgcolor: 'white',
-          borderTop: '1px solid',
-          borderColor: 'divider',
+          bgcolor: TOKEN.black,
+          borderTop: `1px solid rgba(255,255,255,0.06)`,
+          py: { xs: 4, md: 5 },
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Box
             sx={{
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
               justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 2,
+              alignItems: { xs: 'flex-start', md: 'center' },
+              gap: 3,
             }}
           >
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              © {new Date().getFullYear()} Santaane - Plateforme de publication scientifique
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
-              <Link href="/about" style={{ textDecoration: 'none' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: '#ff9d00' } }}>
-                  À propos
-                </Typography>
-              </Link>
-              <Link href="/guide-soumission" style={{ textDecoration: 'none' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: '#ff9d00' } }}>
-                  Guide de soumission
-                </Typography>
-              </Link>
-              <Link href="/contact" style={{ textDecoration: 'none' }}>
-                <Typography variant="body2" color="text.secondary" sx={{ '&:hover': { color: '#ff9d00' } }}>
-                  Contact
-                </Typography>
-              </Link>
+            {/* Brand */}
+            <Box>
+              <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, mb: 1.5, borderRadius: 1 }} />
+              <Typography
+                sx={{
+                  fontFamily: fontSans,
+                  fontWeight: 800,
+                  fontSize: '1rem',
+                  color: TOKEN.white,
+                  letterSpacing: '-0.01em',
+                  mb: 0.5,
+                }}
+              >
+                Santaane
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: fontSans,
+                  fontSize: '0.75rem',
+                  color: TOKEN.gray500,
+                  letterSpacing: '0.01em',
+                }}
+              >
+                © {new Date().getFullYear()} LASPAD · Université Gaston Berger
+              </Typography>
             </Box>
+
+            {/* Footer links */}
+            <Stack direction="row" spacing={3} flexWrap="wrap">
+              {footerLinks.map((item) => (
+                <Link key={item.path} href={item.path} style={{ textDecoration: 'none' }}>
+                  <Typography
+                    sx={{
+                      fontFamily: fontSans,
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      color: TOKEN.gray500,
+                      letterSpacing: '0.01em',
+                      transition: 'color 0.15s ease',
+                      '&:hover': { color: TOKEN.gold },
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                </Link>
+              ))}
+            </Stack>
           </Box>
         </Container>
       </Box>

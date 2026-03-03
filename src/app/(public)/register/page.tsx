@@ -2,68 +2,126 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Container, Paper, CircularProgress } from '@mui/material';
+import { Box, Container, Paper, CircularProgress, Typography } from '@mui/material';
 import RegisterForm from './components/RegisterForm';
 import { useAuthStore } from '@/stores/authStore';
+
+const TOKEN = {
+  black: '#0a0a0a',
+  white: '#ffffff',
+  offWhite: '#f5f4f0',
+  gray100: '#f0efeb',
+  gray300: '#d4d2cc',
+  gray500: '#8a887f',
+  gold: '#b8953a',
+};
+
+const fontSans = '"Noto Sans", sans-serif';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { user, checkAuth } = useAuthStore();
   const [isChecking, setIsChecking] = useState(true);
 
-  // Check authentication status on mount (client-side only)
   useEffect(() => {
     const checkAuthentication = async () => {
       await checkAuth();
       setIsChecking(false);
     };
-
     checkAuthentication();
   }, [checkAuth]);
 
-  // Redirect to dashboard if already authenticated
   useEffect(() => {
-    if (!isChecking && user) {
-      router.replace('/dashboard');
-    }
+    if (!isChecking && user) router.replace('/dashboard');
   }, [user, isChecking, router]);
 
-  // Show loading while checking authentication
   if (isChecking) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress />
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: TOKEN.offWhite }}>
+        <CircularProgress size={28} sx={{ color: TOKEN.gold }} />
       </Box>
     );
   }
 
-  // Don't render register form if already authenticated
-  if (user) {
-    return null;
-  }
+  if (user) return null;
 
   return (
     <Box
       sx={{
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'background.default',
+        bgcolor: TOKEN.offWhite,
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,0,0,0.03) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,0,0,0.03) 40px)',
+          pointerEvents: 'none',
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          top: '-80px',
+          right: '-80px',
+          width: '420px',
+          height: '420px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${TOKEN.gold}18 0%, transparent 70%)`,
+          pointerEvents: 'none',
+        },
       }}
     >
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <RegisterForm />
-        </Paper>
-      </Container>
+      {/* Left panel — desktop */}
+      <Box
+        sx={{
+          display: { xs: 'none', lg: 'flex' },
+          flex: '0 0 38%',
+          bgcolor: TOKEN.black,
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          p: 6,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: '-100px',
+            left: '-100px',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${TOKEN.gold}20 0%, transparent 70%)`,
+            pointerEvents: 'none',
+          },
+        }}
+      >
+        <Box>
+          <Box sx={{ width: 40, height: 2, bgcolor: TOKEN.gold, mb: 3 }} />
+          <Typography variant="h3" fontWeight={800} sx={{ fontFamily: fontSans, color: TOKEN.white, letterSpacing: '-0.03em', lineHeight: 1.1, fontSize: '2.4rem', mb: 2 }}>
+            Rejoignez Santaane
+          </Typography>
+          <Typography sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.95rem', lineHeight: 1.75, maxWidth: 280 }}>
+            Contribuez à la production de savoirs émancipateurs pour l&apos;Afrique et la diaspora.
+          </Typography>
+        </Box>
+        <Typography sx={{ fontFamily: fontSans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: TOKEN.gray500 }}>
+          © {new Date().getFullYear()} LASPAD · UGB
+        </Typography>
+      </Box>
+
+      {/* Right form panel */}
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: { xs: 2, md: 4 }, position: 'relative', zIndex: 1, py: { xs: 4, md: 6 } }}>
+        <Container maxWidth="sm" disableGutters>
+          <Paper elevation={0} sx={{ border: `1px solid ${TOKEN.gray300}`, borderRadius: 2, overflow: 'hidden', bgcolor: TOKEN.white }}>
+            <Box sx={{ height: 3, bgcolor: TOKEN.black }} />
+            <Box sx={{ p: { xs: 3.5, md: 5 } }}>
+              <RegisterForm />
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
     </Box>
   );
 }

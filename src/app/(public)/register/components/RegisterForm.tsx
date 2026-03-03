@@ -13,11 +13,45 @@ import {
   IconButton,
   FormControlLabel,
   Checkbox,
+  Divider,
+  CircularProgress,
 } from '@mui/material';
-import { Visibility, VisibilityOff, PersonAdd as RegisterIcon } from '@mui/icons-material';
+import { Visibility, VisibilityOff, ArrowForward } from '@mui/icons-material';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { AxiosError } from 'axios';
+
+const TOKEN = {
+  black: '#0a0a0a',
+  white: '#ffffff',
+  offWhite: '#f5f4f0',
+  gray100: '#f0efeb',
+  gray300: '#d4d2cc',
+  gray500: '#8a887f',
+  gray700: '#3d3c38',
+  gold: '#b8953a',
+  goldDim: 'rgba(184,149,58,0.08)',
+};
+
+const fontSans = '"Noto Sans", sans-serif';
+
+const inputSx = {
+  '& .MuiOutlinedInput-root': {
+    fontFamily: fontSans,
+    borderRadius: 1,
+    bgcolor: TOKEN.offWhite,
+    '& fieldset': { borderColor: TOKEN.gray300 },
+    '&:hover fieldset': { borderColor: TOKEN.gray700 },
+    '&.Mui-focused fieldset': { borderColor: TOKEN.black, borderWidth: 1.5 },
+  },
+  '& .MuiInputLabel-root': {
+    fontFamily: fontSans,
+    fontSize: '0.875rem',
+    color: TOKEN.gray500,
+    '&.Mui-focused': { color: TOKEN.black },
+  },
+  '& .MuiOutlinedInput-input': { fontFamily: fontSans, fontSize: '0.9rem' },
+};
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -29,7 +63,6 @@ export default function RegisterForm() {
     confirmPassword: '',
     fullName: '',
   });
-  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedEthicalCharter, setAcceptedEthicalCharter] = useState(false);
@@ -45,41 +78,27 @@ export default function RegisterForm() {
     e.preventDefault();
     setError('');
 
-    // --- Validations ---
     if (formData.password !== formData.confirmPassword) {
       setError('Les mots de passe ne correspondent pas.');
       return;
     }
-
     if (formData.password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères.');
       return;
     }
-
     if (!acceptedEthicalCharter) {
       setError('Vous devez accepter la charte éthique et les règles de soumission.');
       return;
     }
-
     if (!acceptedAPAStyle) {
       setError('Vous devez accepter le formatage des références selon le style APA.');
       return;
     }
 
     setIsLoading(true);
-
     try {
-      // 1. Appel du store pour l'inscription
-      await register({
-        email: formData.email,
-        password: formData.password,
-        fullName: formData.fullName,
-      });
-
-      // 2. Redirection vers la page OTP
-      // On passe l'email en paramètre pour que la page OTP sache à qui renvoyer le code si besoin
+      await register({ email: formData.email, password: formData.password, fullName: formData.fullName });
       router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
-      
     } catch (err) {
       const axiosError = err as AxiosError<{ detail?: string; message?: string }>;
       const errorMessage =
@@ -92,169 +111,252 @@ export default function RegisterForm() {
     }
   };
 
+  const eyeBtn = (show: boolean, toggle: () => void) => (
+    <InputAdornment position="end">
+      <IconButton onClick={toggle} edge="end" size="small" sx={{ color: TOKEN.gray500 }}>
+        {show ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
+      </IconButton>
+    </InputAdornment>
+  );
+
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 3 }}>
-        Inscription
-      </Typography>
+
+      {/* Header */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ width: 32, height: 2, bgcolor: TOKEN.gold, mb: 2, borderRadius: 1 }} />
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight={700}
+          sx={{
+            fontFamily: fontSans,
+            letterSpacing: '-0.02em',
+            fontSize: { xs: '1.6rem', md: '1.9rem' },
+            color: TOKEN.black,
+            mb: 0.5,
+          }}
+        >
+          Inscription
+        </Typography>
+        <Typography sx={{ fontFamily: fontSans, fontSize: '0.875rem', color: TOKEN.gray500 }}>
+          Créez votre compte pour soumettre vos travaux
+        </Typography>
+      </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert
+          severity="error"
+          sx={{
+            mb: 3,
+            fontFamily: fontSans,
+            fontSize: '0.85rem',
+            borderRadius: 1,
+            border: `1px solid rgba(211,47,47,0.25)`,
+          }}
+        >
           {error}
         </Alert>
       )}
 
-      <TextField
-        fullWidth
-        label="Nom complet"
-        value={formData.fullName}
-        onChange={handleChange('fullName')}
-        required
-        margin="normal"
-        autoComplete="name"
-        autoFocus
-        disabled={isLoading}
-      />
-
-      <TextField
-        fullWidth
-        label="Email"
-        type="email"
-        value={formData.email}
-        onChange={handleChange('email')}
-        required
-        margin="normal"
-        autoComplete="email"
-        disabled={isLoading}
-      />
-
-      <TextField
-        fullWidth
-        label="Mot de passe"
-        type={showPassword ? 'text' : 'password'}
-        value={formData.password}
-        onChange={handleChange('password')}
-        required
-        margin="normal"
-        autoComplete="new-password"
-        disabled={isLoading}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={() => setShowPassword(!showPassword)}
-                edge="end"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      <TextField
-        fullWidth
-        label="Confirmer le mot de passe"
-        type={showConfirmPassword ? 'text' : 'password'}
-        value={formData.confirmPassword}
-        onChange={handleChange('confirmPassword')}
-        required
-        margin="normal"
-        autoComplete="new-password"
-        disabled={isLoading}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                edge="end"
-              >
-                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      <Box sx={{ mt: 3 }}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={acceptedEthicalCharter}
-              onChange={(e) => setAcceptedEthicalCharter(e.target.checked)}
-              disabled={isLoading}
-              color="primary"
-            />
-          }
-          label={
-            <Typography variant="body2">
-              J'accepte d'avoir lu et validé la{' '}
-              <MuiLink
-                href="https://www.globalafricasciences.org/fr/ethical-charter"
-                target="_blank"
-                rel="noopener noreferrer"
-                underline="hover"
-              >
-                charte éthique
-              </MuiLink>
-              {' '}et les{' '}
-              <MuiLink
-                href="https://www.globalafricasciences.org/fr/submission"
-                target="_blank"
-                rel="noopener noreferrer"
-                underline="hover"
-              >
-                règles de soumission
-              </MuiLink>
-            </Typography>
-          }
+      {/* Fields */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+        <TextField
+          fullWidth
+          label="Nom complet"
+          value={formData.fullName}
+          onChange={handleChange('fullName')}
+          required
+          autoComplete="name"
+          autoFocus
+          disabled={isLoading}
+          sx={inputSx}
         />
+
+        <TextField
+          fullWidth
+          label="Adresse email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange('email')}
+          required
+          autoComplete="email"
+          disabled={isLoading}
+          sx={inputSx}
+        />
+
+        <Box sx={{ display: 'flex', gap: 2.5, flexWrap: 'wrap' }}>
+          <TextField
+            sx={{ ...inputSx, flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)' } }}
+            label="Mot de passe"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={handleChange('password')}
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            InputProps={{ endAdornment: eyeBtn(showPassword, () => setShowPassword(!showPassword)) }}
+          />
+          <TextField
+            sx={{ ...inputSx, flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 10px)' } }}
+            label="Confirmer le mot de passe"
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={formData.confirmPassword}
+            onChange={handleChange('confirmPassword')}
+            required
+            autoComplete="new-password"
+            disabled={isLoading}
+            InputProps={{ endAdornment: eyeBtn(showConfirmPassword, () => setShowConfirmPassword(!showConfirmPassword)) }}
+          />
+        </Box>
       </Box>
 
-      <Box sx={{ mt: 2 }}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={acceptedAPAStyle}
-              onChange={(e) => setAcceptedAPAStyle(e.target.checked)}
-              disabled={isLoading}
-              color="primary"
-            />
-          }
-          label={
-            <Typography variant="body2">
-              J'accepte d'avoir lu et je m'engage à formater toutes les citations et références bibliographiques selon le{' '}
-              <MuiLink
-                href="https://3452f183-579a-4bee-a22d0677afc123bf.filesusr.com/ugd/526d98_9ea1870e53394ea5b34499481c0aed65.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                underline="hover"
-              >
-                style APA
-              </MuiLink>
-            </Typography>
-          }
-        />
+      {/* Checkboxes */}
+      <Box
+        sx={{
+          mt: 3.5,
+          p: 3,
+          borderRadius: 1,
+          border: `1px solid ${TOKEN.gray300}`,
+          bgcolor: TOKEN.offWhite,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: fontSans,
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: TOKEN.gray500,
+            mb: 0.5,
+          }}
+        >
+          Engagements
+        </Typography>
+
+        {[
+          {
+            checked: acceptedEthicalCharter,
+            onChange: setAcceptedEthicalCharter,
+            label: (
+              <Typography sx={{ fontFamily: fontSans, fontSize: '0.82rem', color: TOKEN.gray700, lineHeight: 1.65 }}>
+                J&apos;accepte d&apos;avoir lu et validé la{' '}
+                <MuiLink
+                  href="https://www.globalafricasciences.org/fr/ethical-charter"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  underline="none"
+                  sx={{ color: TOKEN.gold, fontWeight: 600, '&:hover': { textDecoration: 'underline' } }}
+                >
+                  charte éthique
+                </MuiLink>
+                {' '}et les{' '}
+                <MuiLink
+                  href="https://www.globalafricasciences.org/fr/submission"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  underline="none"
+                  sx={{ color: TOKEN.gold, fontWeight: 600, '&:hover': { textDecoration: 'underline' } }}
+                >
+                  règles de soumission
+                </MuiLink>
+              </Typography>
+            ),
+          },
+          {
+            checked: acceptedAPAStyle,
+            onChange: setAcceptedAPAStyle,
+            label: (
+              <Typography sx={{ fontFamily: fontSans, fontSize: '0.82rem', color: TOKEN.gray700, lineHeight: 1.65 }}>
+                J&apos;accepte de formater toutes les références selon le{' '}
+                <MuiLink
+                  href="https://3452f183-579a-4bee-a22d0677afc123bf.filesusr.com/ugd/526d98_9ea1870e53394ea5b34499481c0aed65.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  underline="none"
+                  sx={{ color: TOKEN.gold, fontWeight: 600, '&:hover': { textDecoration: 'underline' } }}
+                >
+                  style APA
+                </MuiLink>
+              </Typography>
+            ),
+          },
+        ].map((item, i) => (
+          <FormControlLabel
+            key={i}
+            control={
+              <Checkbox
+                checked={item.checked}
+                onChange={(e) => item.onChange(e.target.checked)}
+                disabled={isLoading}
+                size="small"
+                sx={{
+                  color: TOKEN.gray300,
+                  '&.Mui-checked': { color: TOKEN.black },
+                  mt: '-2px',
+                }}
+              />
+            }
+            label={item.label}
+            sx={{ alignItems: 'flex-start', mr: 0 }}
+          />
+        ))}
       </Box>
 
+      {/* Submit */}
       <Button
         type="submit"
         fullWidth
         variant="contained"
         size="large"
         disabled={isLoading}
-        startIcon={<RegisterIcon />}
-        sx={{ mt: 3, mb: 2 }}
+        endIcon={
+          isLoading
+            ? <CircularProgress size={16} sx={{ color: TOKEN.white }} />
+            : <ArrowForward sx={{ fontSize: 18 }} />
+        }
+        sx={{
+          mt: 3,
+          mb: 1,
+          fontFamily: fontSans,
+          fontWeight: 700,
+          fontSize: '0.82rem',
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase',
+          bgcolor: TOKEN.black,
+          color: TOKEN.white,
+          borderRadius: 1,
+          py: 1.5,
+          boxShadow: 'none',
+          '&:hover': { bgcolor: TOKEN.gold, boxShadow: 'none' },
+          '&.Mui-disabled': { bgcolor: TOKEN.gray300, color: TOKEN.gray500 },
+          transition: 'background 0.2s ease',
+        }}
       >
-        {isLoading ? 'Inscription en cours...' : "S'inscrire"}
+        {isLoading ? "Inscription en cours…" : "S'inscrire"}
       </Button>
 
-      <Box sx={{ textAlign: 'center', mt: 2 }}>
-        <Typography variant="body2" color="text.secondary">
+      <Divider sx={{ my: 3, borderColor: TOKEN.gray100 }} />
+
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography sx={{ fontFamily: fontSans, fontSize: '0.85rem', color: TOKEN.gray500 }}>
           Vous avez déjà un compte ?{' '}
-          <MuiLink component={Link} href="/login" underline="hover">
+          <MuiLink
+            component={Link}
+            href="/login"
+            underline="none"
+            sx={{
+              fontFamily: fontSans,
+              fontWeight: 700,
+              color: TOKEN.black,
+              '&:hover': { color: TOKEN.gold },
+              transition: 'color 0.2s',
+            }}
+          >
             Se connecter
           </MuiLink>
         </Typography>
