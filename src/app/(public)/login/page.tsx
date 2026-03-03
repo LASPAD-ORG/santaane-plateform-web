@@ -147,8 +147,7 @@ export default function LoginPage() {
             fontWeight: 700,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            color: TOKEN.gray500,
-          }}
+            color: TOKEN.gray300,}}
         >
           © {new Date().getFullYear()} LASPAD · UGB
         </Typography>

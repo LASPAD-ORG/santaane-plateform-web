@@ -99,7 +99,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                       py: 0.75,
                       borderRadius: 1,
                       borderBottom: isActive(item.path) ? `2px solid ${TOKEN.gold}` : '2px solid transparent',
-                      borderRadius: 0,
                       '&:hover': {
                         color: TOKEN.black,
                         bgcolor: 'transparent',

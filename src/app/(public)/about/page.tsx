@@ -382,7 +382,7 @@ export default function AboutPage() {
             >
               <Box
                 component="img"
-                src="https://laspad.org/wp-content/uploads/2023/02/LASPAD-logo-blanc.png"
+                src="/images/logo/LASPAD-logo-noir.png"
                 alt="LASPAD - Laboratoire d'Analyse des Sociétés et Pouvoirs / Afrique – Diasporas"
                 sx={{ maxWidth: '100%', height: 'auto', maxHeight: { xs: 130, md: 170 } }}
               />
