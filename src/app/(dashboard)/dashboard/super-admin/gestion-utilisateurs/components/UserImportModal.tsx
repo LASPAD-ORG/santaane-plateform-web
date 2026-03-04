@@ -41,8 +41,8 @@ interface ImportResult {
 }
 
 const CSV_TEMPLATE = `email,prenom,nom,roles,laboratoire,specialite,telephone
-exemple@santaane.com,Jean,Dupont,AUTHOR,lab1,informatique,+221771234567
-admin@santaane.com,Marie,Martin,"EDITOR,EVALUATOR",lab2,biologie,+221762345678`;
+exemple@globalafrica.com,Jean,Dupont,AUTHOR,lab1,informatique,+221771234567
+admin@globalafrica.com,Marie,Martin,"EDITOR,EVALUATOR",lab2,biologie,+221762345678`;
 
 export function UserImportModal({ open, onClose, onImportUsers }: UserImportModalProps) {
   const [dragOver, setDragOver] = useState(false);

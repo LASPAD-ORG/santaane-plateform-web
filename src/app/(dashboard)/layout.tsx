@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" noWrap component="div">
-              Santaane
+              Global Africa Journal
             </Typography>
           </Toolbar>
         </AppBar>

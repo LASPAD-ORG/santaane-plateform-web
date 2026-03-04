@@ -125,7 +125,7 @@ export default function LoginPage() {
               mb: 2,
             }}
           >
-            Santaane
+            Global Africa Journal
           </Typography>
           <Typography
             sx={{

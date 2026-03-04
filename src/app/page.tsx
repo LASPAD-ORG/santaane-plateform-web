@@ -248,7 +248,7 @@ export default function HomePage() {
               <Box
                 component="img"
                 src="/images/logo_santaane.png"
-                alt="Santaane"
+                alt="Global Africa Journal"
                 sx={{ height: { xs: 50, sm: 70, md: 100 }, width: 'auto', py: { xs: 0.5, sm: 1 } }}
               />
             </Link>
@@ -710,7 +710,7 @@ export default function HomePage() {
             <Box>
               <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, mb: 1.5, borderRadius: 1 }} />
               <Typography variant="body2" sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.8rem' }}>
-                © {mounted ? new Date().getFullYear() : 2024} Santaane — Plateforme de publication scientifique
+                © {mounted ? new Date().getFullYear() : 2024} Global Africa Journal — Plateforme de publication scientifique
               </Typography>
             </Box>
             <Stack direction="row" spacing={3} flexWrap="wrap" justifyContent="center">

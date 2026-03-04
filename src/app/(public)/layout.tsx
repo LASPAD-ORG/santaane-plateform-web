@@ -78,7 +78,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <Box
                 component="img"
                 src="/images/logo_santaane.png"
-                alt="Santaane"
+                alt="Global Africa Journal"
                 sx={{ height: { xs: 44, sm: 56, md: 68 }, width: 'auto', py: 0.5 }}
               />
             </Link>
@@ -303,7 +303,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                   mb: 0.5,
                 }}
               >
-                Santaane
+                Global Africa Journal
               </Typography>
               <Typography
                 sx={{

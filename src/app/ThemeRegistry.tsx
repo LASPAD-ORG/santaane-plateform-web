@@ -7,7 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import GlobalAlert from '@/components/ui/GlobalAlert';
 import { createEmotionCache } from '@/lib/createEmotionCache';
 
-// ─── Santaane design tokens ───
+// ─── Global Africa Journal design tokens ───
 const GOLD = '#b8953a';
 const BLACK = '#0a0a0a';
 const OFF_WHITE = '#f5f4f0';

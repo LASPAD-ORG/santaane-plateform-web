@@ -151,7 +151,7 @@ export default function AboutPage() {
               lineHeight: 1.15,
             }}
           >
-            À propos de Santaane
+            À propos de Global Africa Journal
           </Typography>
           <Typography
             variant="h6"
@@ -174,7 +174,7 @@ export default function AboutPage() {
 
       <Container maxWidth="lg" sx={{ py: { xs: 5, md: 8 } }}>
 
-        {/* ─── SANTAANE PLATFORM ─── */}
+        {/* ─── Global Africa Journal PLATFORM ─── */}
         <Paper
           elevation={0}
           sx={{
@@ -193,14 +193,14 @@ export default function AboutPage() {
               fontWeight={700}
               sx={{ fontFamily: '"Noto Sans", sans-serif', letterSpacing: '-0.01em' }}
             >
-              La plateforme Santaane
+              La plateforme Global Africa Journal
             </Typography>
           </Stack>
 
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 5, alignItems: 'center' }}>
             <Box sx={{ flex: 1 }}>
               {[
-                'Santaane est la plateforme numérique développée par le LASPAD pour faciliter la soumission, l\'évaluation et la publication de travaux de recherche scientifique.',
+                'Global Africa Journal est la plateforme numérique développée par le LASPAD pour faciliter la soumission, l\'évaluation et la publication de travaux de recherche scientifique.',
                 'Elle permet aux chercheur.e.s de soumettre leurs manuscrits dans notre revue de presse, de bénéficier d\'une évaluation par les pairs rigoureuse et transparente, et de contribuer à la diffusion de savoirs scientifiques de qualité.',
               ].map((text, i) => (
                 <Typography
@@ -232,7 +232,7 @@ export default function AboutPage() {
                 <Box component="strong" sx={{ color: TOKEN.black, fontWeight: 600 }}>science ouverte</Box>
                 {' '}et d&apos;
                 <Box component="strong" sx={{ color: TOKEN.black, fontWeight: 600 }}>engagement social</Box>,
-                {' '}Santaane incarne notre vision d&apos;une recherche accessible, collaborative et au service des communautés africaines et de la diaspora.
+                {' '}Global Africa Journal incarne notre vision d&apos;une recherche accessible, collaborative et au service des communautés africaines et de la diaspora.
               </Typography>
             </Box>
 
@@ -250,7 +250,7 @@ export default function AboutPage() {
               <Box
                 component="img"
                 src="/images/logo_santaane.png"
-                alt="Santaane - Plateforme de publication scientifique"
+                alt="Global Africa Journal - Plateforme de publication scientifique"
                 sx={{ maxWidth: '100%', height: 'auto', maxHeight: { xs: 130, md: 170 } }}
               />
             </Box>

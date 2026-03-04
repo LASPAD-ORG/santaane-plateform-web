@@ -46,7 +46,7 @@ export default function GuideSubmissionPage() {
       icon: <PersonAdd sx={{ fontSize: 22 }} />,
       label: 'Inscription sur la plateforme',
       description:
-        'Créez un compte auteur sur la plateforme Santaane. Renseignez vos informations personnelles et académiques.',
+        'Créez un compte auteur sur la plateforme Global Africa Journal. Renseignez vos informations personnelles et académiques.',
       details: [
         'Nom complet et coordonnées',
         'Affiliation institutionnelle',
@@ -183,7 +183,7 @@ export default function GuideSubmissionPage() {
     {
       question: 'Y a-t-il des frais de soumission ou de publication ?',
       answer:
-        'Non, la soumission et la publication sur la plateforme Santaane sont entièrement gratuites. Nous croyons en l\'accès ouvert à la recherche scientifique.',
+        'Non, la soumission et la publication sur la plateforme Global Africa Journal sont entièrement gratuites. Nous croyons en l\'accès ouvert à la recherche scientifique.',
     },
   ];
 
@@ -246,7 +246,7 @@ export default function GuideSubmissionPage() {
               lineHeight: 1.7,
             }}
           >
-            Tout ce que vous devez savoir pour soumettre votre manuscrit sur Santaane
+            Tout ce que vous devez savoir pour soumettre votre manuscrit sur Global Africa Journal
           </Typography>
         </Container>
       </Box>
@@ -744,7 +744,7 @@ export default function GuideSubmissionPage() {
               fontSize: '0.95rem',
             }}
           >
-            Créez un compte et commencez votre parcours de publication sur Santaane
+            Créez un compte et commencez votre parcours de publication sur Global Africa Journal
           </Typography>
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">

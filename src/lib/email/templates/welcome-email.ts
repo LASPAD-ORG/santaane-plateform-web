@@ -17,7 +17,7 @@ export function generateWelcomeEmailHTML(data: WelcomeEmailData): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bienvenue sur Santaane</title>
+  <title>Bienvenue sur Global Africa Journal</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -160,14 +160,14 @@ export function generateWelcomeEmailHTML(data: WelcomeEmailData): string {
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎉 Bienvenue sur Santaane</h1>
+      <h1>🎉 Bienvenue sur Global Africa Journal</h1>
     </div>
     
     <div class="content">
       <p class="greeting">Bonjour ${data.prenom} ${data.nom},</p>
       
       <p>
-        Nous sommes ravis de vous accueillir sur la plateforme Santaane ! 
+        Nous sommes ravis de vous accueillir sur la plateforme Global Africa Journal ! 
         Votre compte a été créé avec succès par l'administrateur de la plateforme.
       </p>
 
@@ -238,7 +238,7 @@ export function generateWelcomeEmailHTML(data: WelcomeEmailData): string {
     </div>
     
     <div class="footer">
-      <p><strong>Santaane Platform</strong></p>
+      <p><strong>Global Africa Journal Platform</strong></p>
       <p>Plateforme de gestion scientifique</p>
       <p style="margin-top: 15px; font-size: 12px; color: #999;">
         Cet email a été envoyé automatiquement, merci de ne pas y répondre.
@@ -252,11 +252,11 @@ export function generateWelcomeEmailHTML(data: WelcomeEmailData): string {
 
 export function generateWelcomeEmailText(data: WelcomeEmailData): string {
   return `
-Bienvenue sur Santaane !
+Bienvenue sur Global Africa Journal !
 
 Bonjour ${data.prenom} ${data.nom},
 
-Nous sommes ravis de vous accueillir sur la plateforme Santaane !
+Nous sommes ravis de vous accueillir sur la plateforme Global Africa Journal !
 Votre compte a été créé avec succès par l'administrateur de la plateforme.
 
 VOS IDENTIFIANTS DE CONNEXION
@@ -276,7 +276,7 @@ COMMENT COMMENCER ?
 Si vous avez des questions ou besoin d'assistance, n'hésitez pas à contacter notre équipe support.
 
 Cordialement,
-L'équipe Santaane
+L'équipe Global Africa Journal
 
 ---
 Cet email a été envoyé automatiquement, merci de ne pas y répondre.
