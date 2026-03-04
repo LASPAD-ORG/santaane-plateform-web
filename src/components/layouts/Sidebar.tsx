@@ -85,7 +85,7 @@ export default function Sidebar({ mobileOpen, onMobileToggle }: SidebarProps) {
       >
         <Image
           src="/images/logo_santaane.png"
-          alt="Logo Santaane"
+          alt="Logo Global Africa Journal"
           width={160}
           height={50}
           style={{ objectFit: 'contain' }}

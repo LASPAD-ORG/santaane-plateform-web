@@ -237,7 +237,7 @@ export default function NotFound() {
               <Box
                 component="img"
                 src="/images/logo_santaane.png"
-                alt="Santaane"
+                alt="Global Africa Journal"
                 sx={{ height: { xs: 40, md: 52 }, width: 'auto', opacity: 0.45 }}
               />
             </Box>

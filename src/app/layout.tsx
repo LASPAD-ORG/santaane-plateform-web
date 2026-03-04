@@ -11,7 +11,7 @@ const notoSans = Noto_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Santaane Platform",
+  title: "Global Africa Journal",
   description: "Plateforme de publication scientifique du LASPAD",
 };
 

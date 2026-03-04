@@ -100,7 +100,7 @@ export default function RegisterPage() {
         <Box>
           <Box sx={{ width: 40, height: 2, bgcolor: TOKEN.gold, mb: 3 }} />
           <Typography variant="h3" fontWeight={800} sx={{ fontFamily: fontSans, color: TOKEN.white, letterSpacing: '-0.03em', lineHeight: 1.1, fontSize: '2.4rem', mb: 2 }}>
-            Rejoignez Santaane
+            Rejoignez Global Africa Journal
           </Typography>
           <Typography sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.95rem', lineHeight: 1.75, maxWidth: 280 }}>
             Contribuez à la production de savoirs émancipateurs pour l&apos;Afrique et la diaspora.
