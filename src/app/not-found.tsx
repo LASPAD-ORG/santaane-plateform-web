@@ -236,7 +236,7 @@ export default function NotFound() {
             <Box sx={{ mt: 5, pt: 4, borderTop: `1px solid ${TOKEN.gray100}` }}>
               <Box
                 component="img"
-                src="/images/logo_santaane.png"
+                src="/images/02-GA-Site-Page-Noir.gif"
                 alt="Global Africa Journal"
                 sx={{ height: { xs: 40, md: 52 }, width: 'auto', opacity: 0.45 }}
               />

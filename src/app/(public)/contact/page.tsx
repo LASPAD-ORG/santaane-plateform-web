@@ -282,7 +282,7 @@ export default function ContactPage() {
                       {
                         icon: <Email sx={{ fontSize: 17 }} />,
                         label: 'Email',
-                        value: 'contact@laspad.org',
+                        value: 'communication@laspad.org',
                       },
                     ].map((item, i) => (
                       <Stack key={i} direction="row" spacing={2} alignItems="center">

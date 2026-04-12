@@ -5,7 +5,6 @@ import {
   Box,
   Container,
   AppBar,
-  Toolbar,
   Typography,
   Button,
   IconButton,
@@ -13,7 +12,7 @@ import {
   Stack,
   Divider,
 } from '@mui/material';
-import { Login, Menu as MenuIcon, Close as CloseIcon, ArrowForward } from '@mui/icons-material';
+import { Login, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -30,6 +29,7 @@ const TOKEN = {
 };
 
 const fontSans = '"Noto Sans", sans-serif';
+const NAVBAR_HEIGHT = 68;
 
 const navLinks = [
   { label: 'Publications', path: '/manuscripts' },
@@ -62,14 +62,20 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           bgcolor: TOKEN.white,
           borderBottom: `1px solid ${TOKEN.gray300}`,
           color: TOKEN.black,
+          height: NAVBAR_HEIGHT,
         }}
       >
-        <Container maxWidth="lg">
-          <Toolbar
-            disableGutters
+        <Container
+          maxWidth="lg"
+          sx={{ height: '100%' }}
+        >
+          {/* On remplace Toolbar par Box pour éviter les overrides MUI */}
+          <Box
             sx={{
+              height: `${NAVBAR_HEIGHT}px`,
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'space-between',
-              minHeight: { xs: 56, sm: 64, md: 68 },
               gap: 2,
             }}
           >
@@ -77,38 +83,63 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
               <Box
                 component="img"
-                src="/images/logo_santaane.png"
+                src="/images/logo/02-GA-Site-Page-Noir.gif"
                 alt="Global Africa Journal"
-                sx={{ height: { xs: 44, sm: 56, md: 68 }, width: 'auto', py: 0.5 }}
+                sx={{
+                  height: 48,
+                  width: 'auto',
+                  display: 'block',
+                }}
               />
             </Link>
 
             {/* Desktop nav */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, flex: 1, justifyContent: 'center' }}>
+            <Box
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                alignItems: 'center',
+                gap: 0.5,
+                flex: 1,
+                justifyContent: 'center',
+                height: '100%',
+              }}
+            >
               {navLinks.map((item) => (
-                <Link key={item.path} href={item.path} style={{ textDecoration: 'none' }}>
-                  <Button
+                <Link key={item.path} href={item.path} style={{ textDecoration: 'none', height: '100%', display: 'flex', alignItems: 'stretch' }}>
+                  <Box
                     sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      px: 1.5,
                       fontFamily: fontSans,
                       fontWeight: isActive(item.path) ? 700 : 500,
                       fontSize: '0.82rem',
                       letterSpacing: '0.02em',
                       color: isActive(item.path) ? TOKEN.black : TOKEN.gray500,
-                      textTransform: 'none',
-                      px: 1.5,
-                      py: 0.75,
-                      borderRadius: 1,
-                      borderBottom: isActive(item.path) ? `2px solid ${TOKEN.gold}` : '2px solid transparent',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      // Trait jaune en bas — droit, pas arrondi
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '2px',
+                        bgcolor: isActive(item.path) ? TOKEN.gold : 'transparent',
+                        borderRadius: 0, // droit
+                      },
                       '&:hover': {
                         color: TOKEN.black,
-                        bgcolor: 'transparent',
-                        borderBottomColor: TOKEN.gray300,
+                        '&::after': {
+                          bgcolor: TOKEN.gray300,
+                        },
                       },
-                      transition: 'all 0.15s ease',
+                      transition: 'color 0.15s ease',
                     }}
                   >
                     {item.label}
-                  </Button>
+                  </Box>
                 </Link>
               ))}
             </Box>
@@ -152,7 +183,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             >
               <MenuIcon sx={{ fontSize: 22 }} />
             </IconButton>
-          </Toolbar>
+          </Box>
         </Container>
       </AppBar>
 
@@ -181,7 +212,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             borderBottom: `1px solid ${TOKEN.gray100}`,
           }}
         >
-          <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, borderRadius: 1 }} />
+          <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, borderRadius: 0 }} />
           <IconButton
             onClick={() => setMobileMenuOpen(false)}
             size="small"
@@ -210,7 +241,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     bgcolor: isActive(item.path) ? TOKEN.goldDim : 'transparent',
-                    border: `1px solid ${isActive(item.path) ? TOKEN.gold + '44' : 'transparent'}`,
+                    borderLeft: `3px solid ${isActive(item.path) ? TOKEN.gold : 'transparent'}`,
                     transition: 'all 0.15s ease',
                     '&:hover': { bgcolor: TOKEN.gray100 },
                   }}
@@ -226,7 +257,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                     {item.label}
                   </Typography>
                   {isActive(item.path) && (
-                    <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: TOKEN.gold }} />
+                    <Box sx={{ width: 6, height: 6, borderRadius: 0, bgcolor: TOKEN.gold }} />
                   )}
                 </Box>
               </Link>
@@ -260,7 +291,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
         {/* Drawer footer */}
         <Box sx={{ mt: 'auto', p: 3, borderTop: `1px solid ${TOKEN.gray100}` }}>
-          <Typography sx={{ fontFamily: fontSans, fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: TOKEN.gray500 }}>
+          <Typography
+            sx={{
+              fontFamily: fontSans,
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: TOKEN.gray500,
+            }}
+          >
             © {new Date().getFullYear()} LASPAD · UGB
           </Typography>
         </Box>
@@ -292,7 +332,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           >
             {/* Brand */}
             <Box>
-              <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, mb: 1.5, borderRadius: 1 }} />
+              <Box sx={{ width: 28, height: 2, bgcolor: TOKEN.gold, mb: 1.5, borderRadius: 0 }} />
               <Typography
                 sx={{
                   fontFamily: fontSans,

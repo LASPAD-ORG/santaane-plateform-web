@@ -247,7 +247,7 @@ export default function HomePage() {
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               <Box
                 component="img"
-                src="/images/logo_santaane.png"
+                src="/images/02-GA-Site-Page-Noir.gif"
                 alt="Global Africa Journal"
                 sx={{ height: { xs: 50, sm: 70, md: 100 }, width: 'auto', py: { xs: 0.5, sm: 1 } }}
               />
