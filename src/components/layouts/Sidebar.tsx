@@ -84,7 +84,7 @@ export default function Sidebar({ mobileOpen, onMobileToggle }: SidebarProps) {
         }}
       >
         <Image
-          src="/images/logo_santaane.png"
+          src="/images/02-GA-Site-Page-Noir.gif"
           alt="Logo Global Africa Journal"
           width={160}
           height={50}
