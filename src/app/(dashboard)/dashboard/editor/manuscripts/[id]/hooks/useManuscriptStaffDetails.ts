@@ -9,7 +9,8 @@ export function useManuscriptStaffDetails(manuscriptId: string) {
   const fetchManuscriptDetails = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/manuscripts/detail/${manuscriptId}`);
+      // ✅ FIX: URL via proxy Next.js rewrites (évite mixed content HTTP/HTTPS)
+      const response = await axios.get(`/api/v1/manuscripts/detail/${manuscriptId}`);
       setManuscript(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des détails:', error);
