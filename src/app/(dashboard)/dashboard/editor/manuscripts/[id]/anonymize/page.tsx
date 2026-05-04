@@ -101,7 +101,7 @@ export default function AnonymizeManuscriptPage({
 
   const fetchManuscript = async () => {
     try {
-      const response = await fetch(`/api/manuscripts/detail/${manuscriptId}`);
+      const response = await fetch(`/api/v1/manuscripts/detail/${manuscriptId}`);
       if (!response.ok) throw new Error('Erreur lors du chargement');
 
       const data = await response.json();
@@ -191,7 +191,7 @@ export default function AnonymizeManuscriptPage({
     );
   }
 
-  const pdfUrl = `${API_URL}/api/v1/files/view/${manuscript.pdfFilename}`;
+  const pdfUrl = `/api/v1/files/view/${manuscript.pdfFilename}`;
   const isAnonymized = manuscript.isAnonymized || anonymizationStatus?.isAnonymized || false;
 
   return (
