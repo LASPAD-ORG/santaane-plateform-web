@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { ManuscriptDetail } from '@/types/manuscriptDetail';
+import { apiClient } from '@/lib/api/client';
 
 export function useManuscriptStaffDetails(manuscriptId: string) {
   const [manuscript, setManuscript] = useState<ManuscriptDetail | null>(null);
@@ -9,11 +9,8 @@ export function useManuscriptStaffDetails(manuscriptId: string) {
   const fetchManuscriptDetails = async () => {
     setLoading(true);
     try {
-      // ✅ FIX: URL via proxy Next.js rewrites (évite mixed content HTTP/HTTPS)
-
-      const response = await fetch(`/api/manuscripts/detail/${manuscriptId}`);
-
-
+      // ✅ FIX: apiClient a withCredentials:true — envoie le cookie auth_token
+      const response = await apiClient.get(`/manuscripts/detail/${manuscriptId}`);
       setManuscript(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des détails:', error);
