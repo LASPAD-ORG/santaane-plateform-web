@@ -184,14 +184,15 @@ export default function PdfRedactor({
     []
   );
 
-  const pdfDocument = authToken
-    ? {
-        url: pdfUrl,
-        httpHeaders: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      }
-    : pdfUrl;
+  const pdfDocument = {
+    url: pdfUrl,
+    withCredentials: true,
+    ...(authToken && {
+      httpHeaders: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    }),
+  };
 
   return (
     <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
