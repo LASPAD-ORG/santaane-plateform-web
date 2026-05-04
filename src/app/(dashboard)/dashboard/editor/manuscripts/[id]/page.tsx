@@ -525,7 +525,7 @@ export default function EditorManuscriptDetailsPage() {
                 </Button>
               )}
             </Box>
-            <PdfViewer pdfUrl={`${API_URL}/api/v1/files/view/${manuscript.pdfFilename}`} />
+            <PdfViewer pdfUrl={`/api/v1/files/view/${manuscript.pdfFilename}`} />
           </CardContent>
         </Card>
       )}
