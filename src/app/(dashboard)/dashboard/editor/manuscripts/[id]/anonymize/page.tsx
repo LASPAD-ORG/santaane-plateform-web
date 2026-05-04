@@ -191,7 +191,7 @@ export default function AnonymizeManuscriptPage({
     );
   }
 
-  const pdfUrl = `/api/v1/files/view/${manuscript.pdfFilename}`;
+  const pdfUrl = `/api/files/download/${manuscript.pdfFilename}`;
   const isAnonymized = manuscript.isAnonymized || anonymizationStatus?.isAnonymized || false;
 
   return (
