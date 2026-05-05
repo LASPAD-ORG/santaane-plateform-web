@@ -139,9 +139,13 @@ function VerifyOtpContent() {
                 <Typography variant="h5" fontWeight={700} sx={{ fontFamily: fontSans, letterSpacing: '-0.01em', mb: 0.75 }}>
                   Vérification de l&apos;email
                 </Typography>
-                <Typography sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.875rem', lineHeight: 1.75, mb: 3.5 }}>
+                <Typography sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.875rem', lineHeight: 1.75, mb: 0.5 }}>
                   Un code de vérification a été envoyé à{' '}
                   <Box component="strong" sx={{ color: TOKEN.black, fontWeight: 600 }}>{email}</Box>
+                </Typography>
+                {/* Mention dossier spam */}
+                <Typography sx={{ fontFamily: fontSans, color: TOKEN.gray500, fontSize: '0.8rem', lineHeight: 1.6, mb: 3.5 }}>
+                  Si vous ne le trouvez pas, vérifiez votre dossier <Box component="strong" sx={{ color: TOKEN.gray700 }}>spam</Box> ou courrier indésirable.
                 </Typography>
 
                 {error && (
