@@ -26,7 +26,7 @@ COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies with cache mount for faster builds
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install
 
 # =============================================================================
 # STAGE 3: Builder - Build Next.js application
@@ -86,7 +86,7 @@ FROM base AS production
 # Install only production dependencies
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install
 
 # Copy built application from builder
 # Note: Next.js standalone mode outputs to .next/standalone
