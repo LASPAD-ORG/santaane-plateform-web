@@ -86,7 +86,7 @@ FROM base AS production
 # Install only production dependencies
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile --prod
+    pnpm install --frozen-lockfile
 
 # Copy built application from builder
 # Note: Next.js standalone mode outputs to .next/standalone
