@@ -88,7 +88,7 @@ export default function ViewManuscriptPage({
         setAuthToken('authenticated');
 
         // 2. Récupérer le manuscrit
-        const response = await fetch('/api/evaluator/manuscripts');
+        const response = await fetch('/api/evaluator/manuscripts', { credentials: 'include' });
         if (!response.ok) {
           throw new Error('Erreur lors du chargement des manuscrits');
         }
