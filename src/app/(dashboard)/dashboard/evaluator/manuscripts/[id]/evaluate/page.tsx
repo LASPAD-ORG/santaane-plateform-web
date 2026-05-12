@@ -143,7 +143,7 @@ export default function EvaluateManuscriptPage({
 
   const fetchManuscript = async () => {
     try {
-      const response = await fetch('/api/evaluator/manuscripts');
+      const response = await fetch('/api/evaluator/manuscripts', { credentials: 'include' });
       if (!response.ok) throw new Error('Erreur lors du chargement');
 
       const data = await response.json();
