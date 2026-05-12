@@ -89,7 +89,7 @@ export default function EvaluateManuscriptPage({
     createAnnotation,
     updateAnnotation,
     deleteAnnotation,
-  } = useAnnotations({ manuscriptId: parseInt(manuscriptId) });
+  } = useAnnotations({ manuscriptId: manuscript ? parseInt(manuscriptId) : 0 });
 
   // Filter highlights to only include those with valid position data
   const highlights = React.useMemo(() => {
