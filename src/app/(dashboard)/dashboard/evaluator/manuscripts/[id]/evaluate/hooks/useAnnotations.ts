@@ -12,9 +12,10 @@ import { useAlertStore } from '@/stores/alertStore';
 
 interface UseAnnotationsOptions {
   manuscriptId: number;
+  evaluatorId?: number;
 }
 
-export function useAnnotations({ manuscriptId }: UseAnnotationsOptions) {
+export function useAnnotations({ manuscriptId, evaluatorId }: UseAnnotationsOptions) {
   const [highlights, setHighlights] = useState<EvaluatorHighlight[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -23,7 +24,7 @@ export function useAnnotations({ manuscriptId }: UseAnnotationsOptions) {
   const loadAnnotations = useCallback(async () => {
     setLoading(true);
     try {
-      const backendAnnotations = await annotationService.getAnnotations(manuscriptId);
+      const backendAnnotations = await annotationService.getAnnotations(manuscriptId, evaluatorId);
       const frontendHighlights = backendAnnotations.map(backendAnnotationToHighlight);
       setHighlights(frontendHighlights);
     } catch (error: any) {

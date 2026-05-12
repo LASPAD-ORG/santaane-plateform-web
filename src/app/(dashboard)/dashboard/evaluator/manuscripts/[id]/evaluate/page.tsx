@@ -34,6 +34,7 @@ import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 import { PdfZoomControls } from './components/PdfZoomControls';
 import { EvaluationGridDialog } from './components/EvaluationGridDialog';
 import { ManuscriptDetailsDialog } from './components/ManuscriptDetailsDialog';
+import { useAuthStore } from '@/stores/authStore';
 import { useAnnotations } from './hooks/useAnnotations';
 import { useRedactionMasks } from './hooks/useRedactionMasks';
 
@@ -63,6 +64,7 @@ export default function EvaluateManuscriptPage({
   params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
+  const { user } = useAuthStore();
   const resolvedParams = use(params);
   const manuscriptId = resolvedParams.id;
   const theme = useTheme();
@@ -89,7 +91,7 @@ export default function EvaluateManuscriptPage({
     createAnnotation,
     updateAnnotation,
     deleteAnnotation,
-  } = useAnnotations({ manuscriptId: manuscript ? parseInt(manuscriptId) : 0 });
+  } = useAnnotations({ manuscriptId: manuscript ? parseInt(manuscriptId) : 0, evaluatorId: user ? parseInt(user.id) : undefined });
 
   // Filter highlights to only include those with valid position data
   const highlights = React.useMemo(() => {
