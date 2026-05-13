@@ -295,7 +295,7 @@ export default function EvaluateManuscriptPage({
     );
   }
 
-  const pdfUrl = `${API_URL}/api/v1/files/view/${manuscript.pdfFilename}`;
+  const pdfUrl = `/api/manuscripts/${manuscriptId}/download`;
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
