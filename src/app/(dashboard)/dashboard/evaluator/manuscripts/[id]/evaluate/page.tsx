@@ -38,7 +38,6 @@ import { useAuthStore } from '@/stores/authStore';
 import { useAnnotations } from './hooks/useAnnotations';
 import { useRedactionMasks } from './hooks/useRedactionMasks';
 
-// Chargement dynamique pour éviter les erreurs SSR avec pdfjs
 const PdfAnnotator = dynamic(() => import('./components'), {
   ssr: false,
   loading: () => (
@@ -50,7 +49,6 @@ const PdfAnnotator = dynamic(() => import('./components'), {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-// Fonction utilitaire pour obtenir les cookies
 function getCookie(name: string): string | undefined {
   if (typeof document === 'undefined') return undefined;
   const value = `; ${document.cookie}`;
@@ -83,7 +81,7 @@ export default function EvaluateManuscriptPage({
   const [exportProgress, setExportProgress] = useState({ current: 0, total: 0 });
   const highlighterUtilsRef = React.useRef<any>(null);
 
-  // Hook pour gérer la persistance des annotations
+  // ✅ FIX : parseInt(manuscriptId) directement, sans condition manuscript
   const {
     highlights: rawHighlights,
     loading: loadingAnnotations,
@@ -91,9 +89,9 @@ export default function EvaluateManuscriptPage({
     createAnnotation,
     updateAnnotation,
     deleteAnnotation,
-  } = useAnnotations({ manuscriptId: manuscript ? parseInt(manuscriptId) : 0, evaluatorId: user ? parseInt(user.id) : undefined });
+  } = useAnnotations({ manuscriptId: parseInt(manuscriptId), evaluatorId: user ? parseInt(user.id) : undefined });
 
-  // Filter highlights to only include those with valid position data
+
   const highlights = React.useMemo(() => {
     return rawHighlights.filter(highlight => {
       const hasValidPosition = highlight.position &&
@@ -106,10 +104,6 @@ export default function EvaluateManuscriptPage({
     });
   }, [rawHighlights]);
 
-  // Hook pour récupérer les masques de redaction (zones anonymisées)
-  // Charger les masques dès que le manuscrit est chargé
-  // Note: authToken n'est pas nécessaire car il est dans un cookie HTTP-Only
-  // qui sera automatiquement envoyé avec les requêtes
   const redactionEnabled = !!manuscript;
   console.log('Redaction masks enabled:', {
     manuscript: !!manuscript,
@@ -125,7 +119,6 @@ export default function EvaluateManuscriptPage({
     enabled: redactionEnabled
   });
 
-  // Log des masques de redaction
   console.log('Redaction masks loaded:', {
     count: redactionMasks.length,
     loading: loadingRedactionMasks,
@@ -170,20 +163,14 @@ export default function EvaluateManuscriptPage({
     setExportProgress({ current: 0, total: 0 });
 
     try {
-      // Utiliser notre route API Next.js qui gère l'authentification automatiquement
-      const pdfUrl = `/api/manuscripts/${manuscriptId}/download`;
-      
-      // Combiner les annotations de l'évaluateur avec les masques de rédaction
       const allHighlights = [
-        // Annotations de l'évaluateur (en jaune)
         ...highlights.map(h => ({
           id: h.id,
           type: h.type,
           content: h.content,
           position: h.position,
-          highlightColor: 'rgba(255, 235, 59, 0.4)', // Couleur jaune pour les annotations
+          highlightColor: 'rgba(255, 235, 59, 0.4)',
         })),
-        // Masques de rédaction (en noir opaque)
         ...redactionMasks.map(mask => {
           try {
             const position = JSON.parse(mask.positionData);
@@ -191,33 +178,30 @@ export default function EvaluateManuscriptPage({
               id: mask.id,
               type: 'area' as const,
               position: position,
-              highlightColor: '#000000', // Couleur noire opaque pour les masques
+              highlightColor: '#000000',
               content: { text: '' },
             };
           } catch (error) {
             console.error('Failed to parse redaction mask position:', error);
             return null;
           }
-        }).filter((h): h is NonNullable<typeof h> => h !== null), // Supprimer les masques invalides
+        }).filter((h): h is NonNullable<typeof h> => h !== null),
       ];
 
-      // Utiliser notre route API Next.js qui gère l'authentification automatiquement
       const exportPdfUrl = `/api/manuscripts/${manuscriptId}/download`;
 
-      // Exporter le PDF avec toutes les annotations et masques
       const pdfBytes = await exportPdf(
-        exportPdfUrl, // URL simple - les cookies sont gérés automatiquement
+        exportPdfUrl,
         allHighlights,
         {
-          textHighlightColor: 'rgba(255, 235, 59, 0.4)', // Jaune pour les annotations de texte
-          areaHighlightColor: 'rgba(255, 235, 59, 0.4)', // Jaune pour les annotations de zone  
+          textHighlightColor: 'rgba(255, 235, 59, 0.4)',
+          areaHighlightColor: 'rgba(255, 235, 59, 0.4)',
           onProgress: (current, total) => {
             setExportProgress({ current, total });
           },
         }
       );
 
-      // Télécharger le fichier PDF annoté
       const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -244,7 +228,6 @@ export default function EvaluateManuscriptPage({
 
     setIsSubmitting(true);
     try {
-      // TODO: Implémenter l'envoi de l'évaluation au backend
       console.log('Soumission de l\'évaluation:', {
         manuscriptId,
         highlights: highlights.map(h => ({
@@ -254,9 +237,7 @@ export default function EvaluateManuscriptPage({
         })),
       });
 
-      // Simuler l'envoi
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       alert('Évaluation soumise avec succès !');
       router.push('/dashboard/evaluator/manuscripts');
     } catch (err) {
@@ -281,8 +262,6 @@ export default function EvaluateManuscriptPage({
   const handleHighlightClick = (highlightId: string) => {
     const highlight = highlights.find((h) => h.id === highlightId);
     if (highlight && highlighterUtilsRef.current) {
-      // All highlights are pre-filtered to have valid positions
-      // Fermer la sidebar sur mobile après clic
       if (isMobile) {
         setSidebarOpen(false);
       }
@@ -366,9 +345,9 @@ export default function EvaluateManuscriptPage({
               </Stack>
             )}
             <Tooltip title={isExporting ? "Export en cours..." : "Télécharger le PDF annoté"}>
-              <IconButton 
-                onClick={handleDownload} 
-                color="primary" 
+              <IconButton
+                onClick={handleDownload}
+                color="primary"
                 disabled={isExporting}
               >
                 {isExporting ? <CircularProgress size={20} /> : <Download />}
@@ -380,8 +359,8 @@ export default function EvaluateManuscriptPage({
               </Typography>
             )}
             <Tooltip title="Détails du manuscrit">
-              <IconButton 
-                onClick={() => setManuscriptDetailsOpen(true)} 
+              <IconButton
+                onClick={() => setManuscriptDetailsOpen(true)}
                 color="primary"
               >
                 <InfoOutlined />
@@ -405,7 +384,6 @@ export default function EvaluateManuscriptPage({
           </Alert>
         )}
 
-        {/* Message informatif si l'annotation n'est pas autorisée */}
         {manuscript?.assignmentStatus !== 'accepted' && (
           <Alert severity="info" sx={{ mt: 2 }}>
             Vous devez accepter la demande d'évaluation pour pouvoir annoter ce manuscrit et accéder à la grille d'évaluation.
@@ -413,9 +391,8 @@ export default function EvaluateManuscriptPage({
         )}
       </Paper>
 
-      {/* Contenu principal - Layout en 2 colonnes */}
+      {/* Contenu principal */}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* PDF Viewer */}
         <Box
           sx={{
             flex: 1,
@@ -425,7 +402,6 @@ export default function EvaluateManuscriptPage({
             transition: 'all 0.3s ease-in-out',
           }}
         >
-          {/* Contrôles de zoom et toggle sidebar */}
           <Box sx={{
             p: 2,
             borderBottom: '1px solid',
@@ -438,7 +414,6 @@ export default function EvaluateManuscriptPage({
               currentZoom={pdfScaleValue}
               onZoomChange={setPdfScaleValue}
             />
-
             <Tooltip title={sidebarOpen ? 'Masquer les commentaires' : 'Afficher les commentaires'}>
               <IconButton
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -450,17 +425,14 @@ export default function EvaluateManuscriptPage({
             </Tooltip>
           </Box>
 
-          {/* PDF Viewer */}
           <Box sx={{ flex: 1, overflow: 'hidden' }}>
             <PdfAnnotator
               pdfUrl={pdfUrl}
               initialHighlights={highlights}
               onHighlightsChange={(newHighlights) => {
-                // Détecter si c'est un ajout d'annotation
                 const addedHighlight = newHighlights.find(
                   (h) => !highlights.some((old) => old.id === h.id)
                 );
-
                 if (addedHighlight) {
                   createAnnotation(addedHighlight);
                 }
@@ -468,13 +440,12 @@ export default function EvaluateManuscriptPage({
               authToken={authToken}
               pdfScaleValue={pdfScaleValue}
               utilsRef={highlighterUtilsRef}
-              redactionMasks={redactionMasks} // NOUVEAU: Passer les masques de redaction
-              annotationEnabled={manuscript?.assignmentStatus === 'accepted'} // NOUVEAU: Autoriser l'annotation seulement si accepté
+              redactionMasks={redactionMasks}
+              annotationEnabled={manuscript?.assignmentStatus === 'accepted'}
             />
           </Box>
         </Box>
 
-        {/* Sidebar avec commentaires - Desktop: Box fixe, Mobile: Drawer */}
         {isMobile ? (
           <Drawer
             anchor="right"
@@ -515,14 +486,12 @@ export default function EvaluateManuscriptPage({
         )}
       </Box>
 
-      {/* Dialog de confirmation de suppression */}
       <DeleteConfirmDialog
         open={Boolean(highlightToDelete)}
         onConfirm={confirmDelete}
         onCancel={() => setHighlightToDelete(null)}
       />
 
-      {/* Dialog de grille d'évaluation */}
       <EvaluationGridDialog
         open={evaluationGridOpen}
         onClose={() => setEvaluationGridOpen(false)}
@@ -531,7 +500,6 @@ export default function EvaluateManuscriptPage({
         manuscriptId={parseInt(manuscriptId)}
       />
 
-      {/* Dialog des détails du manuscrit */}
       <ManuscriptDetailsDialog
         open={manuscriptDetailsOpen}
         onClose={() => setManuscriptDetailsOpen(false)}
