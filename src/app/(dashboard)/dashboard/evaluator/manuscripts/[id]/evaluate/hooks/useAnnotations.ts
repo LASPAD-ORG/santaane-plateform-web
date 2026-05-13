@@ -21,6 +21,11 @@ export function useAnnotations({ manuscriptId, evaluatorId }: UseAnnotationsOpti
   const [saving, setSaving] = useState(false);
 
   const loadAnnotations = useCallback(async () => {
+    // ✅ FIX : ne pas charger si evaluatorId n'est pas encore disponible
+    if (!evaluatorId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const backendAnnotations = await annotationService.getAnnotations(manuscriptId, evaluatorId);
@@ -33,7 +38,7 @@ export function useAnnotations({ manuscriptId, evaluatorId }: UseAnnotationsOpti
     } finally {
       setLoading(false);
     }
-  }, [manuscriptId, evaluatorId]); // ✅ FIX : evaluatorId dans les dépendances
+  }, [manuscriptId, evaluatorId]);
 
   useEffect(() => {
     loadAnnotations();
