@@ -1,49 +1,41 @@
-import { apiClient } from '@/lib/api/client';
 import type { BackendRedaction } from '@/types/redaction';
 
-/**
- * Service for retrieving manuscript redactions for evaluators
- * 
- * This service allows evaluators to see redacted zones (as black masks)
- * without accessing the original redaction content or comments.
- * Only the position data is used to create black overlays.
- */
+function getCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+}
+
 export const redactionViewerService = {
-  /**
-   * Get redacted zones for an evaluator viewing a manuscript
-   * 
-   * Returns only position data to create black masks - no sensitive content
-   * 
-   * @param manuscriptId - ID of the manuscript
-   * @returns Array of redaction positions (without sensitive content)
-   */
   async getRedactionMasks(manuscriptId: number): Promise<RedactionMask[]> {
     try {
-      // Call backend via Next.js API route to get redaction masks for this manuscript
-      // This endpoint returns only position data for masking
-      const { data } = await apiClient.get(`/v1/manuscripts/${manuscriptId}/redaction-masks`);
-      return data;
-    } catch (error: any) {
-      // Log more details about the error to help debug
-      console.error('Error fetching redaction masks:', {
-        manuscriptId,
-        status: error?.response?.status,
-        message: error?.response?.data?.detail || error.message
+      const response = await fetch(`/api/v1/manuscripts/${manuscriptId}/redaction-masks`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       
-      // Return empty array if endpoint doesn't exist or access denied
-      // This is expected behavior - not all manuscripts have redactions
+      if (!response.ok) {
+        console.error('Error fetching redaction masks:', response.status);
+        return [];
+      }
+      
+      return await response.json();
+    } catch (error: any) {
+      console.error('Error fetching redaction masks:', {
+        manuscriptId,
+        message: error.message
+      });
       return [];
     }
   },
 };
 
-/**
- * Redaction mask for evaluators
- * Contains only position data needed to render black overlay
- */
 export interface RedactionMask {
   id: string;
   pageNumber: number;
-  positionData: string; // JSON with bounding rectangles
+  positionData: string;
 }
