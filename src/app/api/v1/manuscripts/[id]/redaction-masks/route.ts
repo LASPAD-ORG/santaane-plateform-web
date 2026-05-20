@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -9,36 +8,30 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get('auth_token');
+    
+    // Lire le cookie directement depuis les headers de la requête
+    const cookieHeader = request.headers.get('cookie') || '';
+    console.log('[redaction-masks] Cookie header:', cookieHeader.substring(0, 100));
+    
+    const match = cookieHeader.match(/auth_token=([^;]+)/);
+    const authToken = match?.[1];
+    
+    console.log('[redaction-masks] Token found:', !!authToken);
 
     if (!authToken) {
-      return NextResponse.json(
-        { detail: 'Token d\'authentification manquant' },
-        { status: 401 }
-      );
+      return NextResponse.json({ detail: 'Token manquant' }, { status: 401 });
     }
 
     const response = await fetch(`${API_URL}/api/v1/manuscripts/${id}/redaction-masks`, {
-      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken.value}`,
+        'Authorization': `Bearer ${authToken}`,
       },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ detail: 'Erreur inconnue' }));
-      return NextResponse.json(errorData, { status: response.status });
-    }
-
     const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error('Error proxying redaction-masks request:', error);
-    return NextResponse.json(
-      { detail: 'Erreur lors de la récupération des masques de redaction' },
-      { status: 500 }
-    );
+    console.error('[redaction-masks] Error:', error);
+    return NextResponse.json({ detail: 'Erreur serveur' }, { status: 500 });
   }
 }
