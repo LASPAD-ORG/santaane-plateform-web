@@ -1,0 +1,1 @@
+export default function EvaluatorManuscriptLayout({ children }: { children: React.ReactNode }) { return <>{children}</>; }

@@ -17,9 +17,11 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const page = searchParams.get('page') || '1';
     const size = searchParams.get('size') || '20';
+    const type = searchParams.get('type');
+    const typeParam = type ? `&type=${type}` : '';
 
     const response = await axios.get(
-      `${API_URL}/api/v1/users/evaluators?page=${page}&size=${size}`,
+      `${API_URL}/api/v1/users/evaluators?page=${page}&size=${size}${typeParam}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
