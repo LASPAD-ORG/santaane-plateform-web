@@ -35,9 +35,6 @@ services:
     ports:
       - "3000:3000"
 
-    networks:
-      - santaane_network
-
     healthcheck:
       test: ["CMD", "node", "healthcheck.js"]
       interval: 30s
@@ -57,8 +54,3 @@ services:
 
     labels:
       - production.service=santaane-web
-
-# Production network
-networks:
-  santaane_network:
-    driver: bridge
