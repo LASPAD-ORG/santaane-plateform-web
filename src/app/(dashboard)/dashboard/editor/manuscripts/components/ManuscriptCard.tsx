@@ -20,6 +20,7 @@ import {
   MoreVert,
   Edit,
   PersonAdd,
+  Person,
   HourglassEmpty,
   ThumbUp,
   ThumbDown,
@@ -34,6 +35,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useAlertStore } from '@/stores/alertStore';
 import AssignEvaluatorDialog from './AssignEvaluatorDialog';
+import AssignInternalEvaluatorDialog from './AssignInternalEvaluatorDialog';
 import EvaluatorHistoryDialog from './EvaluatorHistoryDialog';
 // Importation du nouveau dialogue de gestion éditoriale
 import EditorialManagerDialog from './EditorialManagerDialog';
@@ -49,6 +51,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
   const { showSuccess, showError } = useAlertStore();
   const [updating, setUpdating] = useState(false);
   const [openAssignDialog, setOpenAssignDialog] = useState(false);
+  const [openInternalAssignDialog, setOpenInternalAssignDialog] = useState(false);
   const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
   // 1. Nouvel état pour le dialogue de gestion éditoriale
   const [openEditorialDialog, setOpenEditorialDialog] = useState(false);
@@ -232,10 +235,35 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
                 <Block fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Assigner un évaluateur">
-              <IconButton size="small" onClick={handleOpenAssignDialog} disabled={updating}>
-                <PersonAdd fontSize="small" />
-              </IconButton>
+            {/* Étape 1 : assigner un évaluateur INTERNE (si anonymisé et pas encore validé) */}
+            {manuscript.isAnonymized && !manuscript.isInternallyValidated && (
+              <Tooltip title="Assigner un évaluateur interne">
+                <IconButton
+                  size="small"
+                  color="secondary"
+                  onClick={(e) => { e.stopPropagation(); setOpenInternalAssignDialog(true); }}
+                  disabled={updating}
+                >
+                  <Person fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Étape 2 : assigner des évaluateurs EXTERNES (débloqué après validation interne) */}
+            <Tooltip title={
+              manuscript.isInternallyValidated
+                ? "Assigner un évaluateur externe"
+                : "Validation interne requise avant d'assigner des externes"
+            }>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={handleOpenAssignDialog}
+                  disabled={updating || !manuscript.isInternallyValidated}
+                >
+                  <PersonAdd fontSize="small" />
+                </IconButton>
+              </span>
             </Tooltip>
 
             {manuscript.status === 'accepted' && (
@@ -418,6 +446,13 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
 
       {/* Dialogs - Ajout de stopPropagation pour isoler les interactions */}
       <Box onClick={(e) => e.stopPropagation()}>
+        <AssignInternalEvaluatorDialog
+          open={openInternalAssignDialog}
+          onClose={() => setOpenInternalAssignDialog(false)}
+          manuscriptId={manuscript.id}
+          manuscriptTitle={manuscript.title}
+          onSuccess={onUpdate}
+        />
         <AssignEvaluatorDialog
           open={openAssignDialog}
           onClose={handleCloseAssignDialog}

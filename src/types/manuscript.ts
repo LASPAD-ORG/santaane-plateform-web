@@ -76,6 +76,7 @@ export interface Manuscript {
   evaluators?: Evaluator[];
   evaluationStatus?: EvaluationStatus;
   isAnonymized?: boolean;
+  isInternallyValidated?: boolean;
   coauthors?: Coauthor[];
   createdAt: string;
   updatedAt: string;

@@ -67,6 +67,14 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
     defaultRoute: '/dashboard/evaluator',
     color: '#7b1fa2', // Purple
   },
+
+  [UserRole.INTERNAL_EVALUATOR]: {
+    role: UserRole.INTERNAL_EVALUATOR,
+    label: 'Évaluateur interne',
+    defaultRoute: '/dashboard/internal-evaluator',
+    color: '#00897b', // Teal
+  },
+
   [UserRole.AUTHOR]: {
     role: UserRole.AUTHOR,
     label: 'Auteur',
@@ -97,6 +105,8 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: PeopleIcon,
     roles: [UserRole.SUPER_ADMIN],
   },
+
+  
   {
     label:'Roles',
     path:'/dashboard/developer/gestion-roles',
@@ -161,7 +171,18 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: ArticleIcon,
     roles: [UserRole.AUTHOR],
   },
-
+  {
+    label: 'Dashboard',
+    path: '/dashboard/internal-evaluator',
+    icon: DashboardIcon,
+    roles: [UserRole.INTERNAL_EVALUATOR],
+  },
+  {
+    label: 'Manuscrits',
+    path: '/dashboard/internal-evaluator/manuscripts',
+    icon: ArticleIcon,
+    roles: [UserRole.INTERNAL_EVALUATOR],
+  },
   // Common Profile Menu Item
 
 
@@ -182,7 +203,8 @@ export const MENU_ITEMS: MenuItem[] = [
     label: 'Profil',
     path: '/dashboard/profil',
     icon: AccountCircleIcon,
-    roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR],
+    roles: [UserRole.AUTHOR, UserRole.EDITOR, UserRole.EVALUATOR, UserRole.INTERNAL_EVALUATOR],
+
   },
   
 
@@ -223,6 +245,7 @@ export function getDefaultRouteForRoles(userRoles: UserRole[]): string {
     UserRole.SUPER_ADMIN,
     UserRole.EDITOR,
     UserRole.EVALUATOR,
+    UserRole.INTERNAL_EVALUATOR, 
     UserRole.AUTHOR,
   ];
 

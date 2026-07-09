@@ -4,6 +4,7 @@ export enum UserRole {
   DEVELOPER = 'DEVELOPER',
   EDITOR = 'EDITOR',
   EVALUATOR = 'EVALUATOR',
+  INTERNAL_EVALUATOR = 'INTERNAL_EVALUATOR',   // ← nouveau
   AUTHOR = 'AUTHOR',
 }
 
