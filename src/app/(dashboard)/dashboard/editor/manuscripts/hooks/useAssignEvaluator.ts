@@ -56,8 +56,43 @@ export function useAssignEvaluator() {
     }
   };
 
+  const assignInternalEvaluator = async (
+    manuscriptId: number,
+    data: AssignEvaluatorRequest
+  ): Promise<boolean> => {
+    setLoading(true);
+    try {
+      await axios.post(`/api/manuscripts/${manuscriptId}/assign-internal-evaluator`, data);
+      showSuccess('Évaluateur interne assigné avec succès. Un email de notification a été envoyé.');
+      return true;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorData = error.response?.data;
+        let message = "Erreur lors de l'assignation de l'évaluateur interne";
+        if (errorData) {
+          message = errorData.detail || errorData.message || errorData.error || errorData.errorCode ||
+                    (typeof errorData === 'string' ? errorData : message);
+        }
+        if (typeof message === 'string' && (
+            message.toLowerCase().includes('must be anonymized') ||
+            message.toLowerCase().includes('anonymized first')
+          )) {
+          showError("Le manuscrit doit d'abord être anonymisé avant d'assigner un évaluateur interne.");
+        } else {
+          showError(typeof message === 'string' ? message : "Erreur lors de l'assignation de l'évaluateur interne");
+        }
+      } else {
+        showError("Erreur lors de l'assignation de l'évaluateur interne");
+      }
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     assignEvaluator,
+    assignInternalEvaluator,
     loading,
   };
 }
