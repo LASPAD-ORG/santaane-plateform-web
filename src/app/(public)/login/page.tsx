@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Container, Paper, CircularProgress, Typography } from '@mui/material';
 import LoginForm from './components/LoginForm';
-import GoogleTranslate from '@/components/ui/GoogleTranslate';
 import { useAuthStore } from '@/stores/authStore';
 
 // ─── Design tokens ───
@@ -88,18 +87,6 @@ export default function LoginPage() {
         },
       }}
     >
-      {/* Language switcher - top right */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 10,
-        }}
-      >
-        <GoogleTranslate />
-      </Box>
-
       {/* Left decorative panel (desktop only) */}
       <Box
         sx={{

@@ -15,6 +15,9 @@ import {
 import { Login, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const GoogleTranslate = dynamic(() => import('@/components/ui/GoogleTranslate'), { ssr: false });
 
 const TOKEN = {
   black: '#0a0a0a',
@@ -144,8 +147,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               ))}
             </Box>
 
-            {/* Desktop CTA */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, flexShrink: 0 }}>
+            {/* Desktop CTA + Language */}
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.5, flexShrink: 0 }}>
+              <GoogleTranslate />
               <Link href="/login" style={{ textDecoration: 'none' }}>
                 <Button
                   endIcon={<Login sx={{ fontSize: 16 }} />}
@@ -170,19 +174,21 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </Link>
             </Box>
 
-            {/* Mobile menu icon */}
-            <IconButton
-              onClick={() => setMobileMenuOpen(true)}
-              sx={{
-                display: { xs: 'flex', md: 'none' },
-                color: TOKEN.black,
-                border: `1px solid ${TOKEN.gray300}`,
-                borderRadius: 1,
-                p: 0.75,
-              }}
-            >
-              <MenuIcon sx={{ fontSize: 22 }} />
-            </IconButton>
+            {/* Mobile: Language + menu icon */}
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1 }}>
+              <GoogleTranslate />
+              <IconButton
+                onClick={() => setMobileMenuOpen(true)}
+                sx={{
+                  color: TOKEN.black,
+                  border: `1px solid ${TOKEN.gray300}`,
+                  borderRadius: 1,
+                  p: 0.75,
+                }}
+              >
+                <MenuIcon sx={{ fontSize: 22 }} />
+              </IconButton>
+            </Box>
           </Box>
         </Container>
       </AppBar>
