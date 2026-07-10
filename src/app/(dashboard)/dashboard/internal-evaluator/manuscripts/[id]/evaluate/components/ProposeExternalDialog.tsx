@@ -8,21 +8,16 @@ import {
   DialogActions,
   Button,
   TextField,
-  Stack,
+  Box,
   Typography,
-  IconButton,
   List,
   ListItem,
   ListItemText,
-  Divider,
+  IconButton,
   CircularProgress,
-  Box,
+  Divider,
 } from '@mui/material';
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useAlertStore } from '@/stores/alertStore';
 
 interface Proposal {
@@ -30,8 +25,6 @@ interface Proposal {
   firstName: string;
   lastName: string;
   email: string;
-  status: string;
-  createdAt: string;
 }
 
 interface ProposeExternalDialogProps {
@@ -62,7 +55,15 @@ export default function ProposeExternalDialog({
       const res = await fetch(`/api/manuscripts/${manuscriptId}/proposed-evaluators`);
       if (!res.ok) return;
       const data = await res.json();
-      setProposals(Array.isArray(data) ? data : []);
+      const list = Array.isArray(data) ? data : [];
+      setProposals(
+        list.map((p: any) => ({
+          id: p.id,
+          firstName: p.first_name ?? p.firstName ?? '',
+          lastName: p.last_name ?? p.lastName ?? '',
+          email: p.email ?? '',
+        }))
+      );
     } catch {
       /* silencieux */
     } finally {
@@ -71,7 +72,9 @@ export default function ProposeExternalDialog({
   }, [manuscriptId]);
 
   useEffect(() => {
-    if (open) loadProposals();
+    if (open) {
+      loadProposals();
+    }
   }, [open, loadProposals]);
 
   const isValid =
@@ -92,17 +95,28 @@ export default function ProposeExternalDialog({
           email: email.trim(),
         }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.detail || data?.message || 'Proposition impossible');
+
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        /* la réponse peut ne pas avoir de corps JSON */
       }
+
+      if (!res.ok) {
+        const message =
+          data?.detail || data?.message || data?.error || 'Cet évaluateur ne peut pas être proposé';
+        showError(message);
+        return;
+      }
+
       showSuccess('Évaluateur externe proposé');
       setFirstName('');
       setLastName('');
       setEmail('');
       await loadProposals();
-    } catch (err) {
-      showError(err instanceof Error ? err.message : 'Erreur lors de la proposition');
+    } catch {
+      showError('Erreur réseau lors de la proposition');
     } finally {
       setSubmitting(false);
     }
@@ -114,13 +128,23 @@ export default function ProposeExternalDialog({
         `/api/manuscripts/${manuscriptId}/proposed-evaluators/${proposalId}`,
         { method: 'DELETE' }
       );
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.detail || data?.message || 'Suppression impossible');
+
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        /* pas de corps JSON */
       }
+
+      if (!res.ok) {
+        const message = data?.detail || data?.message || 'Suppression impossible';
+        showError(message);
+        return;
+      }
+
       setProposals((prev) => prev.filter((p) => p.id !== proposalId));
-    } catch (err) {
-      showError(err instanceof Error ? err.message : 'Erreur lors de la suppression');
+    } catch {
+      showError('Erreur réseau lors de la suppression');
     }
   };
 
@@ -129,7 +153,7 @@ export default function ProposeExternalDialog({
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         Proposer des évaluateurs externes
         <IconButton onClick={onClose} size="small">
-          <CloseIcon />
+          <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
 
@@ -138,51 +162,50 @@ export default function ProposeExternalDialog({
           Ces propositions sont transmises à l&apos;éditeur, qui reste libre de son choix final.
         </Typography>
 
-        <Stack spacing={2} sx={{ mb: 3 }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <TextField
-              label="Prénom"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              label="Nom"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              size="small"
-              fullWidth
-            />
-          </Stack>
+        <Box sx={{ display: 'flex', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
           <TextField
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            label="Prénom"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             size="small"
-            fullWidth
+            sx={{ flex: 1, minWidth: 140 }}
           />
-          <Box>
-            <Button
-              variant="contained"
-              startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : <AddIcon />}
-              onClick={handleAdd}
-              disabled={!isValid || submitting}
-            >
-              Ajouter la proposition
-            </Button>
-          </Box>
-        </Stack>
+          <TextField
+            label="Nom"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            size="small"
+            sx={{ flex: 1, minWidth: 140 }}
+          />
+        </Box>
 
-        <Divider sx={{ mb: 2 }} />
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          size="small"
+          fullWidth
+          sx={{ mb: 1.5 }}
+        />
+
+        <Button
+          variant="contained"
+          startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : <AddIcon />}
+          onClick={handleAdd}
+          disabled={!isValid || submitting}
+        >
+          Ajouter la proposition
+        </Button>
+
+        <Divider sx={{ my: 2 }} />
 
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
           Propositions ({proposals.length})
         </Typography>
 
         {loading ? (
-          <Box display="flex" justifyContent="center" py={2}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
             <CircularProgress size={24} />
           </Box>
         ) : proposals.length === 0 ? (
@@ -195,13 +218,13 @@ export default function ProposeExternalDialog({
               <ListItem
                 key={p.id}
                 secondaryAction={
-                  <IconButton edge="end" onClick={() => handleDelete(p.id)} size="small">
+                  <IconButton edge="end" size="small" onClick={() => handleDelete(p.id)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 }
               >
                 <ListItemText
-                  primary={`${p.firstName} ${p.lastName}`}
+                  primary={`${p.firstName} ${p.lastName}`.trim() || p.email}
                   secondary={p.email}
                 />
               </ListItem>
