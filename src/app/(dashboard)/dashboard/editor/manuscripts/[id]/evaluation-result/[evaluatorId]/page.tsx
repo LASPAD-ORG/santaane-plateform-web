@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import EditorProposedEvaluatorsDialog from './components/EditorProposedEvaluatorsDialog';
 import type { PdfScaleValue } from 'react-pdf-highlighter-plus';
 import {
   Box,
@@ -66,6 +67,7 @@ export default function EvaluationResultPage({
   const [authToken, setAuthToken] = useState<string>('');
   const [pdfScaleValue, setPdfScaleValue] = useState<PdfScaleValue>('auto');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [proposalsOpen, setProposalsOpen] = useState(false);
   const [gridDialogOpen, setGridDialogOpen] = useState(false);
   const highlighterUtilsRef = React.useRef<any>(null);
 
@@ -197,6 +199,13 @@ export default function EvaluationResultPage({
             >
               Voir la grille d'évaluation
             </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setProposalsOpen(true)}
+              sx={{ ml: 1 }}
+            >
+              Propositions d&apos;évaluateurs externes
+            </Button>
 
             {isMobile && (
               <IconButton onClick={() => setSidebarOpen(!sidebarOpen)}>
@@ -206,6 +215,7 @@ export default function EvaluationResultPage({
           </Stack>
         </Stack>
       </Paper>
+      
 
       {/* Main content */}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -259,6 +269,12 @@ export default function EvaluationResultPage({
           grid={grid}
         />
       )}
+      <EditorProposedEvaluatorsDialog
+        open={proposalsOpen}
+        onClose={() => setProposalsOpen(false)}
+        manuscriptId={manuscriptId}
+      />
+      
     </Box>
   );
 }
