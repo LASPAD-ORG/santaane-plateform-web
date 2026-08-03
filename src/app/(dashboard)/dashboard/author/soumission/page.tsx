@@ -31,6 +31,7 @@ import { useAlertStore } from '@/stores/alertStore';
 import GeneralInfoSection from './components/GeneralInfoSection';
 import ClassificationSection from './components/ClassificationSection';
 import PdfUploadSection from './components/PdfUploadSection';
+import InitialDocxUploadSection from './components/InitialDocxUploadSection';
 import CoauthorsSection from './components/CoauthorsSection';
 import { useManuscriptData } from './hooks/useManuscriptData';
 import { useManuscriptSubmission } from './hooks/useManuscriptSubmission';
@@ -44,6 +45,7 @@ interface ManuscriptData {
   sectionId: number | '';
   languageId: number | '';
   pdfFile: File | null;
+  initialDocxFile: File | null;
   coauthors: CoauthorInput[];
 }
 
@@ -73,6 +75,7 @@ export default function AuthorSoumission() {
     sectionId: '',
     languageId: '',
     pdfFile: null,
+    initialDocxFile: null,
     coauthors: [],
   });
 
@@ -172,6 +175,10 @@ export default function AuthorSoumission() {
           showError('Veuillez sélectionner un fichier PDF');
           return false;
         }
+        if (!formData.initialDocxFile) {
+          showError('Veuillez sélectionner le fichier Word (obligatoire)');
+          return false;
+        }
         return true;
 
       default:
@@ -212,6 +219,30 @@ export default function AuthorSoumission() {
 
   const handleRemoveFile = () => {
     setFormData((prev) => ({ ...prev, pdfFile: null }));
+  };
+
+  const handleInitialDocxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const validTypes = [
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ];
+      const isDocx = validTypes.includes(file.type) || file.name.toLowerCase().endsWith('.docx');
+      if (!isDocx) {
+        showError('Veuillez selectionner un fichier Word (.docx)');
+        return;
+      }
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        showError('Le fichier Word ne doit pas depasser 10MB');
+        return;
+      }
+      setFormData((prev) => ({ ...prev, initialDocxFile: file }));
+    }
+  };
+
+  const handleRemoveInitialDocx = () => {
+    setFormData((prev) => ({ ...prev, initialDocxFile: null }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -370,11 +401,20 @@ export default function AuthorSoumission() {
                       />
                     )}
                     {index === 4 && (
-                      <PdfUploadSection
-                        pdfFile={formData.pdfFile}
-                        onFileChange={handleFileChange}
-                        onRemoveFile={handleRemoveFile}
-                      />
+                      <>
+                        <PdfUploadSection
+                          pdfFile={formData.pdfFile}
+                          onFileChange={handleFileChange}
+                          onRemoveFile={handleRemoveFile}
+                        />
+                        <Box mt={4}>
+                          <InitialDocxUploadSection
+                            docxFile={formData.initialDocxFile}
+                            onFileChange={handleInitialDocxChange}
+                            onRemoveFile={handleRemoveInitialDocx}
+                          />
+                        </Box>
+                      </>
                     )}
                   </Box>
 

@@ -23,6 +23,7 @@ export interface ManuscriptDetail {
   status: string;
   pdfFilename: string;
   docxFilename?: string | null;
+  initialDocxFilename?: string | null;
   author: AuthorInfo;
   coauthors?: Coauthor[];
   createdAt: string;

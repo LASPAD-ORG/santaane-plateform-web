@@ -73,6 +73,7 @@ export interface Manuscript {
   status: ManuscriptStatus;
   pdfFilename: string;
   docxFilename?: string | null;
+  initialDocxFilename?: string | null;
   evaluators?: Evaluator[];
   evaluationStatus?: EvaluationStatus;
   isAnonymized?: boolean;

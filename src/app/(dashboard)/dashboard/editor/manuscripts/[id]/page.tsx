@@ -74,6 +74,12 @@ export default function EditorManuscriptDetailsPage() {
     }
   };
 
+  const handleDownloadInitialDocx = () => {
+    if (manuscript?.initialDocxFilename) {
+      window.open(`/api/files/download/${manuscript.initialDocxFilename}`, '_blank');
+    }
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await refetch();
@@ -513,6 +519,17 @@ export default function EditorManuscriptDetailsPage() {
               <Button variant="outlined" size="small" startIcon={<PictureAsPdf />} onClick={handleDownloadPdf}>
                 Télécharger PDF
               </Button>
+              {manuscript.initialDocxFilename && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="info"
+                  startIcon={<Description />}
+                  onClick={handleDownloadInitialDocx}
+                >
+                  Word initial (editeur)
+                </Button>
+              )}
               {manuscript.docxFilename && (
                 <Button
                   variant="contained"

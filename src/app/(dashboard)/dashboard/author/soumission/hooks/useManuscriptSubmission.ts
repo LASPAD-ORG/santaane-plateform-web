@@ -12,6 +12,7 @@ interface ManuscriptData {
   sectionId: number | '';
   languageId: number | '';
   pdfFile: File | null;
+  initialDocxFile: File | null;
   coauthors: CoauthorInput[];
 }
 
@@ -45,6 +46,10 @@ export function useManuscriptSubmission() {
       showError('Veuillez sélectionner un fichier PDF');
       return false;
     }
+    if (!formData.initialDocxFile) {
+      showError('Veuillez sélectionner le fichier Word (obligatoire)');
+      return false;
+    }
 
     return true;
   };
@@ -72,6 +77,18 @@ export function useManuscriptSubmission() {
       console.log('PDF uploaded successfully:', pdfFilePath);
 
       // Étape 2: Soumettre le manuscrit avec le chemin du fichier
+      const docxFormData = new FormData();
+      docxFormData.append('file', formData.initialDocxFile!);
+      docxFormData.append('subdirectory', 'manuscripts');
+
+      const docxUploadResponse = await axios.post('/api/files/upload', docxFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const initialDocxFilePath = docxUploadResponse.data.filePath;
+
       const submitData = {
         title: formData.title,
         abstract: formData.abstract,
@@ -80,6 +97,7 @@ export function useManuscriptSubmission() {
         sectionId: Number(formData.sectionId),
         languageId: Number(formData.languageId),
         pdfFilename: pdfFilePath,
+        initialDocxFilename: initialDocxFilePath,
         coauthors: formData.coauthors.length > 0 ? formData.coauthors : undefined,
       };
 
