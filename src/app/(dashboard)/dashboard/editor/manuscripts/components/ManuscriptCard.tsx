@@ -1,3 +1,5 @@
+'use client';
+
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -29,6 +31,7 @@ import {
   Block,
   Description,
   RateReview,
+  Groups,
 } from '@mui/icons-material';
 import { Manuscript, MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import { useState } from 'react';
@@ -40,6 +43,8 @@ import EvaluatorHistoryDialog from './EvaluatorHistoryDialog';
 // Importation du nouveau dialogue de gestion éditoriale
 import EditorialManagerDialog from './EditorialManagerDialog';
 import ManuscriptStatusModal from './ManuscriptStatusModal';
+import ProposedEvaluatorsDialog from './ProposedEvaluatorsDialog';
+
 
 interface ManuscriptCardProps {
   manuscript: Manuscript;
@@ -52,6 +57,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
   const [updating, setUpdating] = useState(false);
   const [openAssignDialog, setOpenAssignDialog] = useState(false);
   const [openInternalAssignDialog, setOpenInternalAssignDialog] = useState(false);
+  const [openProposalsDialog, setOpenProposalsDialog] = useState(false);
   const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
   // 1. Nouvel état pour le dialogue de gestion éditoriale
   const [openEditorialDialog, setOpenEditorialDialog] = useState(false);
@@ -108,6 +114,11 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
 
   const handleCloseHistoryDialog = () => {
     setOpenHistoryDialog(false);
+  };
+
+  const handleOpenProposalsDialog = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenProposalsDialog(true);
   };
 
   const handleDownloadDocx = (e: React.MouseEvent) => {
@@ -248,6 +259,17 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
                 </IconButton>
               </Tooltip>
             )}
+
+            {/* Voir les propositions d'évaluateurs externes faites par l'interne */}
+            <Tooltip title="Voir les propositions d'évaluateurs externes">
+              <IconButton
+                size="small"
+                onClick={handleOpenProposalsDialog}
+                disabled={updating}
+              >
+                <Groups fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
             {/* Étape 2 : assigner des évaluateurs EXTERNES (débloqué après validation interne) */}
             <Tooltip title={
@@ -461,6 +483,11 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
           onSuccess={onUpdate}
         />
 
+        <ProposedEvaluatorsDialog
+          open={openProposalsDialog}
+          onClose={() => setOpenProposalsDialog(false)}
+          manuscriptId={manuscript.id}
+        />
 
         <EvaluatorHistoryDialog
           open={openHistoryDialog}
@@ -488,15 +515,6 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
         onSuccess={onUpdate}
       />
 
-      {/* Evaluator History Dialog */}
-      <EvaluatorHistoryDialog
-        open={openHistoryDialog}
-        onClose={handleCloseHistoryDialog}
-        manuscriptTitle={manuscript.title}
-        manuscriptId={manuscript.id}
-        evaluators={evaluators}
-      />
-      
     </Card>
   );
 }

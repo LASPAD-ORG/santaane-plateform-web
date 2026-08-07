@@ -39,17 +39,17 @@ interface EvaluationGridDialogProps {
 
 const recommendationOptions = [
   {
-    value: 'accepted_with_validation',
-    label: 'Accepté sous réserve de validation par le comité de rédaction'
+    value: 'internal_accepted_after_revision',
+    label: 'Accepté pour évaluation après révisions',
   },
   {
-    value: 'resubmission_required',
-    label: 'Soumission d\'une nouvelle version'
+    value: 'internal_to_external',
+    label: 'Accepté pour évaluation externe',
   },
   {
-    value: 'rejected',
-    label: 'Refusé'
-  }
+    value: 'internal_rejected',
+    label: 'Refusé',
+  },
 ];
 
 export function EvaluationGridDialog({
@@ -65,120 +65,83 @@ export function EvaluationGridDialog({
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  // Only use the hook if NOT in readOnly mode
   const hookResult = useEvaluationGrid({
     manuscriptId,
     articleTitle: manuscriptTitle || '',
     evaluatorName: evaluatorName || '',
-    enabled: !readOnly, // Ne charge pas si en mode lecture seule
+    enabled: !readOnly,
   });
 
-  // Use hook data or default values for readOnly mode
   const grid = readOnly ? null : hookResult.grid;
   const loading = readOnly ? false : hookResult.loading;
   const saving = readOnly ? false : hookResult.saving;
   const saveGrid = readOnly ? async () => {} : hookResult.saveGrid;
 
-  // Form state
+  // Form state (grille interne : 4 champs texte + décision)
+  const [editorialLineFit, setEditorialLineFit] = useState('');
   const [originalityOfIdeas, setOriginalityOfIdeas] = useState('');
-  const [methodologyRigor, setMethodologyRigor] = useState('');
   const [theoreticalApproach, setTheoreticalApproach] = useState('');
-  const [presentationClarity, setPresentationClarity] = useState('');
-  const [strengths, setStrengths] = useState('');
-  const [weaknesses, setWeaknesses] = useState('');
-  const [suggestions, setSuggestions] = useState('');
-  const [recommendation, setRecommendation] = useState<
-    'accepted_with_validation' | 'resubmission_required' | 'rejected' | ''
+  const [globalOpinion, setGlobalOpinion] = useState('');
+  const [recommendation, setRecommendation] = useState <
+    'internal_accepted_after_revision' | 'internal_to_external' | 'internal_rejected' | ''
   >('');
-
-  // Confirmation dialog state
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load existing grid data into form
   useEffect(() => {
     const dataToLoad = readOnly ? initialData : grid;
     if (dataToLoad) {
+      setEditorialLineFit(dataToLoad.editorialLineFit || '');
       setOriginalityOfIdeas(dataToLoad.originalityOfIdeas || '');
-      setMethodologyRigor(dataToLoad.methodologyRigor || '');
       setTheoreticalApproach(dataToLoad.theoreticalApproach || '');
-      setPresentationClarity(dataToLoad.presentationClarity || '');
-      setStrengths(dataToLoad.strengths || '');
-      setWeaknesses(dataToLoad.weaknesses || '');
-      setSuggestions(dataToLoad.suggestions || '');
+      setGlobalOpinion(dataToLoad.globalOpinion || '');
       setRecommendation(dataToLoad.recommendation || '');
     }
   }, [grid, initialData, readOnly]);
 
-  // Form validation
   const isFormValid =
+    editorialLineFit.trim() !== '' &&
     originalityOfIdeas.trim() !== '' &&
-    methodologyRigor.trim() !== '' &&
     theoreticalApproach.trim() !== '' &&
-    presentationClarity.trim() !== '' &&
-    strengths.trim() !== '' &&
-    weaknesses.trim() !== '' &&
+    globalOpinion.trim() !== '' &&
     recommendation !== '';
 
-  // Handle save
+  const buildPayload = (): SaveEvaluationGridRequest => ({
+    evaluatorType: 'internal',
+    editorialLineFit,
+    originalityOfIdeas,
+    theoreticalApproach,
+    globalOpinion,
+    recommendation: recommendation as Exclude<typeof recommendation, ''>,
+  });
+
   const handleSave = async () => {
     if (!isFormValid) return;
-
-    const data: SaveEvaluationGridRequest = {
-      originalityOfIdeas,
-      methodologyRigor,
-      theoreticalApproach,
-      presentationClarity,
-      strengths,
-      weaknesses,
-      suggestions,
-      recommendation: recommendation as Exclude<typeof recommendation, ''>,
-    };
-
     try {
-      await saveGrid(data);
-      // Ne pas fermer le dialog après sauvegarde - permet de continuer à modifier
+      await saveGrid(buildPayload());
     } catch (error) {
       // Error handled by hook
     }
   };
 
-  // Handle submit evaluation
   const handleSubmit = () => {
     if (!isFormValid) {
       if (recommendation === '') {
-        useAlertStore.getState().showError('Veuillez choisir un avis avant de soumettre l\'évaluation');
+        useAlertStore.getState().showError('Veuillez choisir une décision avant de soumettre l\'évaluation');
       } else {
         useAlertStore.getState().showError('Veuillez remplir tous les champs requis');
       }
       return;
     }
-    // Open confirmation dialog
     setConfirmDialogOpen(true);
   };
 
-  // Handle confirmed submission
   const handleConfirmedSubmit = async () => {
     setConfirmDialogOpen(false);
     setIsSubmitting(true);
-
     try {
-      // 1. Sauvegarder la grille d'abord
-      const data: SaveEvaluationGridRequest = {
-        originalityOfIdeas,
-        methodologyRigor,
-        theoreticalApproach,
-        presentationClarity,
-        strengths,
-        weaknesses,
-        suggestions,
-        recommendation: recommendation as Exclude<typeof recommendation, ''>,
-      };
-      await saveGrid(data);
-
-      // 2. Soumettre l'évaluation complète (marque la grille comme soumise)
-      const response = await evaluationGridService.submitEvaluation(manuscriptId);
-
+      await saveGrid(buildPayload());
+      await evaluationGridService.submitEvaluation(manuscriptId);
       onClose();
       router.push('/dashboard/internal-evaluator/manuscripts');
     } catch (error) {
@@ -198,7 +161,7 @@ export function EvaluationGridDialog({
       scroll="paper"
     >
       <DialogTitle>
-        Grille d&apos;Évaluation
+        Grille d&apos;évaluation (interne)
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -220,7 +183,6 @@ export function EvaluationGridDialog({
           </Box>
         ) : (
           <Stack spacing={3}>
-            {/* Champ lecture seule */}
             <TextField
               label="Titre article"
               value={manuscriptTitle}
@@ -229,9 +191,21 @@ export function EvaluationGridDialog({
               variant="filled"
             />
 
-            {/* Champs éditables */}
             <TextField
-              label="Originalité et pertinence des idées"
+              label="Adéquation à la ligne éditoriale"
+              multiline
+              minRows={3}
+              maxRows={8}
+              fullWidth
+              required
+              disabled={readOnly}
+              value={editorialLineFit}
+              onChange={(e) => setEditorialLineFit(e.target.value)}
+              helperText="Le sujet correspond-il aux thématiques et aux objectifs scientifiques de la revue ?"
+            />
+
+            <TextField
+              label="Originalité et apport scientifique"
               multiline
               minRows={3}
               maxRows={8}
@@ -240,24 +214,10 @@ export function EvaluationGridDialog({
               disabled={readOnly}
               value={originalityOfIdeas}
               onChange={(e) => setOriginalityOfIdeas(e.target.value)}
-              helperText="Évaluez l'originalité et la pertinence des idées présentées"
             />
 
             <TextField
-              label="Pertinence et rigueur de la méthode, de la démarche et des références"
-              multiline
-              minRows={3}
-              maxRows={8}
-              fullWidth
-              required
-              disabled={readOnly}
-              value={methodologyRigor}
-              onChange={(e) => setMethodologyRigor(e.target.value)}
-              helperText="Commentez la rigueur méthodologique et la qualité des références"
-            />
-
-            <TextField
-              label="Recours à des études empiriques et une approche théorique solide"
+              label="Qualité de l'analyse et du cadre théorique"
               multiline
               minRows={3}
               maxRows={8}
@@ -266,81 +226,41 @@ export function EvaluationGridDialog({
               disabled={readOnly}
               value={theoreticalApproach}
               onChange={(e) => setTheoreticalApproach(e.target.value)}
-              helperText="Évaluez la solidité de l'approche théorique et empirique"
+              helperText="Méthodologie, démarche, références, approche théorique"
             />
 
             <TextField
-              label="Soin dans la présentation et la structure du texte, clarté de l'expression"
+              label="Avis global sur le manuscrit"
               multiline
               minRows={3}
               maxRows={8}
               fullWidth
               required
               disabled={readOnly}
-              value={presentationClarity}
-              onChange={(e) => setPresentationClarity(e.target.value)}
-              helperText="Commentez la qualité de la rédaction et de la présentation"
+              value={globalOpinion}
+              onChange={(e) => setGlobalOpinion(e.target.value)}
             />
 
-            <TextField
-              label="Points forts"
-              multiline
-              minRows={3}
-              maxRows={8}
-              fullWidth
-              required
-              disabled={readOnly}
-              value={strengths}
-              onChange={(e) => setStrengths(e.target.value)}
-              helperText="Listez les principaux points forts de l'article"
-            />
-
-            <TextField
-              label="Points faibles"
-              multiline
-              minRows={3}
-              maxRows={8}
-              fullWidth
-              required
-              disabled={readOnly}
-              value={weaknesses}
-              onChange={(e) => setWeaknesses(e.target.value)}
-              helperText="Listez les principaux points faibles à améliorer"
-            />
-
-            <TextField
-              label="Suggestions pour améliorer le texte"
-              multiline
-              minRows={3}
-              maxRows={8}
-              fullWidth
-              disabled={readOnly}
-              value={suggestions}
-              onChange={(e) => setSuggestions(e.target.value)}
-              helperText="Proposez des pistes d'amélioration concrètes (optionnel)"
-            />
-
-            {/* Select pour l'avis */}
             <FormControl fullWidth required>
-              <InputLabel id="recommendation-label">Avis</InputLabel>
+              <InputLabel id="recommendation-label">Décision</InputLabel>
               <Select
                 labelId="recommendation-label"
                 id="recommendation"
                 value={recommendation}
-                label="Avis"
+                label="Décision"
                 disabled={readOnly}
                 onChange={(e) =>
                   setRecommendation(
                     e.target.value as
-                      | 'accepted_with_validation'
-                      | 'resubmission_required'
-                      | 'rejected'
+                      | 'internal_accepted_after_revision'
+                      | 'internal_to_external'
+                      | 'internal_rejected'
                       | ''
                   )
                 }
               >
                 <MenuItem value="" disabled>
-                  <em>Choisir un avis</em>
+                  <em>Choisir une décision</em>
                 </MenuItem>
                 {recommendationOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -378,7 +298,6 @@ export function EvaluationGridDialog({
         )}
       </DialogActions>
 
-      {/* Confirmation Dialog */}
       <Dialog
         open={confirmDialogOpen}
         onClose={() => setConfirmDialogOpen(false)}

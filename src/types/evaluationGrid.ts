@@ -5,41 +5,55 @@
  * on manuscripts using standardized criteria.
  */
 
+export type EvaluatorType = 'internal' | 'external';
+
+export type EvaluationRecommendation =
+  | 'accepted_with_validation'
+  | 'resubmission_required'
+  | 'rejected'
+  | 'internal_accepted_after_revision'
+  | 'internal_to_external'
+  | 'internal_rejected';
+
 export interface EvaluationGrid {
-  id?: string;                          // ID généré par backend (optionnel pour création)
-  manuscriptId: number;                 // ID du manuscrit
-  evaluatorId: number;                  // ID de l'évaluateur
+  id?: string;
+  manuscriptId: number;
+  evaluatorId: number;
 
-  // Champs auto-remplis (lecture seule dans le formulaire)
-  articleTitle: string;                 // Titre du manuscrit
-  evaluatorName: string;                // Nom de l'évaluateur
+  articleTitle: string;
+  evaluatorName: string;
 
-  // Champs éditables (critères d'évaluation)
-  originalityOfIdeas: string;           // Originalité des idées et des conclusions
-  methodologyRigor: string;             // Pertinence et rigueur de la méthode
-  theoreticalApproach: string;          // Recours à des études empiriques et approche théorique
-  presentationClarity: string;          // Soin dans la présentation et clarté
-  strengths: string;                    // Points forts
-  weaknesses: string;                   // Points faibles
-  suggestions: string;                  // Suggestions pour améliorer le texte
+  originalityOfIdeas?: string;
+  methodologyRigor?: string;
+  theoreticalApproach?: string;
+  presentationClarity?: string;
+  strengths?: string;
+  weaknesses?: string;
+  suggestions?: string;
 
-  // Avis final (select)
-  recommendation: 'accepted_with_validation' | 'resubmission_required' | 'rejected';
+  editorialLineFit?: string;
+  globalOpinion?: string;
 
-  // Métadonnées
-  createdAt?: string;                   // ISO 8601
-  updatedAt?: string;                   // ISO 8601
-  submittedAt?: string | null;          // Date de soumission finale (null si brouillon)
+  recommendation: EvaluationRecommendation;
+
+  createdAt?: string;
+  updatedAt?: string;
+  submittedAt?: string | null;
 }
 
-// Request pour créer/mettre à jour
 export interface SaveEvaluationGridRequest {
-  originalityOfIdeas: string;
-  methodologyRigor: string;
-  theoreticalApproach: string;
-  presentationClarity: string;
-  strengths: string;
-  weaknesses: string;
-  suggestions: string;
-  recommendation: 'accepted_with_validation' | 'resubmission_required' | 'rejected';
+  evaluatorType?: EvaluatorType;
+
+  originalityOfIdeas?: string;
+  methodologyRigor?: string;
+  theoreticalApproach?: string;
+  presentationClarity?: string;
+  strengths?: string;
+  weaknesses?: string;
+  suggestions?: string;
+
+  editorialLineFit?: string;
+  globalOpinion?: string;
+
+  recommendation: EvaluationRecommendation;
 }

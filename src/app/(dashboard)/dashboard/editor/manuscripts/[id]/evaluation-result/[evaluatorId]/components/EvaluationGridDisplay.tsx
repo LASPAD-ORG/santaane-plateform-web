@@ -50,6 +50,21 @@ const recommendationConfig = {
     color: 'error' as const,
     icon: <Cancel />,
   },
+  internal_accepted_after_revision: {
+    label: 'Accepté pour évaluation après révisions',
+    color: 'success' as const,
+    icon: <CheckCircle />,
+  },
+  internal_to_external: {
+    label: 'Accepté pour évaluation externe',
+    color: 'info' as const,
+    icon: <Info />,
+  },
+  internal_rejected: {
+    label: 'Refusé',
+    color: 'error' as const,
+    icon: <Cancel />,
+  },
 };
 
 export function EvaluationGridDisplay({ open, onClose, grid }: EvaluationGridDisplayProps) {
