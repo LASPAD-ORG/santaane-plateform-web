@@ -142,7 +142,7 @@ export default function EvaluateManuscriptPage({
 
   // Lit discrètement si la grille de l'interne a été soumise (pour activer le bouton Valider)
   useEffect(() => {
-    if (manuscript?.assignmentStatus !== 'accepted') return;
+    if (manuscript?.assignmentStatus?.toLowerCase() !== 'accepted') return;
     (async () => {
       try {
         const res = await fetch(`/api/manuscripts/${manuscriptId}/evaluation-grid`);
@@ -385,7 +385,7 @@ export default function EvaluateManuscriptPage({
                 <InfoOutlined />
               </IconButton>
             </Tooltip>
-            {manuscript?.assignmentStatus === 'accepted' && (
+            {manuscript?.assignmentStatus?.toLowerCase() === 'accepted' && (
               <Button
                 variant="contained"
                 startIcon={<Assignment />}
@@ -394,14 +394,14 @@ export default function EvaluateManuscriptPage({
                 Grille d&apos;évaluation
               </Button>
             )}
-            {manuscript?.assignmentStatus === 'accepted' && (
+            {manuscript?.assignmentStatus?.toLowerCase() === 'accepted' && (
               <ValidateForExternalButton
                 manuscriptId={parseInt(manuscriptId)}
                 gridSubmitted={gridSubmitted}
                 onValidated={() => router.push('/dashboard/internal-evaluator/manuscripts')}
               />
             )}
-            {manuscript?.assignmentStatus === 'accepted' && (
+            {manuscript?.assignmentStatus?.toLowerCase() === 'accepted' && (
               <Button
                 variant="outlined"
                 startIcon={<Assignment />}
@@ -419,7 +419,7 @@ export default function EvaluateManuscriptPage({
           </Alert>
         )}
 
-        {manuscript?.assignmentStatus !== 'accepted' && (
+        {manuscript?.assignmentStatus?.toLowerCase() !== 'accepted' && (
           <Alert severity="info" sx={{ mt: 2 }}>
             Vous devez accepter la demande d'évaluation pour pouvoir annoter ce manuscrit et accéder à la grille d'évaluation.
           </Alert>
@@ -476,7 +476,7 @@ export default function EvaluateManuscriptPage({
               pdfScaleValue={pdfScaleValue}
               utilsRef={highlighterUtilsRef}
               redactionMasks={redactionMasks}
-              annotationEnabled={manuscript?.assignmentStatus === 'accepted'}
+              annotationEnabled={manuscript?.assignmentStatus?.toLowerCase() === 'accepted'}
             />
           </Box>
         </Box>

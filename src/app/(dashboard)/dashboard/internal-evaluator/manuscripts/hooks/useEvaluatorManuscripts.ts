@@ -20,8 +20,8 @@ export function useEvaluatorManuscripts() {
         console.log(`Manuscrit ${index}:`, {
           id: m.id,
           title: m.title,
-          assignmentStatus: m.assignmentStatus,
-          evaluationStatus: m.evaluationStatus
+          assignmentStatus: (m.assignmentStatus?.toLowerCase() as AssignmentStatus),
+          evaluationStatus: (m.evaluationStatus?.toLowerCase() as EvaluationStatus)
         });
       });
       setManuscripts(response.data);
