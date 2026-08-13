@@ -16,7 +16,7 @@ export function useCreateEvaluator() {
     } catch (error) {
       console.error('Erreur lors de la création de l\'évaluateur:', error);
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || 'Erreur lors de la création de l\'évaluateur';
+        const message = error.response?.data?.detail || error.response?.data?.message || 'Erreur lors de la création de l\'évaluateur';
         showError(message);
       } else {
         showError('Erreur lors de la création de l\'évaluateur');

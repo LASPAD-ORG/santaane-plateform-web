@@ -35,6 +35,7 @@ export interface CreateEvaluatorRequest {
   bio?: string;
   position?: string;
   institution?: string;
+  evaluatorType: 'internal' | 'external';
 }
 
 // Evaluator Manuscript Assignment Types

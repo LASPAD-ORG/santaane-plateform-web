@@ -8,6 +8,7 @@ import {
   Button,
   Box,
   CircularProgress,
+  MenuItem,
 } from '@mui/material';
 import { useCreateEvaluator } from '../hooks/useCreateEvaluator';
 import { CreateEvaluatorRequest } from '@/types/evaluator';
@@ -31,6 +32,7 @@ export default function CreateEvaluatorDialog({
     bio: '',
     position: '',
     institution: '',
+    evaluatorType: 'external',
   });
 
   const handleChange = (field: keyof CreateEvaluatorRequest) => (
@@ -56,6 +58,7 @@ export default function CreateEvaluatorDialog({
         bio: '',
         position: '',
         institution: '',
+        evaluatorType: 'external',
       });
       onSuccess();
       onClose();
@@ -74,6 +77,17 @@ export default function CreateEvaluatorDialog({
         <DialogTitle>Créer un évaluateur</DialogTitle>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2} pt={1}>
+            <TextField
+              select
+              label="Type d'evaluateur"
+              value={formData.evaluatorType}
+              onChange={handleChange('evaluatorType')}
+              fullWidth
+              disabled={loading}
+            >
+              <MenuItem value="external">Evaluateur externe</MenuItem>
+              <MenuItem value="internal">Evaluateur interne</MenuItem>
+            </TextField>
             <TextField
               label="Email"
               type="email"
