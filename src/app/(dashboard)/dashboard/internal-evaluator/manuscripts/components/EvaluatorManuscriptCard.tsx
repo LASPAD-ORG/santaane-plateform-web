@@ -26,6 +26,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useAlertStore } from '@/stores/alertStore';
 import { useRouter } from 'next/navigation';
+import ProposeExternalDialog from '../[id]/evaluate/components/ProposeExternalDialog';
+import { Groups } from '@mui/icons-material';
 
 interface EvaluatorManuscriptCardProps {
   manuscript: EvaluatorManuscript;
@@ -39,6 +41,7 @@ export default function EvaluatorManuscriptCard({
   const router = useRouter();
   const { showSuccess, showError } = useAlertStore();
   const [responding, setResponding] = useState(false);
+  const [proposeOpen, setProposeOpen] = useState(false);
 
   const formatDate = (dateString: string) => {
     try {
@@ -337,19 +340,40 @@ export default function EvaluatorManuscriptCard({
           )}
 
           {/* Actions disponibles uniquement pour les manuscrits acceptés et non terminés */}
-          {manuscript.assignmentStatus === 'accepted' && manuscript.evaluationStatus !== 'completed' && (
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              fullWidth
-              onClick={() => router.push(`/dashboard/internal-evaluator/manuscripts/${manuscript.id}/evaluate`)}
-            >
-              Évaluer
-            </Button>
+          {/* Actions pour les manuscrits acceptés */}
+          {manuscript.assignmentStatus === 'accepted' && (
+            <Stack direction="column" spacing={1}>
+              {manuscript.evaluationStatus !== 'completed' && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  fullWidth
+                  onClick={() => router.push(`/dashboard/internal-evaluator/manuscripts/${manuscript.id}/evaluate`)}
+                >
+                  Évaluer
+                </Button>
+              )}
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                fullWidth
+                startIcon={<Groups />}
+                onClick={() => setProposeOpen(true)}
+              >
+                Proposer des évaluateurs externes
+              </Button>
+            </Stack>
           )}
         </Box>
       </CardContent>
+
+      <ProposeExternalDialog
+        open={proposeOpen}
+        onClose={() => setProposeOpen(false)}
+        manuscriptId={manuscript.id}
+      />
     </Card>
   );
 }
