@@ -11,6 +11,7 @@ import {
   Create as CreateIcon,
   Dashboard as DashboardIcon,
   Groups as GroupsIcon,
+  Gavel as GavelIcon,
   Translate as TranslateIcon,
   People as PeopleIcon,
   School as SchoolIcon,
@@ -197,6 +198,12 @@ export const MENU_ITEMS: MenuItem[] = [
     path: '/dashboard/evaluator/manuscripts',
     icon: ArticleIcon,
     roles: [UserRole.EVALUATOR],
+  },
+  {
+    label: 'Charte',
+    path: '/dashboard/evaluator/charte',
+    icon: GavelIcon,
+    roles: [UserRole.EVALUATOR, UserRole.INTERNAL_EVALUATOR],
   },
 
     {
