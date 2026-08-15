@@ -220,14 +220,18 @@ export default function EvaluatorManuscriptCard({
           variant="body2"
           color="text.secondary"
           mb={2}
-          sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            flex: 1,
-          }}
+          sx={
+            manuscript.assignmentStatus === 'pending'
+              ? { flex: 1 }
+              : {
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  flex: 1,
+                }
+          }
         >
           {manuscript.abstract}
         </Typography>
@@ -260,6 +264,17 @@ export default function EvaluatorManuscriptCard({
               {manuscript.languageName}
             </Typography>
           </Box>
+
+          {manuscript.keywords && (
+            <Box display="flex" alignItems="flex-start" gap={1}>
+              <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+                Mots-cles:
+              </Typography>
+              <Typography variant="caption" fontWeight="500">
+                {manuscript.keywords}
+              </Typography>
+            </Box>
+          )}
         </Box>
 
         <Divider sx={{ my: 2 }} />
@@ -296,19 +311,7 @@ export default function EvaluatorManuscriptCard({
           {/* Boutons d'action pour les manuscrits en attente */}
           {manuscript.assignmentStatus === 'pending' && (
             <Stack direction="column" spacing={1}>
-              {/* Bouton pour consulter le manuscrit (lecture seule) */}
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                fullWidth
-                startIcon={<PictureAsPdf />}
-                onClick={() => router.push(`/dashboard/evaluator/manuscripts/${manuscript.id}/view`)}
-              >
-                Consulter le manuscrit
-              </Button>
-              
-              {/* Boutons Accepter/Refuser */}
+              {/* Boutons Accepter/Refuser (le manuscrit n'est consultable qu'apres acceptation) */}
               <Stack direction="row" spacing={1}>
                 <Button
                   variant="contained"
