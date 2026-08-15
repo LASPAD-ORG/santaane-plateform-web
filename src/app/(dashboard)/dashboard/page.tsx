@@ -6,6 +6,8 @@ import {
   Article as AuthorIcon,
   RateReview as EvaluatorIcon,
   EditNote as EditorIcon,
+  AdminPanelSettings as AdminIcon,
+  Gavel as InternalEvaluatorIcon,
 } from '@mui/icons-material';
 import { useAuthStore } from '@/stores/authStore';
 import { UserRole } from '@/types/auth';
@@ -13,6 +15,8 @@ import PageHeader from '@/components/ui/PageHeader';
 import AuthorDashboardContent from './author/components/AuthorDashboardContent';
 import EvaluatorDashboardContent from './evaluator/components/EvaluatorDashboardContent';
 import EditorDashboardContent from './editor/components/EditorDashboardContent';
+import SuperAdminDashboardContent from './super-admin/components/SuperAdminDashboardContent';
+import InternalEvaluatorDashboardContent from './internal-evaluator/components/InternalEvaluatorDashboardContent';
 
 interface ProfileTab {
   role: UserRole;
@@ -30,6 +34,14 @@ export default function UnifiedDashboardPage() {
     const roles = user.roles || [];
     const list: ProfileTab[] = [];
 
+    if (roles.includes(UserRole.SUPER_ADMIN)) {
+      list.push({
+        role: UserRole.SUPER_ADMIN,
+        label: 'Super Admin',
+        icon: <AdminIcon fontSize="small" />,
+        content: <SuperAdminDashboardContent />,
+      });
+    }
     if (roles.includes(UserRole.EDITOR)) {
       list.push({
         role: UserRole.EDITOR,
@@ -44,6 +56,14 @@ export default function UnifiedDashboardPage() {
         label: 'Évaluateur',
         icon: <EvaluatorIcon fontSize="small" />,
         content: <EvaluatorDashboardContent />,
+      });
+    }
+    if (roles.includes(UserRole.INTERNAL_EVALUATOR)) {
+      list.push({
+        role: UserRole.INTERNAL_EVALUATOR,
+        label: 'Éval. interne',
+        icon: <InternalEvaluatorIcon fontSize="small" />,
+        content: <InternalEvaluatorDashboardContent />,
       });
     }
     if (roles.includes(UserRole.AUTHOR)) {
