@@ -140,7 +140,7 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.EDITOR],
   },
   {
-    label: 'Manuscrits',
+    label: 'Manuscrits (editeur)',
     path: '/dashboard/editor/manuscripts',
     icon: ArticleIcon,
     roles: [UserRole.EDITOR],
@@ -166,7 +166,7 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.AUTHOR],
   },
   {
-    label: 'Manuscrits',
+    label: 'Manuscrits (auteur)',
     path: '/dashboard/author/manuscripts',
     icon: ArticleIcon,
     roles: [UserRole.AUTHOR],
@@ -178,7 +178,7 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.INTERNAL_EVALUATOR],
   },
   {
-    label: 'Manuscrits',
+    label: 'Manuscrits (eval. interne)',
     path: '/dashboard/internal-evaluator/manuscripts',
     icon: ArticleIcon,
     roles: [UserRole.INTERNAL_EVALUATOR],
@@ -193,9 +193,9 @@ export const MENU_ITEMS: MenuItem[] = [
     roles: [UserRole.EVALUATOR],
   },
      {
-    label: 'Manuscrits',
+    label: 'Manuscrits (evaluateur)',
     path: '/dashboard/evaluator/manuscripts',
-    icon: DashboardIcon,
+    icon: ArticleIcon,
     roles: [UserRole.EVALUATOR],
   },
 
@@ -226,14 +226,47 @@ export function getMenuItemsForRoles(userRoles: UserRole[]): MenuItem[] {
 
   // Process in the order of MENU_ITEMS to preserve menu order
   MENU_ITEMS.forEach(menuItem => {
-    // Check if any of the user's roles can access this menu item
     const hasAccess = menuItem.roles.some(role => userRoles.includes(role));
     if (hasAccess) {
       allMenuItems.set(menuItem.path, menuItem);
     }
   });
 
-  return Array.from(allMenuItems.values());
+  const items = Array.from(allMenuItems.values());
+
+  // Un seul "Dashboard" : on garde le premier (selon la priorite des roles)
+  // et on remplace son label par "Tableau de bord", on retire les autres Dashboards.
+  const dashboardPriority = [
+    '/dashboard/super-admin',
+    '/dashboard/editor',
+    '/dashboard/evaluator',
+    '/dashboard/internal-evaluator',
+    '/dashboard/author',
+    '/dashboard/developer',
+  ];
+  const isDashboard = (p: string) => dashboardPriority.includes(p);
+
+  let chosenDashboard: MenuItem | null = null;
+  for (const p of dashboardPriority) {
+    const found = items.find(it => it.path === p);
+    if (found) { chosenDashboard = found; break; }
+  }
+
+  const result: MenuItem[] = [];
+  let dashboardInserted = false;
+  for (const it of items) {
+    if (isDashboard(it.path)) {
+      if (!dashboardInserted && chosenDashboard) {
+        result.push({ ...chosenDashboard, label: 'Tableau de bord', path: '/dashboard' });
+        dashboardInserted = true;
+      }
+      // on saute les autres dashboards
+      continue;
+    }
+    result.push(it);
+  }
+
+  return result;
 }
 
 /**
