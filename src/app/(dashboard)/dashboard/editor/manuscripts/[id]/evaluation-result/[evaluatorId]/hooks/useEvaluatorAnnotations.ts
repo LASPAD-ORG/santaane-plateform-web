@@ -31,9 +31,15 @@ export function useEvaluatorAnnotations({
       setAnnotations(frontendHighlights);
     } catch (err: any) {
       console.error('Error loading evaluator annotations:', err);
-      const errorMsg = 'Erreur lors du chargement des annotations';
-      setError(errorMsg);
-      useAlertStore.getState().showError(errorMsg);
+      const httpStatus = err?.response?.status;
+      const detail = err?.response?.data?.detail;
+      if (httpStatus === 403) {
+        setError(detail || "Les evaluations sont en cours de validation par l'editeur.");
+      } else {
+        const errorMsg = 'Erreur lors du chargement des annotations';
+        setError(errorMsg);
+        useAlertStore.getState().showError(errorMsg);
+      }
       setAnnotations([]);
     } finally {
       setLoading(false);

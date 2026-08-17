@@ -29,9 +29,15 @@ export function useEvaluatorGrid({
       setGrid(data);
     } catch (err: any) {
       console.error('Error loading evaluation grid:', err);
-      const errorMsg = "Erreur lors du chargement de la grille d'évaluation";
-      setError(errorMsg);
-      useAlertStore.getState().showError(errorMsg);
+      const httpStatus = err?.response?.status;
+      const detail = err?.response?.data?.detail;
+      if (httpStatus === 403) {
+        setError(detail || "Les evaluations sont en cours de validation par l'editeur.");
+      } else {
+        const errorMsg = "Erreur lors du chargement de la grille d'evaluation";
+        setError(errorMsg);
+        useAlertStore.getState().showError(errorMsg);
+      }
       setGrid(null);
     } finally {
       setLoading(false);

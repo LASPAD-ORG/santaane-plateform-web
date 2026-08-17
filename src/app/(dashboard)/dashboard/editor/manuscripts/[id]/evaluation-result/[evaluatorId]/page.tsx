@@ -29,6 +29,8 @@ import { useEvaluatorGrid } from './hooks/useEvaluatorGrid';
 import { CommentsSidebar } from '@/app/(dashboard)/dashboard/evaluator/manuscripts/[id]/evaluate/components/CommentsSidebar';
 import { PdfZoomControls } from '@/app/(dashboard)/dashboard/evaluator/manuscripts/[id]/evaluate/components/PdfZoomControls';
 import { EvaluationGridDisplay } from './components/EvaluationGridDisplay';
+import ValidateEvaluationsButton from './components/ValidateEvaluationsButton';
+import { EvaluationGridEditor } from './components/EvaluationGridEditor';
 
 const PdfAnnotator = dynamic(
   () => import('@/app/(dashboard)/dashboard/evaluator/manuscripts/[id]/evaluate/components/PdfAnnotator'),
@@ -69,6 +71,7 @@ export default function EvaluationResultPage({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [proposalsOpen, setProposalsOpen] = useState(false);
   const [gridDialogOpen, setGridDialogOpen] = useState(false);
+  const [gridEditorOpen, setGridEditorOpen] = useState(false);
   const highlighterUtilsRef = React.useRef<any>(null);
 
   // Fetch data using hooks
@@ -207,6 +210,23 @@ export default function EvaluationResultPage({
               Propositions d&apos;évaluateurs externes
             </Button>
 
+            <ValidateEvaluationsButton
+              manuscriptId={manuscriptId}
+              alreadyValidated={manuscript?.evaluationsValidated ?? false}
+              validatedAt={manuscript?.evaluationsValidatedAt}
+              onValidated={fetchManuscript}
+            />
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => setGridEditorOpen(true)}
+              disabled={!grid}
+              sx={{ ml: 1 }}
+            >
+              Modifier la grille
+            </Button>
+
             {isMobile && (
               <IconButton onClick={() => setSidebarOpen(!sidebarOpen)}>
                 {sidebarOpen ? <MenuOpen /> : <Menu />}
@@ -267,6 +287,17 @@ export default function EvaluationResultPage({
           open={gridDialogOpen}
           onClose={() => setGridDialogOpen(false)}
           grid={grid}
+        />
+      )}
+
+      {grid && (
+        <EvaluationGridEditor
+          open={gridEditorOpen}
+          onClose={() => setGridEditorOpen(false)}
+          manuscriptId={manuscriptId}
+          evaluatorId={evaluatorId}
+          grid={grid}
+          onSaved={() => { /* grille rechargee au prochain rendu */ }}
         />
       )}
       <EditorProposedEvaluatorsDialog

@@ -136,11 +136,16 @@ export default function AuthorEvaluationResultPage({
     : 'Chargement...';
 
   const error = annotationsError || gridError;
+  const isPendingValidation = !!error && error.includes('cours de validation');
 
   if (error) {
     return (
       <Box sx={{ p: 4 }}>
-        <Alert severity="error">{error}</Alert>
+        <Alert severity={isPendingValidation ? 'info' : 'error'}>
+          {isPendingValidation
+            ? "Les evaluations de votre manuscrit sont en cours de validation par l'editeur. Vous serez notifie(e) par email des qu'elles seront disponibles."
+            : error}
+        </Alert>
         <Button
           onClick={() => router.back()}
           startIcon={<ArrowBack />}
