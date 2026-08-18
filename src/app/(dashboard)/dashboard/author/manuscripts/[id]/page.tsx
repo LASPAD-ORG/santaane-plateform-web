@@ -35,6 +35,9 @@ import { useManuscriptDetails } from './hooks/useManuscriptDetails';
 import { MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import PdfViewer from './components/PdfViewer';
 import DocxUploadSection from './components/DocxUploadSection';
+import AttachmentsSection from '@/components/attachments/AttachmentsSection';
+import AttachmentRequests from '@/components/attachments/AttachmentRequests';
+import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -42,6 +45,7 @@ export default function ManuscriptDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const currentUserId = useAuthStore((s) => (s.user?.id ? Number(s.user.id) : undefined));
   const { loading, manuscript, refetch } = useManuscriptDetails(id);
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -332,6 +336,13 @@ export default function ManuscriptDetailsPage() {
           </CardContent>
         </Card>
       )}
+
+      <Box sx={{ mt: 3 }}>
+        <AttachmentRequests role="author" manuscriptId={Number(id)} />
+      </Box>
+      <Box sx={{ mt: 3 }}>
+        <AttachmentsSection role="author" manuscriptId={Number(id)} currentUserId={currentUserId} />
+      </Box>
     </Box>
   );
 }

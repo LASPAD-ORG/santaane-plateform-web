@@ -36,6 +36,9 @@ import { useState } from 'react';
 import { useManuscriptStaffDetails } from './hooks/useManuscriptStaffDetails';
 import { MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manuscript';
 import PdfViewer from '../../../author/manuscripts/[id]/components/PdfViewer';
+import AttachmentsSection from '@/components/attachments/AttachmentsSection';
+import AttachmentRequests from '@/components/attachments/AttachmentRequests';
+import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -43,6 +46,7 @@ export default function EditorManuscriptDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const currentUserId = useAuthStore((s) => (s.user?.id ? Number(s.user.id) : undefined));
   const { loading, manuscript, refetch } = useManuscriptStaffDetails(id);
   const [currentTab, setCurrentTab] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -546,6 +550,13 @@ export default function EditorManuscriptDetailsPage() {
           </CardContent>
         </Card>
       )}
+
+      <Box sx={{ mt: 3 }}>
+        <AttachmentsSection role="editor" manuscriptId={Number(id)} currentUserId={currentUserId} />
+      </Box>
+      <Box sx={{ mt: 3 }}>
+        <AttachmentRequests role="editor" manuscriptId={Number(id)} />
+      </Box>
     </Box>
   );
 }
