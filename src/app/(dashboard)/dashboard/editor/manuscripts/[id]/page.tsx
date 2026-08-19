@@ -8,6 +8,7 @@ import {
   Typography,
   CircularProgress,
   Button,
+  Alert,
   Chip,
   Divider,
   IconButton,
@@ -38,6 +39,8 @@ import { MANUSCRIPT_STATUS_LABELS, MANUSCRIPT_STATUS_COLORS } from '@/types/manu
 import PdfViewer from '../../../author/manuscripts/[id]/components/PdfViewer';
 import AttachmentsSection from '@/components/attachments/AttachmentsSection';
 import AttachmentRequests from '@/components/attachments/AttachmentRequests';
+import VersionHistory from '@/components/versions/VersionHistory';
+import { versionService } from '@/services/versionService';
 import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -81,6 +84,20 @@ export default function EditorManuscriptDetailsPage() {
   const handleDownloadInitialDocx = () => {
     if (manuscript?.initialDocxFilename) {
       window.open(`/api/files/download/${manuscript.initialDocxFilename}`, '_blank');
+    }
+  };
+
+  const [cycleLoading, setCycleLoading] = useState(false);
+
+  const handleStartCycle = async () => {
+    try {
+      setCycleLoading(true);
+      await versionService.startEvaluationCycle(Number(id));
+      await refetch();
+    } catch (e) {
+      console.error('Erreur lancement cycle:', e);
+    } finally {
+      setCycleLoading(false);
     }
   };
 
@@ -139,12 +156,34 @@ export default function EditorManuscriptDetailsPage() {
         />
       </Box>
 
+      {/* Banniere : nouvelle version a traiter */}
+      {manuscript.status === 're_submitted' && (
+        <Alert
+          severity="info"
+          sx={{ mb: 3 }}
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              variant="outlined"
+              onClick={handleStartCycle}
+              disabled={cycleLoading}
+            >
+              {cycleLoading ? 'Lancement...' : "Lancer le cycle d'evaluation"}
+            </Button>
+          }
+        >
+          Nouvelle version recue. Anonymisez-la si necessaire (onglet Manuscrit), puis lancez le nouveau cycle d'evaluation externe.
+        </Alert>
+      )}
+
       {/* Onglets */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
           <Tab label="Informations" />
           <Tab label="Auteur" />
           <Tab label="Manuscrit" />
+          <Tab label="Historique des versions" />
         </Tabs>
       </Box>
 
@@ -515,7 +554,7 @@ export default function EditorManuscriptDetailsPage() {
             )}
           </CardContent>
         </Card>
-      ) : (
+      ) : currentTab === 2 ? (
         // Onglet Manuscrit
         <Card elevation={2}>
           <CardContent sx={{ p: 2 }}>
@@ -549,6 +588,9 @@ export default function EditorManuscriptDetailsPage() {
             <PdfViewer pdfUrl={`/api/files/download/${manuscript.pdfFilename}`} />
           </CardContent>
         </Card>
+      ) : (
+        // Onglet Historique des versions
+        <VersionHistory manuscriptId={Number(id)} />
       )}
 
       <Box sx={{ mt: 3 }}>

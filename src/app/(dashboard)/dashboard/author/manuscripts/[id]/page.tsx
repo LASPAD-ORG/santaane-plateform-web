@@ -37,6 +37,7 @@ import PdfViewer from './components/PdfViewer';
 import DocxUploadSection from './components/DocxUploadSection';
 import AttachmentsSection from '@/components/attachments/AttachmentsSection';
 import AttachmentRequests from '@/components/attachments/AttachmentRequests';
+import VersionHistory from '@/components/versions/VersionHistory';
 import { useAuthStore } from '@/stores/authStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -138,6 +139,7 @@ export default function ManuscriptDetailsPage() {
         <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
           <Tab label="Informations" />
           <Tab label="Prévisualisation PDF"  />
+          <Tab label="Historique des versions" />
         </Tabs>
       </Box>
 
@@ -328,13 +330,16 @@ export default function ManuscriptDetailsPage() {
             </Box>
           </CardContent>
         </Card>
-      ) : (
+      ) : currentTab === 1 ? (
         // Onglet Prévisualisation PDF
         <Card elevation={2}>
           <CardContent sx={{ p: 4 }}>
             <PdfViewer pdfUrl={`${API_URL}/api/v1/files/view/${manuscript.pdfFilename}`} />
           </CardContent>
         </Card>
+      ) : (
+        // Onglet Historique des versions
+        <VersionHistory manuscriptId={Number(id)} />
       )}
 
       <Box sx={{ mt: 3 }}>

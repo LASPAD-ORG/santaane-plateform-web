@@ -25,6 +25,9 @@ import {
 } from '@mui/icons-material';
 import { PdfZoomControls } from '../evaluate/components/PdfZoomControls';
 import { ManuscriptDetailsDialog } from '../evaluate/components/ManuscriptDetailsDialog';
+import { Dialog, DialogTitle, DialogContent } from '@mui/material';
+import HistoryIcon from '@mui/icons-material/History';
+import VersionHistory from '@/components/versions/VersionHistory';
 import { useRedactionMasks } from '../evaluate/hooks/useRedactionMasks';
 
 // Chargement dynamique pour éviter les erreurs SSR avec pdfjs
@@ -65,6 +68,7 @@ export default function ViewManuscriptPage({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState({ current: 0, total: 0 });
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   // Hook pour récupérer les masques de redaction (zones anonymisées)
   const {
@@ -281,6 +285,11 @@ export default function ViewManuscriptPage({
                 <InfoOutlined />
               </IconButton>
             </Tooltip>
+            <Tooltip title="Historique des versions">
+              <IconButton onClick={() => setHistoryOpen(true)} color="primary">
+                <HistoryIcon />
+              </IconButton>
+            </Tooltip>
           </Stack>
 
           {/* Barre de progression pour l'export */}
@@ -347,6 +356,13 @@ export default function ViewManuscriptPage({
       </Box>
 
       {/* Dialog des détails du manuscrit */}
+      <Dialog open={historyOpen} onClose={() => setHistoryOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Historique des versions</DialogTitle>
+        <DialogContent dividers>
+          <VersionHistory manuscriptId={Number(manuscriptId)} />
+        </DialogContent>
+      </Dialog>
+
       <ManuscriptDetailsDialog
         open={manuscriptDetailsOpen}
         onClose={() => setManuscriptDetailsOpen(false)}
