@@ -28,6 +28,7 @@ interface PdfRedactorProps {
   pdfScaleValue?: PdfScaleValue;
   utilsRef?: React.MutableRefObject<PdfHighlighterUtils | null>;
   viewAnonymized?: boolean;
+  selectionMode?: 'text' | 'area';
 }
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -121,6 +122,7 @@ export default function PdfRedactor({
   pdfScaleValue,
   utilsRef,
   viewAnonymized = false,
+  selectionMode = 'area',
 }: PdfRedactorProps) {
   const [redactions, setRedactions] = useState<RedactionHighlight[]>(initialRedactions);
   const currentSelectionRef = useRef<PdfSelection | null>(null);
@@ -202,7 +204,7 @@ export default function PdfRedactor({
             pdfDocument={pdfDoc}
             highlights={redactions}
             onSelection={handleSelection}
-            enableAreaSelection={(e) => e.altKey} // Alt+Drag to create redaction zones
+            enableAreaSelection={(e) => selectionMode === 'area' || e.altKey} // Mode Zone: tout drag; Mode Texte: Alt+Drag
             utilsRef={(utils) => {
               highlighterUtilsRef.current = utils;
             }}

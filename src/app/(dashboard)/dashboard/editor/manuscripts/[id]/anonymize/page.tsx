@@ -11,6 +11,8 @@ import {
   Paper,
   Typography,
   Button,
+  ToggleButton,
+  ToggleButtonGroup,
   Alert,
   Chip,
   Stack,
@@ -32,6 +34,8 @@ import {
   Menu,
   MenuOpen,
 } from '@mui/icons-material';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
+import CropSquareIcon from '@mui/icons-material/CropSquare';
 import { RedactionsSidebar } from './components/RedactionsSidebar';
 import { useRedactions } from './hooks/useRedactions';
 import { PdfZoomControls } from '@/app/(dashboard)/dashboard/evaluator/manuscripts/[id]/evaluate/components/PdfZoomControls';
@@ -71,6 +75,7 @@ export default function AnonymizeManuscriptPage({
   const [pdfScaleValue, setPdfScaleValue] = useState<PdfScaleValue>('auto');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [viewAnonymized, setViewAnonymized] = useState(false);
+  const [selectionMode, setSelectionMode] = useState<'text' | 'area'>('area');
   const highlighterUtilsRef = React.useRef<any>(null);
 
   const {
@@ -212,6 +217,22 @@ export default function AnonymizeManuscriptPage({
 
           <Divider orientation="vertical" flexItem />
 
+          <ToggleButtonGroup
+            value={selectionMode}
+            exclusive
+            size="small"
+            onChange={(_, val) => { if (val) setSelectionMode(val); }}
+          >
+            <ToggleButton value="area">
+              <CropSquareIcon fontSize="small" sx={{ mr: 0.5 }} /> Zone
+            </ToggleButton>
+            <ToggleButton value="text">
+              <TextFieldsIcon fontSize="small" sx={{ mr: 0.5 }} /> Texte
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+          <Divider orientation="vertical" flexItem />
+
           <FormControlLabel
             control={
               <Switch
@@ -280,6 +301,7 @@ export default function AnonymizeManuscriptPage({
             pdfScaleValue={pdfScaleValue}
             utilsRef={highlighterUtilsRef}
             viewAnonymized={viewAnonymized}
+            selectionMode={selectionMode}
           />
         </Box>
 

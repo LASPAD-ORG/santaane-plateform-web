@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import {
   Card,
+  Alert,
   CardContent,
   Typography,
   Box,
@@ -281,7 +282,7 @@ export default function ManuscriptCard({ manuscript, onUpdate }: ManuscriptCardP
                 <IconButton
                   size="small"
                   onClick={handleOpenAssignDialog}
-                  disabled={updating || !manuscript.isInternallyValidated}
+                  disabled={updating}
                 >
                   <PersonAdd fontSize="small" />
                 </IconButton>
